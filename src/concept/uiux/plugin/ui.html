@@ -1,0 +1,18 @@
+<!doctype html><html lang="id"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ClipThat · Pembuat UI/UX</title>
+<style>
+*{box-sizing:border-box}body{margin:0;padding:28px;background:#F6F3EC;color:#30352F;font:14px/1.6 Arial,sans-serif}h1{font-size:25px;line-height:1.25;margin:12px 0}p{color:#656A60;margin:12px 0}.eyebrow{color:#426451;font-weight:bold;font-size:12px;letter-spacing:.07em}button{font:inherit;font-weight:600;min-height:44px;border:1px solid #858B7C;border-radius:10px;padding:10px 16px;color:#30352F;background:#FFFCF7;cursor:pointer}button:focus-visible{outline:3px solid #426451;outline-offset:3px}button:disabled{opacity:.6;cursor:default}.primary{background:#426451;border-color:#426451;color:#fff;width:100%;margin-top:12px}.card{background:#FFFCF7;border:1px solid #DDD9CF;border-radius:16px;padding:16px;margin:16px 0}label{display:flex;gap:10px;align-items:start;margin:8px 0}input{accent-color:#426451;margin-top:5px}progress{width:100%;accent-color:#426451;height:10px}#status{white-space:pre-wrap}#status.error{color:#983F32}.actions{display:flex;gap:8px;margin-top:16px}[hidden]{display:none!important}.meta{font-size:12px}#report{word-break:break-word}
+</style>
+<div class="eyebrow">CLIPTHAT · DESKTOP UI/UX</div><h1>Ruang belajar yang lebih tenang.</h1>
+<p>Bangun layar mahasiswa dan dosen, komponen, warna, serta alur prototipe di halaman Figma yang sedang terbuka.</p>
+<div class="card"><strong>Oat cream · Sage · Muted forest</strong><p class="meta">Layer teks, ikon, dan komponen dapat diedit. Data yang ditampilkan adalah contoh. Plugin ini tidak memakai layanan AI atau pembayaran.</p><label><input id="confirm" type="checkbox" checked><span>Tambahkan desain ke halaman yang sedang terbuka. Konten yang sudah ada tetap dipertahankan.</span></label></div>
+<button class="primary" id="build">Buat UI/UX ClipThat</button><progress id="progress" value="0" max="100" hidden></progress><p id="status" aria-live="polite">Siap membuat desain.</p>
+<div class="actions"><button id="report" hidden>Unduh laporan hasil</button><button id="close">Tutup</button></div>
+<script>
+let report;
+const build=document.getElementById('build'),status=document.getElementById('status'),progress=document.getElementById('progress');
+build.onclick=()=>{if(!document.getElementById('confirm').checked){status.textContent='Pilih kotak penambahan desain terlebih dahulu.';return;}build.disabled=true;progress.hidden=false;status.className='';status.textContent='Menyiapkan font dan komponen…';parent.postMessage({pluginMessage:{type:'build'}},'*');};
+document.getElementById('close').onclick=()=>parent.postMessage({pluginMessage:{type:'close'}},'*');
+window.onmessage=event=>{const m=event.data.pluginMessage;if(!m)return;if(m.type==='progress'){progress.value=m.percent;status.textContent=m.message;}if(m.type==='complete'||m.type==='error'){build.disabled=false;report=m.report;status.textContent=m.message;status.className=m.type==='error'?'error':'';progress.value=m.type==='complete'?100:progress.value;if(report)document.getElementById('report').hidden=false;}};
+document.getElementById('report').onclick=()=>{const blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='clipthat-figma-build-report.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+</script></html>

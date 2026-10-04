@@ -37,6 +37,7 @@ Dosen tidak dapat membaca catatan personal, capture pribadi, foto pribadi, atau 
 
 ### 3.1 Keputusan yang sudah dikonfirmasi
 
+- Platform aplikasi adalah **web app desktop** untuk mahasiswa dan dosen.
 - Mahasiswa dapat mengakses aplikasi mandiri, tetapi kelas dimulai dengan keterlibatan dosen.
 - Audio berasal dari perangkat dosen; transkrip tersedia langsung selama kelas.
 - Setelah kelas, transkrip disaring untuk mempertahankan materi pembelajaran dan pengumuman akademik.
@@ -309,7 +310,7 @@ Sinkronisasi dua arah dapat ditinjau setelah arah integrasi dikonfirmasi; belum 
 ## 8. Hal yang belum ditetapkan
 
 - Persetujuan atas asumsi sementara arah sinkronisasi ke tiga layanan.
-- Metode login, platform aplikasi, format unggahan, dan batas ukuran file.
+- Metode login, format unggahan, dan batas ukuran file. Platform telah ditetapkan sebagai web app desktop untuk seluruh pengguna.
 - Target jeda transkrip langsung, waktu pemrosesan, dan jumlah peserta per sesi.
 - Apakah audio disimpan setelah transkripsi, serta masa retensi data aktif. Arsip penghapusan 30 hari berbeda dari masa penyimpanan data aktif.
 - Mekanisme izin perekaman dan penanganan pencabutan izin.

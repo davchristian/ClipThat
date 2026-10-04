@@ -1,0 +1,28 @@
+{
+  "screens": 82,
+  "prototypeLinks": 675,
+  "nodeTypes": {
+    "FRAME": 2364,
+    "TEXT": 2158,
+    "COMPONENT": 25,
+    "COMPONENT_SET": 3,
+    "INSTANCE": 549,
+    "VECTOR": 526,
+    "RECTANGLE": 70
+  },
+  "createdNodes": 5695,
+  "variables": 61,
+  "textStyles": 8,
+  "checks": [
+    "runtime completed with supported API double",
+    "all nodes tracked",
+    "navigation destinations top-level",
+    "variables scoped",
+    "existing content retained",
+    "rerun refused without duplicates",
+    "missing fonts fail before canvas mutation",
+    "partial failure report preserves IDs"
+  ],
+  "warnings": [],
+  "limitation": "API double only; not executed inside Figma"
+}

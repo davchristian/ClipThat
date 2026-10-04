@@ -1,0 +1,30 @@
+const D=ClipThatDesign;
+const C=D.colors;
+let current='s-home',previousFocus;
+const hugWidth=d=>d.kind==='button'?Math.max(68,d.label.length*8.1+36):d.kind==='badge'?d.label.length*8+28:d.kind==='icon'?d.w:120;
+function widths(d,width){const pad=Array.isArray(d.pad)?d.pad[1]:(d.pad||0),inner=width-pad*2,kids=d.children.filter(Boolean);if(d.dir!=='row')return kids.map(k=>typeof k.w==='number'?k.w:k.w==='hug'?Math.min(inner,hugWidth(k)):inner);const fixed=kids.reduce((sum,k)=>sum+(typeof k.w==='number'?k.w:k.w==='hug'?hugWidth(k):0),0),flex=kids.filter(k=>!k.w||k.w==='fill').length,room=inner-fixed-Math.max(0,kids.length-1)*(d.gap||0);return kids.map(k=>typeof k.w==='number'?k.w:k.w==='hug'?hugWidth(k):Math.max(20,room/Math.max(1,flex)));}
+function el(tag,cls){const e=document.createElement(tag);if(cls)e.className=cls;return e;}
+function render(d,width){let e;
+ if(d.kind==='text'){e=el('p','text');e.textContent=d.text;const s=D.type[d.style];Object.assign(e.style,{fontSize:s.size+'px',lineHeight:s.line+'px',fontWeight:s.weight==='Bold'?'700':'400',color:C[d.color]});}
+ else if(d.kind==='button'){e=el('button','button '+d.variant);e.textContent=d.label;e.disabled=!!d.disabled;if(d.target)e.dataset.target=d.target;}
+ else if(d.kind==='badge'){e=el('span','badge');e.textContent=d.label;e.style.background=C[d.tone];e.style.color=C[d.tone==='peach'?'review':d.tone==='errorBg'?'error':'primary'];}
+ else if(d.kind==='input'){e=el('div','input');e.textContent=d.value;e.style.minHeight=d.multiline?'124px':'52px';e.setAttribute('role','textbox');e.setAttribute('aria-readonly','true');}
+ else if(d.kind==='icon'){e=el('div','icon');e.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="'+d.w+'" height="'+d.h+'" viewBox="0 0 24 24"><path d="'+D.icons[d.icon]+'" fill="none" stroke="'+C[d.color]+'" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';width=d.w;e.style.height=d.h+'px';}
+ else if(d.kind==='divider'){e=el('div','divider');e.style.background=C[d.color];}
+ else if(d.kind==='meter'){e=el('div');e.style.cssText='height:10px;background:'+C.sage+';border-radius:8px';const fill=el('div');fill.style.cssText='height:10px;width:'+d.value+'%;background:'+C.primary+';border-radius:8px';e.append(fill);}
+ else if(d.kind==='week'){e=el('div','box');e.style.gap='8px';['Sen\n05','Sel\n06','Rab\n07','Kam\n08','Jum\n09','Sab\n10','Min\n11'].forEach((label,i)=>{const day=el('div','input');day.textContent=label;day.style.cssText='text-align:center;border:0;background:'+C[i===3?'sage':'app']+';width:'+((width-48)/7)+'px;font-size:14px;padding:12px';e.append(day);});}
+ else if(d.kind==='graph'){const children=[];for(const [label,target,selected]of [['Basis dan dimensi',d.edit?'m-graph-edit':'s-graph-basis',d.selected==='basis'],['Representasi matriks',d.edit?'m-graph-edit':'s-graph',d.selected!=='basis'],['Kernel dan image',d.edit?'m-graph-edit':'s-source',false]]){children.push({kind:'box',dir:'row',pad:16,gap:12,radius:12,bg:selected?'sage':'surface',border:selected?'primary':'border',target,children:[{kind:'text',text:label,style:'label',color:selected?'primary':'ink'}]});if(label!=='Kernel dan image')children.push({kind:'text',text:'↓  '+(label==='Basis dan dimensi'?'prasyarat':'berkaitan'),style:'small',color:'muted'});}return render({kind:'box',dir:'column',gap:24,pad:20,radius:16,bg:'app',children},width);}
+ else if(d.kind==='board')return render({kind:'box',dir:'column',pad:32,gap:20,radius:16,bg:'sage',children:[{kind:'text',text:'Papan · Transformasi linear',style:'label',color:'primary'},{kind:'text',text:'T(u + v) = T(u) + T(v)',style:'title',color:'ink'},{kind:'text',text:'[T] = [ T(b₁)   T(b₂) ]',style:'title',color:'ink'},{kind:'text',text:'Koordinat ditulis terhadap basis tujuan.',style:'body',color:'muted'}]},width);
+ else if(d.kind==='box'){
+   e=el('div','box');const [py,px]=Array.isArray(d.pad)?d.pad:[d.pad||0,d.pad||0];Object.assign(e.style,{flexDirection:d.dir==='row'?'row':'column',gap:(d.gap||0)+'px',padding:py+'px '+px+'px',background:d.bg?C[d.bg]:'transparent',borderRadius:(d.radius||0)+'px',alignItems:d.align==='center'?'center':'flex-start',justifyContent:d.justify==='center'?'center':'flex-start'});if(d.border)e.style.boxShadow='inset 0 0 0 1px '+C[d.border];if(d.h)e.style.height=d.h+'px';if(d.minH)e.style.minHeight=d.minH+'px';const sizes=widths(d,width);d.children.filter(Boolean).forEach((child,i)=>e.append(render(child,sizes[i])));if(d.target){e.dataset.target=d.target;e.tabIndex=0;e.setAttribute('role','button');}}
+ else throw Error('Unknown node '+d.kind);
+ e.style.width=Math.max(1,width)+'px';e.dataset.kind=d.kind;return e;
+}
+function closeModal(){document.getElementById('overlay').hidden=true;document.getElementById('dialog').replaceChildren();previousFocus?.focus();}
+function show(id){if(id==='@close'){closeModal();return;}const s=D.screens.find(s=>s.id===id);if(!s)throw Error('Screen missing '+id);if(s.modal){previousFocus=document.activeElement;document.getElementById('dialog').replaceChildren(render(D.tree(s),640));document.getElementById('overlay').hidden=false;document.querySelector('#dialog button')?.focus();return;}closeModal();current=id;document.getElementById('picker').value=id;document.getElementById('screen').replaceChildren(render(D.tree(s),1440));window.scrollTo(0,0);}
+for(const s of D.screens){const option=el('option');option.value=s.id;option.textContent=(s.role==='lecturer'?'Dosen':'Mahasiswa')+' · '+s.title+(s.modal?' [dialog]':s.state?' [state]':'');document.getElementById('picker').append(option);}
+document.getElementById('picker').onchange=e=>show(e.target.value);
+document.getElementById('student').onclick=()=>show('s-home');document.getElementById('lecturer').onclick=()=>show('d-home');
+document.addEventListener('click',e=>{const t=e.target.closest('[data-target]');if(t)show(t.dataset.target);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();if(e.key==='Enter'&&e.target.matches('.box[data-target]'))show(e.target.dataset.target);});
+document.getElementById('overlay').onclick=e=>{if(e.target.id==='overlay')closeModal();};show('s-home');
