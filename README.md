@@ -1,1 +1,1 @@
-"# ClipThat" 
+# ClipThat
