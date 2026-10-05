@@ -1,18 +1,52 @@
-<!doctype html><html lang="id"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ClipThat · Pembuat UI/UX</title>
+<!doctype html>
+<html lang="id">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ClipThat · Semua Layar Desktop v3</title>
 <style>
-*{box-sizing:border-box}body{margin:0;padding:28px;background:#F6F3EC;color:#30352F;font:14px/1.6 Arial,sans-serif}h1{font-size:25px;line-height:1.25;margin:12px 0}p{color:#656A60;margin:12px 0}.eyebrow{color:#426451;font-weight:bold;font-size:12px;letter-spacing:.07em}button{font:inherit;font-weight:600;min-height:44px;border:1px solid #858B7C;border-radius:10px;padding:10px 16px;color:#30352F;background:#FFFCF7;cursor:pointer}button:focus-visible{outline:3px solid #426451;outline-offset:3px}button:disabled{opacity:.6;cursor:default}.primary{background:#426451;border-color:#426451;color:#fff;width:100%;margin-top:12px}.card{background:#FFFCF7;border:1px solid #DDD9CF;border-radius:16px;padding:16px;margin:16px 0}label{display:flex;gap:10px;align-items:start;margin:8px 0}input{accent-color:#426451;margin-top:5px}progress{width:100%;accent-color:#426451;height:10px}#status{white-space:pre-wrap}#status.error{color:#983F32}.actions{display:flex;gap:8px;margin-top:16px}[hidden]{display:none!important}.meta{font-size:12px}#report{word-break:break-word}
+*{box-sizing:border-box}body{margin:0;padding:24px;background:#F6F3EC;color:#30352F;font:14px/1.55 Arial,sans-serif}h1{font-size:24px;line-height:1.3;margin:12px 0}p{margin:12px 0;color:#656A60}.eyebrow{font-size:12px;letter-spacing:.06em;font-weight:bold;color:#426451}button,select{font:inherit;border:1px solid #858B7C;border-radius:10px;padding:10px 12px;min-height:44px;background:#FFFCF7;color:#30352F;width:100%}button{cursor:pointer;font-weight:bold;margin:5px 0}button:focus-visible,select:focus-visible{outline:3px solid #426451;outline-offset:2px}button:disabled{opacity:.6;cursor:default}.primary{background:#426451;border-color:#426451;color:#fff}.row{display:flex;gap:8px}label{display:block;font-weight:bold;margin:16px 0 8px}progress{width:100%;accent-color:#426451}#status{white-space:pre-wrap}#status.error{color:#983F32}.small{font-size:12px}[hidden]{display:none!important}details{margin-top:16px}summary{cursor:pointer}#ready{border-top:1px solid #DDD9CF;padding-top:12px}
 </style>
-<div class="eyebrow">CLIPTHAT · DESKTOP UI/UX</div><h1>Ruang belajar yang lebih tenang.</h1>
-<p>Bangun layar mahasiswa dan dosen, komponen, warna, serta alur prototipe di halaman Figma yang sedang terbuka.</p>
-<div class="card"><strong>Oat cream · Sage · Muted forest</strong><p class="meta">Layer teks, ikon, dan komponen dapat diedit. Data yang ditampilkan adalah contoh. Plugin ini tidak memakai layanan AI atau pembayaran.</p><label><input id="confirm" type="checkbox" checked><span>Tambahkan desain ke halaman yang sedang terbuka. Konten yang sudah ada tetap dipertahankan.</span></label></div>
-<button class="primary" id="build">Buat UI/UX ClipThat</button><progress id="progress" value="0" max="100" hidden></progress><p id="status" aria-live="polite">Siap membuat desain.</p>
-<div class="actions"><button id="report" hidden>Unduh laporan hasil</button><button id="close">Tutup</button></div>
+<div class="eyebrow">CLIPTHAT · DESKTOP · V3.1</div>
+<h1 id="heading">Menyiapkan seluruh layar…</h1>
+<p id="status" aria-live="polite">Desain otomatis dibuat di page baru dalam file ini. Tunggu sampai proses selesai.</p>
+<progress id="progress" max="100" value="0" aria-label="Kemajuan pembuatan layar"></progress>
+<button id="retry" class="primary" hidden>Coba lagi</button>
+<div id="ready" hidden>
+  <div class="row"><button data-focus="all">Semua layar</button><button data-focus="main">Layar utama</button></div>
+  <button class="primary" data-focus="s-home">Lihat Beranda mahasiswa</button>
+  <button data-focus="d-home">Lihat Beranda dosen</button>
+  <label for="screen">Buka layar lain</label>
+  <select id="screen"><option value="">Pilih layar…</option></select>
+  <p class="small" id="hint">Semua layar ada di kanvas. Pilih nama layar di sini untuk melihatnya lebih dekat.</p>
+  <button id="present">Coba layar ini di Present</button>
+</div>
+<details id="details" hidden><summary>Laporan pembuatan</summary><button id="download">Unduh laporan</button><p class="small">Laporan mencatat jumlah layar, koneksi, dan pesan kegagalan. Data UI adalah contoh.</p></details>
+<button id="close">Tutup</button>
 <script>
-let report;
-const build=document.getElementById('build'),status=document.getElementById('status'),progress=document.getElementById('progress');
-build.onclick=()=>{if(!document.getElementById('confirm').checked){status.textContent='Pilih kotak penambahan desain terlebih dahulu.';return;}build.disabled=true;progress.hidden=false;status.className='';status.textContent='Menyiapkan font dan komponen…';parent.postMessage({pluginMessage:{type:'build'}},'*');};
-document.getElementById('close').onclick=()=>parent.postMessage({pluginMessage:{type:'close'}},'*');
-window.onmessage=event=>{const m=event.data.pluginMessage;if(!m)return;if(m.type==='progress'){progress.value=m.percent;status.textContent=m.message;}if(m.type==='complete'||m.type==='error'){build.disabled=false;report=m.report;status.textContent=m.message;status.className=m.type==='error'?'error':'';progress.value=m.type==='complete'?100:progress.value;if(report)document.getElementById('report').hidden=false;}};
-document.getElementById('report').onclick=()=>{const blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='clipthat-figma-build-report.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
-</script></html>
+let report,screenList=[];
+const byId=id=>document.getElementById(id);
+const send=message=>parent.postMessage({pluginMessage:message},'*');
+function busy(value){document.querySelectorAll('#ready button,#ready select').forEach(el=>el.disabled=value);}
+function showScreens(screens){
+  screenList=screens;byId('ready').hidden=!screens.length;
+  const select=byId('screen');select.replaceChildren(new Option('Pilih layar…',''));
+  for(const kind of ['Layar utama','Variasi','Dialog'])for(const role of ['student','lecturer']){const matches=screenList.filter(s=>s.kind===kind&&s.role===role);if(!matches.length)continue;const group=document.createElement('optgroup');group.label=kind+' · '+(role==='student'?'Mahasiswa':'Dosen');for(const screen of matches)group.appendChild(new Option(screen.title,screen.id));select.appendChild(group);}
+}
+document.querySelectorAll('[data-focus]').forEach(button=>button.onclick=()=>{busy(true);send({type:'focus',id:button.dataset.focus});});
+byId('screen').onchange=event=>{if(event.target.value){busy(true);send({type:'focus',id:event.target.value});}};
+byId('retry').onclick=()=>{byId('retry').hidden=true;byId('status').className='';byId('progress').hidden=false;byId('status').textContent='Menyiapkan seluruh layar…';send({type:'retry'});};
+byId('present').onclick=()=>{busy(true);send({type:'present'});};
+byId('close').onclick=()=>send({type:'close'});
+window.onmessage=event=>{
+  const message=event.data.pluginMessage;if(!message)return;
+  if(message.type==='progress'){byId('progress').value=message.percent;byId('status').textContent=message.message;}
+  if(message.type==='complete'){
+    report=message.report;showScreens(message.screens);byId('heading').textContent='Seluruh layar sudah tersedia.';byId('status').textContent=message.message;byId('status').className='';byId('progress').hidden=true;byId('details').hidden=false;busy(false);
+  }
+  if(message.type==='focused'){busy(false);const screen=screenList.find(s=>s.id===message.id);byId('screen').value=screen?screen.id:'';byId('hint').textContent=screen?'Kanvas menampilkan '+screen.title+'. Untuk mencoba tombol UI, klik “Coba layar ini di Present”, lalu tombol ▶ di Figma.':'Grid terlihat di kanvas. Pilih layar dari daftar untuk memperbesar.';}
+  if(message.type==='error'){report=message.report;showScreens(message.screens||[]);byId('heading').textContent='Proses belum selesai.';byId('status').textContent=message.message;byId('status').className='error';byId('progress').hidden=true;byId('retry').hidden=false;byId('details').hidden=!report;busy(false);}
+};
+byId('download').onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(report,null,2)],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download='clipthat-v3-report.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+send({type:'ready'});
+</script>
+</html>

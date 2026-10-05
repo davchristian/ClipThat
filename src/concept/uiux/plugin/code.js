@@ -40,7 +40,7 @@ const ClipThatDesign = (() => {
   const two=(a,b)=>row([box(a,{w:736}),box(b,{w:376})],{align:'start',gap:24});
   const section=(title,subtitle)=>box([txt(title,'heading'),subtitle&&txt(subtitle,'small','muted')],{gap:4});
   const linkrow=(title,detail,target,ico='file')=>row([box([icon(ico)],{w:44,h:44,bg:'sage',radius:12,align:'center',justify:'center'}),box([txt(title,'label'),txt(detail,'small','muted')],{gap:2}),btn('Buka',target,'ghost')],{gap:14});
-  const transcript=(time,text,selected=false)=>box([row([txt(time,'caption','muted',{w:80}),selected&&badge('Ditandai untuk review','peach')]),txt(text,'reading'),row([btn(selected?'✓ Bingung':'Bingung',selected?'s-live':'s-bookmarked','ghost'),btn('Review nanti',selected?'s-live':'s-reviewmarked','ghost')],{gap:8})],{pad:20,bg:selected?'peach':'surface',radius:12,gap:12});
+  const transcript=(time,text,selected=false)=>box([row([txt(time,'caption','muted',{w:80}),selected&&badge('Ditandai untuk review','peach')]),txt(text,'reading'),row([btn(selected?'✓ Bingung':'Bingung',selected?'s-live':time==='00:17:00'?'s-bookmarked-first':'s-bookmarked','ghost'),btn('Review nanti',selected?'s-live':time==='00:17:00'?'s-reviewmarked-first':'s-reviewmarked','ghost')],{gap:8})],{pad:20,bg:selected?'peach':'surface',radius:12,gap:12});
   const paragraph='Untuk menentukan matriks transformasi, kita melihat citra setiap vektor basis. Koordinat hasilnya ditulis terhadap basis pada ruang tujuan.';
   const privacy=()=>row([icon('lock','muted',16),txt('Hanya untukmu. Dosen tidak melihat catatan pribadimu.','caption','muted')],{gap:8});
   const tabs=(active,lecturer=false)=>row((lecturer?[
@@ -58,9 +58,10 @@ const ClipThatDesign = (() => {
       state==='captured'&&notice('90 detik terakhir tersimpan','Lanjut ikuti kelas. Rangkuman dan draf pertanyaan bisa dibuka nanti.','sage','s-capture'),
       state==='offline'&&notice('Transkrip sedang terputus','Bagian yang sudah muncul tetap tersimpan. Coba sambungkan kembali.','errorBg','s-live'),
       two([card([row([section('Transkrip langsung','Audio dari perangkat dosen'),badge('00:18:30')]),divider(),
-        transcript('00:17:00','Suatu pemetaan disebut linear jika memenuhi sifat penjumlahan dan perkalian skalar.'),
+        transcript('00:17:00','Suatu pemetaan disebut linear jika memenuhi sifat penjumlahan dan perkalian skalar.',state==='bookmarked-first'),
         transcript('00:17:45',paragraph,state==='bookmarked'),
         state==='reviewmarked'&&notice('Review nanti tersimpan','Bagian 00:17:45 ditambahkan ke panduan review pribadimu.','peach'),
+        state==='reviewmarked-first'&&notice('Review nanti tersimpan','Bagian 00:17:00 ditambahkan ke panduan review pribadimu.','peach'),
         row([icon('mic','muted',16),txt(state==='offline'?'Menunggu sambungan…':'Mendengarkan pembahasan berikutnya…','small','muted')],{gap:8})],{gap:16})],
       [card([badge('TANGKAP MOMEN'),txt('Nggak perlu mencatat semuanya.','heading'),txt('Simpan pembahasan 90 detik terakhir untuk kamu pahami lagi nanti.','body','muted'),btn('Capture 90 detik','s-captured','primary',{w:'fill'}),txt('Transkrip tersimpan langsung. Pertanyaan tidak dikirim otomatis.','caption','muted')],{bg:'sage',border:null}),
        card([section('Ada yang ingin ditanyakan?'),txt('Pertanyaanmu anonim bagi dosen dan teman sekelas.','small','muted'),btn('Buka pertanyaan kelas','s-questions','secondary',{w:'fill'}),divider(),btn('Tambah foto papan','s-photo','ghost',{w:'fill'}),btn('Koleksi pribadiku','s-collection','ghost',{w:'fill'})]),privacy()])];
@@ -85,9 +86,10 @@ const ClipThatDesign = (() => {
     const dosen=role==='lecturer';
     return [intro('ALJABAR LINEAR · PERTEMUAN 05','Pertanyaan kelas','Tetap bisa dibaca dan dijawab setelah kelas selesai.',btn(dosen?'Kembali ke kontrol kelas':'Kembali ke kelas',dosen?'d-live':'s-live','secondary')),
       state==='sent'&&notice('Pertanyaanmu sudah terkirim','Identitasmu disembunyikan. Capture tetap pribadi.'),
-      two([card([row([badge(state==='answered'?'Sudah dijawab':'Belum dijawab',state==='answered'?'sage':'peach'),txt('00:18:30 · Anonim','caption','muted')]),txt('Bagaimana menentukan koordinat citra vektor pada basis yang berbeda?','heading'),
+      two([card([row([badge(['answered','oral'].includes(state)?'Sudah dijawab':'Belum dijawab',['answered','oral'].includes(state)?'sage':'peach'),txt('00:18:30 · Anonim','caption','muted')]),txt('Bagaimana menentukan koordinat citra vektor pada basis yang berbeda?','heading'),
         state==='answered'&&box([txt('Jawaban Dr. Nadia','label','primary'),txt('Nyatakan citra vektor sebagai kombinasi linear dari vektor basis tujuan. Koefisiennya adalah koordinat yang kita gunakan.','body')],{bg:'sage',pad:16,radius:12}),
-        dosen?row([btn('Tulis jawaban','m-answer','primary'),btn('Sudah dijawab lisan','d-answered','secondary')]):btn(state==='supported'?'✓ Didukung · 9':'Saya juga ingin tahu · 8',state==='supported'?'s-questions':'s-supported','secondary')]),
+        state==='oral'&&notice('Ditandai sudah dijawab lisan','Jawaban tertulis belum ditambahkan.'),
+        dosen?row([btn('Tulis jawaban','m-answer','primary'),btn('Sudah dijawab lisan','d-answered-oral','secondary')]):btn(state==='supported'?'✓ Didukung · 9':'Saya juga ingin tahu · 8',state==='supported'?'s-questions':'s-supported','secondary')]),
         card([badge('Sudah dijawab'),txt('Apakah pemetaan x → Ax selalu linear?','heading'),txt('Dr. Nadia: Ya, perkalian matriks memenuhi penjumlahan dan perkalian skalar. Penambahan konstanta perlu diperiksa kembali.','body','muted')])],
       [card(dosen?[icon('chat'),txt('Bantu menjernihkan pembahasan.','heading'),txt('Jawaban tertulis tetap tersedia untuk peserta yang membaca ulang setelah kelas.','body','muted'),txt('Nama pengirim dan pemberi dukungan tidak ditampilkan.','small','muted')]:[section('Tanyakan dengan nyaman'),field('Pertanyaanmu','Bagian apa yang ingin kamu pahami lagi?',{multiline:true}),btn('Kirim pertanyaan anonim','s-question-sent','primary',{w:'fill'}),txt('Terlihat oleh dosen dan peserta kelas, tanpa nama pengirim.','caption','muted')])])];
   }
@@ -102,19 +104,19 @@ const ClipThatDesign = (() => {
     section('01   Apa itu transformasi linear?'),txt('Transformasi linear mempertahankan dua operasi: penjumlahan vektor dan perkalian skalar.','reading'),box([txt('T(u + v) = T(u) + T(v)','heading','primary'),txt('T(cu) = cT(u)','heading','primary')],{bg:'sage',pad:20,radius:12}),btn('Sumber · slide 3 / 00:05:00','s-source','ghost'),divider(),
     section('02   Representasi matriks'),txt('Kolom-kolom matriks diperoleh dari koordinat citra setiap vektor basis, terhadap basis pada ruang tujuan.','reading'),row([badge('Kamu menandai bagian ini','peach'),btn('Ulangi bagian ini','s-review','ghost')]),divider(),section('03   Kernel dan image'),txt('Kernel berisi vektor yang dipetakan ke nol. Image adalah himpunan vektor hasil pemetaan.','reading')
   ])],[card([section('Dalam catatan ini'),btn('Definisi dan sifat linear','s-source','ghost',{w:'fill'}),btn('Representasi matriks','s-review','ghost',{w:'fill'}),btn('Hubungan antar konsep','s-graph','ghost',{w:'fill'})]),card([badge('DARI PENGUMUMAN KELAS','peach'),txt('Ada agenda untuk ditinjau.','heading'),txt('Kuis Aljabar Linear · tanggal perlu kamu konfirmasi.','small','muted'),btn('Tinjau agenda','s-agenda-review','secondary',{w:'fill'})]),btn('Koleksi pribadiku','s-collection','ghost',{w:'fill'})])]);
-  student('s-review','Review personal',[8,17,18,25],[intro('REVIEW SAYA','Pelan-pelan, kita ulang bagian ini.','Berdasarkan bagian yang kamu tandai di kelas terakhir.'),two([card([badge('01 · DARI PENANDAMU','peach'),txt('Koordinat pada basis yang berbeda','heading'),txt('Sebuah vektor tetap sama, tetapi angka koordinatnya bergantung pada basis yang kita pilih.','reading'),divider(),txt('Mulai dari konsep sebelumnya','label','primary'),txt('Ingat kembali cara menulis vektor sebagai kombinasi linear. Koefisien kombinasi itulah koordinatnya.','body'),row([btn('Buka materi basis','s-material','primary'),btn('Lihat cuplikan kelas','s-source','secondary')])]),card([badge('02 · HUBUNGKAN KE MATERI TERBARU'),txt('Dari basis ke matriks transformasi','heading'),txt('Terapkan transformasi pada setiap vektor basis. Susun koordinat hasilnya menjadi kolom matriks.','body'),btn('Lihat peta hubungan','s-graph','secondary')])],[card([icon('bookmark'),section('Titik awal review'),txt('Bingung · 00:17:45\nPertemuan 5 · Transformasi linear','small','muted'),divider(),txt('Materi sebelumnya','label'),txt('Pertemuan 4 · Basis dan dimensi','small','muted'),btn('Buka catatan kelas','s-notes','ghost',{w:'fill'})]),privacy(),card([section('Sumber tambahan'),txt('Penjelasan dari luar kelas ditandai terpisah dan disertai tautan sumber.','small','muted'),btn('Contoh referensi','m-reference','ghost')])])]);
+  student('s-review','Review personal',[8,17,18,25],[intro('REVIEW SAYA','Pelan-pelan, kita ulang bagian ini.','Berdasarkan bagian yang kamu tandai di kelas terakhir.'),two([card([badge('01 · DARI PENANDAMU','peach'),txt('Koordinat pada basis yang berbeda','heading'),txt('Sebuah vektor tetap sama, tetapi angka koordinatnya bergantung pada basis yang kita pilih.','reading'),divider(),txt('Mulai dari konsep sebelumnya','label','primary'),txt('Ingat kembali cara menulis vektor sebagai kombinasi linear. Koefisien kombinasi itulah koordinatnya.','body'),row([btn('Buka materi basis','s-material-basis','primary'),btn('Lihat cuplikan kelas','s-source','secondary')])]),card([badge('02 · HUBUNGKAN KE MATERI TERBARU'),txt('Dari basis ke matriks transformasi','heading'),txt('Terapkan transformasi pada setiap vektor basis. Susun koordinat hasilnya menjadi kolom matriks.','body'),btn('Lihat peta hubungan','s-graph','secondary')])],[card([icon('bookmark'),section('Titik awal review'),txt('Bingung · 00:17:45\nPertemuan 5 · Transformasi linear','small','muted'),divider(),txt('Materi sebelumnya','label'),txt('Pertemuan 4 · Basis dan dimensi','small','muted'),btn('Buka catatan kelas','s-notes','ghost',{w:'fill'})]),privacy(),card([section('Sumber tambahan'),txt('Penjelasan dari luar kelas ditandai terpisah dan disertai tautan sumber.','small','muted'),btn('Contoh referensi','m-reference','ghost')])])]);
   function graphBody(edit=false,selected='matrix'){
     return [intro('ALJABAR LINEAR · PETA MATERI',edit?'Hubungkan konsep dengan tepat.':'Lihat bagaimana materi saling terkait.',edit?'Koreksi dosen menjadi rujukan untuk review berikutnya.':'Mulai dari materi sebelumnya, lalu ikuti hubungannya.'),tabs(edit?'d-graph':'s-graph',edit),two([
       card([row([badge('Pertemuan 4'),badge('Pertemuan 5','peach')]),{kind:'graph',edit,selected,w:'fill',h:320},txt('Pilih subbab untuk membaca detail, materi, dan sumber pembahasannya.','small','muted')])],
-    [card([badge(selected==='basis'?'PERTEMUAN 04':'PERTEMUAN 05'),txt(selected==='basis'?'Basis dan dimensi':'Representasi matriks','heading'),txt(selected==='basis'?'Dasar untuk menyatakan koordinat vektor dalam suatu ruang.':'Menggunakan citra vektor basis untuk membentuk matriks transformasi.','body','muted'),divider(),txt('Hubungan','label'),txt('Basis dan dimensi → Representasi matriks','small'),btn('Buka materi terkait','s-material','secondary',{w:'fill'}),btn('Lihat transkrip sumber','s-source','ghost',{w:'fill'}),edit&&btn('Koreksi hubungan','m-graph-edit','primary',{w:'fill'})])])];
+    [card([badge(selected==='basis'?'PERTEMUAN 04':'PERTEMUAN 05'),txt(selected==='basis'?'Basis dan dimensi':selected==='kernel'?'Kernel dan image':'Representasi matriks','heading'),txt(selected==='basis'?'Dasar untuk menyatakan koordinat vektor dalam suatu ruang.':selected==='kernel'?'Kernel memuat vektor yang dipetakan ke nol; image memuat seluruh hasil pemetaan.':'Menggunakan citra vektor basis untuk membentuk matriks transformasi.','body','muted'),divider(),txt('Hubungan','label'),txt(selected==='kernel'?'Representasi matriks → Kernel dan image':'Basis dan dimensi → Representasi matriks','small'),btn('Buka materi terkait',edit?'d-courses':selected==='basis'?'s-material-basis':'s-material','secondary',{w:'fill'}),btn('Lihat transkrip sumber',edit?'d-source':selected==='kernel'?'s-source-kernel':'s-source','ghost',{w:'fill'}),edit&&btn('Tambah / koreksi hubungan','m-graph-edit','primary',{w:'fill'})])])];
   }
   student('s-graph','Peta materi',[19],graphBody());
   student('s-graph-basis','Detail basis',[19],graphBody(false,'basis'),{state:true});
-  function agendaBody(updated=false){return [intro('AGENDA AKADEMIK','Ada waktu untuk bersiap.','Agenda yang sudah kamu konfirmasi, dalam satu tempat.',btn('Tambah agenda','m-agenda-manual','primary')),
+  function agendaBody(updated=false,own=false){return [intro('AGENDA AKADEMIK','Ada waktu untuk bersiap.','Agenda yang sudah kamu konfirmasi, dalam satu tempat.',btn('Tambah agenda','m-agenda-manual','primary')),
     two([card([row([section('Oktober 2026'),badge('Kamis, 8 Oktober')]),{kind:'week',w:'fill'},divider(),
-      row([box([txt(updated?'10':'08','title','primary'),txt('OKT','caption','muted')],{w:56,align:'center'}),box([txt('Kuis Aljabar Linear','heading'),txt('09.00 · Basis dan transformasi linear','small','muted'),badge('Terkonfirmasi')],{gap:6}),btn('Detail','m-agenda-detail','secondary')]),divider(),
+      row([box([txt(own?'09':updated?'10':'08','title','primary'),txt('OKT','caption','muted')],{w:56,align:'center'}),box([txt('Kuis Aljabar Linear','heading'),txt((own?'10.00':'09.00')+' · Basis dan transformasi linear','small','muted'),badge('Terkonfirmasi')],{gap:6}),btn('Detail',own?'m-agenda-detail-own':updated?'m-agenda-detail-updated':'m-agenda-detail','secondary')]),divider(),
       row([box([txt('12','title','primary'),txt('OKT','caption','muted')],{w:56,align:'center'}),box([txt('Pengumpulan tugas matriks','label'),txt('23.59 · Aljabar Linear','small','muted')],{gap:6}),btn('Edit','m-agenda-manual','ghost')])]),
-      card([badge('PERLU DITINJAU','peach'),section(updated?'Usulan sudah ditangani':'Kuis dipindah ke 10 Oktober?'),txt(updated?'Kuis yang sama sudah diperbarui, tanpa agenda duplikat.':'Dosen menyebut perubahan jadwal dalam kelas. Jadwalmu belum berubah sampai kamu menyetujuinya.','body','muted'),btn(updated?'Lihat agenda':'Tinjau perubahan',updated?'m-agenda-detail':'s-agenda-review','secondary')])],
+      card([badge(updated||own?'SELESAI DITINJAU':'PERLU DITINJAU','peach'),section(own?'Jadwal pribadimu dipertahankan':updated?'Usulan sudah ditangani':'Kuis dipindah ke 10 Oktober?'),txt(own?'9 Oktober 2026 pukul 10.00 tetap menjadi jadwalmu.':updated?'Kuis yang sama sudah diperbarui, tanpa agenda duplikat.':'Dosen menyebut perubahan jadwal dalam kelas. Jadwalmu belum berubah sampai kamu menyetujuinya.','body','muted'),btn(updated||own?'Lihat agenda':'Tinjau perubahan',own?'m-agenda-detail-own':updated?'m-agenda-detail-updated':'s-agenda-review','secondary')])],
     [card([section('Siapkan bahan belajarmu'),txt('Basis dan dimensi → Transformasi linear','body'),btn('Buka panduan review','s-review','primary',{w:'fill'})]),card([section('Pengingat dan kalender'),txt('Pengingat: 1 hari sebelumnya','small','muted'),btn('Atur pengingat','m-reminder','secondary',{w:'fill'}),divider(),txt('Google Calendar · terhubung','small','primary'),btn('Kelola integrasi','s-integrations','ghost',{w:'fill'})])])];}
   student('s-agenda','Agenda',[21,22,24,25,30],agendaBody());
   student('s-agenda-updated','Agenda diperbarui',[23],agendaBody(true),{state:true});
@@ -143,7 +145,7 @@ const ClipThatDesign = (() => {
   lecturer('d-live','Kontrol kelas',[5,6,7,13,14],[intro('ALJABAR LINEAR · PERTEMUAN 05','Kelas sedang berlangsung.','Transformasi linear · Kode ALG05',badge('● Audio aktif · 00:18:30')),two([
     card([row([section('Transkrip kelas'),badge('32 peserta')]),txt('00:17:45','caption','muted'),txt(paragraph,'reading'),divider(),txt('00:18:15','caption','muted'),txt('Koordinat hasil pemetaan ditulis terhadap basis pada ruang tujuan.','reading')]),
     card([row([icon('mic'),txt('Mikrofon perangkat ini terhubung','label','primary')]),txt('Pengambilan audio berhenti setelah Anda mengakhiri kelas.','small','muted'),btn('Akhiri kelas','m-end','danger')])
-  ],[card([badge('PERTANYAAN KELAS','peach'),txt('Bagaimana menentukan koordinat citra pada basis yang berbeda?','heading'),txt('8 dukungan · Anonim','small','muted'),btn('Tulis jawaban','m-answer','primary',{w:'fill'}),btn('Sudah dijawab lisan','d-answered','secondary',{w:'fill'}),btn('Lihat semua pertanyaan','d-questions','ghost',{w:'fill'})]),notice('Catatan mahasiswa tetap pribadi','Panel ini menampilkan pertanyaan yang dikirim ke kelas.')])]);
+  ],[card([badge('PERTANYAAN KELAS','peach'),txt('Bagaimana menentukan koordinat citra pada basis yang berbeda?','heading'),txt('8 dukungan · Anonim','small','muted'),btn('Tulis jawaban','m-answer','primary',{w:'fill'}),btn('Sudah dijawab lisan','d-answered-oral','secondary',{w:'fill'}),btn('Lihat semua pertanyaan','d-questions','ghost',{w:'fill'})]),notice('Catatan mahasiswa tetap pribadi','Panel ini menampilkan pertanyaan yang dikirim ke kelas.')])]);
   lecturer('d-questions','Pertanyaan dosen',[12,13,14],questionsBody('normal','lecturer'));
   lecturer('d-answered','Pertanyaan dijawab',[14],questionsBody('answered','lecturer'),{state:true});
   lecturer('d-results','Rekap kelas',[14,26,28],[intro('ALJABAR LINEAR · PERTEMUAN 05','Bagian mana yang perlu diulang?','Rekap kelas · tanpa identitas penanda dan catatan pribadi.'),tabs('d-results',true),two([
@@ -153,8 +155,8 @@ const ClipThatDesign = (() => {
     card([section('Tindak lanjut kelas'),row([btn('Jawab pertanyaan','d-questions','primary'),btn('Periksa peta materi','d-graph','secondary')])])
   ],[card([badge('SESI SELESAI'),section('Hasil pembahasan'),txt('Catatan, peta materi, dan draf agenda telah disiapkan.','body','muted'),btn('Kelola materi sesi','d-courses','secondary',{w:'fill'})]),card([section('Pengelolaan data'),txt('Data bersama yang dihapus masuk arsip selama 30 hari.','small','muted'),btn('Arsipkan sesi','m-archive','ghost',{w:'fill'}),btn('Buka arsip','d-archive','ghost',{w:'fill'})])])]);
   lecturer('d-graph','Koreksi peta',[19,20],graphBody(true));
-  lecturer('d-archive','Arsip penghapusan',[28,29],[intro('PENGELOLAAN DATA','Arsip penghapusan','Pulihkan data bersama sebelum masa arsip 30 hari berakhir.'),card([row([icon('archive'),box([txt('Pertemuan 3 · Ruang vektor','heading'),txt('Aljabar Linear · sesi, materi, pertanyaan, dan peta','small','muted')],{gap:6}),badge('Tersisa 27 hari','peach'),btn('Pulihkan sesi','d-restored','primary')]),divider(),txt('Sesi dipulihkan terlebih dahulu agar sumber di dalamnya kembali dapat diakses peserta.','small','muted')]),notice('Salinan pribadi tetap milik mahasiswa','Pengarsipan sumber tidak menghapus catatan dan kutipan capture yang sudah mereka simpan.'),btn('Kembali ke mata kuliah','d-courses','secondary')]);
-  lecturer('d-restored','Sesi dipulihkan',[29],[intro('ARSIP PENGHAPUSAN','Sesi berhasil dipulihkan.','Peserta yang sebelumnya berhak dapat mengakses kembali sumber kelas.'),notice('Ruang vektor kembali tersedia','Materi, pertanyaan, dan peta sesi ikut dipulihkan.'),card([linkrow('Pertemuan 3 · Ruang vektor','Aljabar Linear · dapat diakses kembali','d-courses','book')]),btn('Buka mata kuliah','d-courses','primary')],{state:true});
+  lecturer('d-archive','Arsip penghapusan',[28,29],[intro('PENGELOLAAN DATA','Arsip penghapusan','Pulihkan data bersama sebelum masa arsip 30 hari berakhir.'),card([row([icon('archive'),box([txt('Pertemuan 5 · Transformasi linear','heading'),txt('Aljabar Linear · sesi, materi, pertanyaan, dan peta','small','muted')],{gap:6}),badge('Tersisa 30 hari','peach'),btn('Pulihkan sesi','d-restored','primary')]),divider(),txt('Sesi dipulihkan terlebih dahulu agar sumber di dalamnya kembali dapat diakses peserta.','small','muted')]),notice('Salinan pribadi tetap milik mahasiswa','Pengarsipan sumber tidak menghapus catatan dan kutipan capture yang sudah mereka simpan.'),btn('Kembali ke mata kuliah','d-courses','secondary')]);
+  lecturer('d-restored','Sesi dipulihkan',[29],[intro('ARSIP PENGHAPUSAN','Sesi berhasil dipulihkan.','Peserta yang sebelumnya berhak dapat mengakses kembali sumber kelas.'),notice('Transformasi linear kembali tersedia','Materi, pertanyaan, dan peta sesi ikut dipulihkan.'),card([linkrow('Pertemuan 5 · Transformasi linear','Aljabar Linear · dapat diakses kembali','d-courses','book')]),btn('Buka mata kuliah','d-courses','primary')],{state:true});
   lecturer('d-courses','Materi dan sesi',[2,28],[intro('MATA KULIAH','Aljabar Linear','Kelas A · Dr. Nadia',btn('Buat sesi','d-setup','primary')),two([
     card([section('Sesi dan materi'),linkrow('05 · Transformasi linear','Disiapkan · Transformasi-linear.pdf','d-setup','book'),divider(),linkrow('04 · Basis dan dimensi','Selesai · catatan dan peta tersedia','d-results','book'),divider(),linkrow('03 · Ruang vektor','Selesai · materi tersedia','d-results','book')]),
     card([section('Kelola satu sumber'),txt('Transformasi-linear.pdf · Pertemuan 5','body'),row([btn('Unggah materi','m-upload','primary'),btn('Arsipkan berkas','m-archive-source','ghost')])])
@@ -168,7 +170,7 @@ const ClipThatDesign = (() => {
   modal('m-archive-source','Arsipkan berkas materi?','Hanya Transformasi-linear.pdf yang disembunyikan. Seluruh sesi tidak ikut diarsipkan.',[notice('Pemulihan tersedia 30 hari','Tidak dapat mengarsipkan sumber saat sesi sedang berlangsung.','peach')],[btn('Batal','@close'),btn('Arsipkan berkas','d-source-archived','danger')],[28],'lecturer');
   modal('m-graph-edit','Koreksi hubungan subbab','Perubahan akan terlihat bagi peserta dan dipakai untuk panduan review berikutnya.',[field('Dari subbab','Basis dan dimensi'),field('Hubungan','Menjadi prasyarat'),field('Ke subbab','Representasi matriks'),notice('Koreksi dosen dipertahankan','Hasil otomatis berikutnya perlu ditinjau sebelum mengganti koreksi ini.')],[btn('Hapus hubungan','d-graph-removed','danger'),btn('Batal','@close'),btn('Simpan koreksi','d-graph-saved','primary')],[20],'lecturer');
   modal('m-agenda-manual','Atur agenda pribadimu','Perubahan hanya berlaku pada agendamu sendiri.',[field('Judul kegiatan','Pengumpulan tugas matriks'),row([field('Tanggal','12 Oktober 2026'),field('Waktu','23.59')]),field('Mata kuliah','Aljabar Linear'),field('Pengingat','1 hari sebelumnya')],[btn('Batal','@close'),btn('Simpan agenda','s-agenda-updated','primary')],[22,25]);
-  modal('m-agenda-detail','Kuis Aljabar Linear','10 Oktober 2026 · 09.00 · Aljabar Linear',[badge('TERKONFIRMASI'),txt('Cakupan: basis, dimensi, dan transformasi linear.','body'),btn('Buka bahan persiapan','s-review','primary'),btn('Atur pengingat','m-reminder'),btn('Hapus agenda','m-delete-agenda','ghost')],[btn('Tutup','@close')],[25,30]);
+  for(const [id,date]of [['m-agenda-detail','8 Oktober 2026 · 09.00'],['m-agenda-detail-updated','10 Oktober 2026 · 09.00'],['m-agenda-detail-own','9 Oktober 2026 · 10.00']])modal(id,'Kuis Aljabar Linear',date+' · Aljabar Linear',[badge('TERKONFIRMASI'),txt('Cakupan: basis, dimensi, dan transformasi linear.','body'),btn('Buka bahan persiapan','s-review','primary'),btn('Atur pengingat','m-reminder'),btn('Hapus agenda','m-delete-agenda','ghost')],[btn('Tutup','@close')],[25,30]);
   modal('m-delete-agenda','Hapus agenda ini?','Pilih apakah entri yang dibuat ClipThat di tujuan terhubung juga dihapus.',[txt('Entri lain di kalender atau Notion tidak akan diubah.','small','muted'),btn('Hapus dari ClipThat saja','s-agenda-deleted','secondary',{w:'fill'}),btn('Hapus juga di tujuan terhubung','s-agenda-delete-status','danger',{w:'fill'})],[btn('Batal','@close')],[27,30]);
   modal('m-reminder','Pengingat yang sesuai waktumu','Pengingat mengikuti tanggal agenda yang sudah kamu konfirmasi.',[field('Ingatkan saya','1 hari sebelum kegiatan'),txt('Pengingat di kalender tujuan mengikuti pengaturan layanan tersebut.','small','muted')],[btn('Nonaktifkan','s-reminder-off'),btn('Simpan pengingat','s-reminder-saved','primary')],[25]);
   modal('m-integration','Pilih tujuan agenda','Contoh pengaturan koneksi. Prototipe tidak masuk ke akun sungguhan.',[field('Layanan','Google Calendar / Notion / Microsoft Outlook'),field('Akun','Akun kampus'),field('Tujuan','Kalender kuliah / database agenda'),notice('Kirim setelah dikonfirmasi','Agenda tersimpan di ClipThat meskipun pengiriman ke layanan tujuan gagal.')],[btn('Putuskan koneksi','s-disconnected','danger'),btn('Batal','@close'),btn('Simpan tujuan','s-sync-done','primary')],[24]);
@@ -193,14 +195,25 @@ const ClipThatDesign = (() => {
   outcome('s-agenda-deleted','Agenda lokal sudah dihapus.','Entri di tujuan integrasi tetap ada dan tidak lagi menerima pembaruan dari ClipThat.','s-agenda','student',[27,30]);
   student('s-agenda-delete-status','Hasil penghapusan agenda',[30],[intro('PENGELOLAAN AGENDA','Periksa hasil per tujuan.','Agenda di ClipThat sudah dihapus.'),card([row([txt('Google Calendar','label'),badge('Berhasil dihapus')]),divider(),row([txt('Notion','label'),badge('Berhasil dihapus')]),divider(),row([txt('Microsoft Outlook','label'),badge('Gagal · perlu masuk ulang','peach')]),btn('Coba lagi untuk Outlook','m-integration','primary')]),btn('Kembali ke agenda','s-agenda','secondary')],{state:true});
   lecturer('d-processing','Hasil kelas diproses',[5,15,16,17],[intro('KELAS DIAKHIRI','Audio sudah dihentikan.','Catatan dan rekap sedang disiapkan.'),notice('Pertanyaan tetap terbuka','Anda dapat menjawab pertanyaan tanpa menunggu proses ini selesai.'),row([btn('Buka pertanyaan','d-questions','primary'),btn('Lihat contoh rekap selesai','d-results','secondary')])],{state:true});
-  outcome('d-source-archived','Berkas masuk arsip.','Transformasi-linear.pdf disembunyikan dari peserta selama diarsipkan. Sesi lainnya tetap tersedia.','d-archive','lecturer',[28]);
+  outcome('d-source-archived','Berkas masuk arsip.','Transformasi-linear.pdf disembunyikan dari peserta selama diarsipkan. Sesi lainnya tetap tersedia.','d-file-archive','lecturer',[28]);
   outcome('d-graph-saved','Koreksi hubungan tersimpan.','Basis dan dimensi menjadi prasyarat representasi matriks. Koreksi tersedia untuk peserta.','d-graph','lecturer',[20]);
   outcome('d-graph-removed','Hubungan dihapus.','Hubungan yang dipilih dihapus. Kedua subbab dan materinya tetap tersedia.','d-graph','lecturer',[20]);
   outcome('d-uploaded','Materi berhasil diunggah.','Transformasi-linear.pdf kini tersedia pada sesi dan dapat dibuka peserta.','d-setup','lecturer',[2]);
-  student('s-agenda-conflict','Konflik perubahan agenda',[21,23],[intro('TINJAU PERBEDAAN','Jadwal ini pernah kamu ubah.','Pilih nilai yang ingin digunakan. Tidak ada perubahan otomatis.'),card([field('Jadwal yang kamu simpan','9 Oktober 2026 · 10.00'),field('Usulan dari kelas','10 Oktober 2026 · 09.00'),txt('Sumber: pengumuman dosen · 00:42:10','small','muted'),row([btn('Pakai usulan kelas','s-agenda-updated','primary'),btn('Pertahankan milikku','s-agenda','secondary')])])],{state:true});
+  student('s-agenda-conflict','Konflik perubahan agenda',[21,23],[intro('TINJAU PERBEDAAN','Jadwal ini pernah kamu ubah.','Pilih nilai yang ingin digunakan. Tidak ada perubahan otomatis.'),card([field('Jadwal yang kamu simpan','9 Oktober 2026 · 10.00'),field('Usulan dari kelas','10 Oktober 2026 · 09.00'),txt('Sumber: pengumuman dosen · 00:42:10','small','muted'),row([btn('Pakai usulan kelas','s-agenda-updated','primary'),btn('Pertahankan milikku','s-agenda-own','secondary')])])],{state:true});
   student('s-agenda-ambiguous','Tanggal belum jelas',[21],[intro('LENGKAPI AGENDA','Tanggalnya belum disebutkan dengan pasti.','“Kuis kita adakan minggu depan.” · 00:42:10'),card([field('Judul','Kuis Aljabar Linear'),field('Tanggal','Pilih tanggal setelah dikonfirmasi'),notice('Perlu tanggal yang jelas','Draf ini belum disimpan atau dikirim ke kalender.','peach'),row([btn('Simpan',null,'primary',{disabled:true}),btn('Simpan sebagai draf','s-agenda','secondary'),btn('Tanyakan ke dosen','s-questions','ghost')])])],{state:true});
   student('s-photo-error','Timestamp foto tidak valid',[11],[intro('FOTO PRIBADI','Sesuaikan waktu fotonya.','Foto yang dipilih tetap tersedia.'),card([field('Timestamp sesi','00:99:00'),notice('Waktu di luar rentang sesi','Gunakan waktu yang tersedia pada transkrip kelas.','errorBg'),btn('Perbaiki timestamp','s-photo-ready','primary')])],{state:true});
-  student('s-review-empty','Review tanpa penanda',[17],[intro('REVIEW SAYA','Mulai dari ringkasan hari ini.','Kamu belum menandai bagian tertentu pada sesi ini.'),card([section('Transformasi linear'),txt('Baca catatan seluruh kelas atau ulangi basis dan dimensi sebagai konsep terkait.','body'),row([btn('Baca catatan','s-notes','primary'),btn('Materi sebelumnya','s-material')])])],{state:true});
+  student('s-review-empty','Review tanpa penanda',[17],[intro('REVIEW SAYA','Mulai dari ringkasan hari ini.','Kamu belum menandai bagian tertentu pada sesi ini.'),card([section('Transformasi linear'),txt('Baca catatan seluruh kelas atau ulangi basis dan dimensi sebagai konsep terkait.','body'),row([btn('Baca catatan','s-notes','primary'),btn('Materi sebelumnya','s-material-basis')])])],{state:true});
+  student('s-agenda-own','Jadwal pribadi dipertahankan',[23],agendaBody(false,true),{state:true});
+  lecturer('d-answered-oral','Sudah dijawab lisan',[14],questionsBody('oral','lecturer'),{state:true});
+  lecturer('d-source','Transkrip sumber dosen',[7,15],[intro('ALJABAR LINEAR · PERTEMUAN 05','Transkrip pembahasan','Sumber kelas bertimestamp.'),card([txt('00:17:45','caption','muted'),txt(paragraph,'reading'),divider(),txt('00:18:15','caption','muted'),txt('Koordinat ditulis terhadap basis pada ruang tujuan.','reading')]),btn('Kembali ke peta materi','d-graph','primary')],{state:true});
+  outcome('d-archive-expired','Masa arsip sudah berakhir.','Data bersama yang telah dihapus permanen tidak dapat dipulihkan melalui aplikasi. Salinan pribadi mahasiswa tetap tersedia.','d-courses','lecturer',[29],'peach');
+  lecturer('d-file-archive','Arsip satu berkas',[28,29],[intro('ARSIP MATERI','Berkas yang diarsipkan','Sesi tetap tersedia. Hanya sumber yang dipilih disembunyikan.'),card([linkrow('Transformasi-linear.pdf','Pertemuan 5 · tersisa 30 hari','d-file-restored','archive'),btn('Pulihkan berkas','d-file-restored','primary')]),btn('Kembali ke materi','d-courses','secondary')],{state:true});
+  outcome('d-file-restored','Berkas berhasil dipulihkan.','Transformasi-linear.pdf kembali dapat dibuka oleh peserta yang memiliki akses ke sesi.','d-courses','lecturer',[29]);
+  student('s-material-basis','Materi basis dan dimensi',[2,17],[intro('MATERI SEBELUMNYA · PERTEMUAN 04','Basis dan dimensi','Aljabar Linear · contoh materi kelas'),card([section('Vektor yang sama, koordinat yang berbeda'),txt('Basis adalah kumpulan vektor bebas linear yang merentang ruang. Sebuah vektor dapat ditulis sebagai kombinasi linear dari vektor-vektor basis tersebut.','reading'),box([txt('v = c₁b₁ + c₂b₂','title','primary'),txt('Koordinat v pada basis B adalah (c₁, c₂).','body')],{bg:'sage',pad:24,radius:12}),txt('Dimensi ruang adalah banyaknya vektor dalam basis. Konsep ini menjadi bekal untuk representasi matriks transformasi.','reading')]),btn('Kembali ke review','s-review','primary')],{state:true});
+  student('s-graph-kernel','Detail kernel dan image',[19],graphBody(false,'kernel'),{state:true});
+  student('s-source-kernel','Transkrip kernel dan image',[15,19],[intro('SUMBER KELAS · 00:32:00','Kernel dan image','Aljabar Linear · Pertemuan 5'),card([txt('Kernel memuat semua vektor yang dipetakan ke vektor nol. Image adalah himpunan seluruh vektor hasil transformasi.','reading'),badge('00:32:00')]),btn('Kembali ke peta materi','s-graph-kernel','primary')],{state:true});
+  student('s-bookmarked-first','Penanda bagian 00:17:00',[8],liveBody('bookmarked-first'),{state:true});
+  student('s-reviewmarked-first','Review bagian 00:17:00',[8],liveBody('reviewmarked-first'),{state:true});
   function nav(role){return role==='lecturer'?[['home','Beranda','d-home'],['book','Mata kuliah','d-courses'],['chat','Pertanyaan','d-questions'],['archive','Arsip','d-archive']]:[['home','Beranda','s-home'],['book','Mata kuliah','s-courses'],['bookmark','Review saya','s-review'],['calendar','Agenda','s-agenda'],['settings','Integrasi','s-integrations']];}
   function activeFor(s){
     if(s.id==='s-home'||s.id==='d-home')return s.id;
@@ -231,11 +244,12 @@ const ClipThatDesign = (() => {
 if(typeof module!=='undefined')module.exports=ClipThatDesign;
 
 /* Classic local plugin runtime. Bundled after design.js into plugin/code.js. */
+const CLIPTHAT_BUILD_REVISION='desktop-3.1';
 async function buildClipThat(figma, D, progress = () => {}) {
   const page = figma.currentPage;
   const prefix = 'ClipThat UIUX 1.0 / ';
   const created = [], links = [], errors = [], warnings = [], frames = {};
-  const ledger = {version:D.version,pageId:page.id,screenIds:{},componentIds:{},variableIds:{},styleIds:{},createdNodeIds:created,mutatedNodeIds:[],warnings,errors,completed:false};
+  const ledger = {version:D.version,pageId:page.id,pageName:page.name,screenIds:{},componentIds:{},variableIds:{},styleIds:{},createdNodeIds:created,mutatedNodeIds:[],warnings,errors,completed:false,screenCount:0,linkCount:0};
   const track=n=>{created.push(n.id);return n;};
   try {
   // Exact-name discovery never deletes or rewrites existing designs.
@@ -274,7 +288,9 @@ async function buildClipThat(figma, D, progress = () => {}) {
   function bindSpace(node,prop,value){node[prop]=value;const v=vars['space/'+value];if(v)node.setBoundVariable(prop,v);}
   function surface(node,key,border,radius){node.fills=key?[paint(key)]:[];if(border){node.strokes=[paint(border)];node.strokeWeight=1;}if(radius){node.cornerRadius=radius;const v=vars['radius/'+radius];if(v)for(const p of ['topLeftRadius','topRightRadius','bottomLeftRadius','bottomRightRadius'])node.setBoundVariable(p,v);}}
   async function text(parent,str,style='body',color='ink',width=200){
-    const t=track(figma.createText());t.name=str.slice(0,60);t.fontName=D.type[style].weight==='Bold'?selected.bold:selected.regular;t.characters=str;t.textAutoResize='HEIGHT';t.resize(Math.max(1,width),1);await t.setTextStyleIdAsync(styles[style].id);t.fills=[paint(color)];parent.appendChild(t);return t;
+    const t=track(figma.createText());t.name=str.slice(0,60);t.fontName=D.type[style].weight==='Bold'?selected.bold:selected.regular;t.characters=str;await t.setTextStyleIdAsync(styles[style].id);t.resize(Math.max(1,width),D.type[style].line);t.textAutoResize='HEIGHT';t.fills=[paint(color)];parent.appendChild(t);
+    if('layoutMode' in parent&&parent.layoutMode!=='NONE')t.layoutSizingVertical='HUG';
+    return t;
   }
   function frame(parent,name,width,dir='VERTICAL',pad=0,gap=0,bg,border,radius){
     const n=track(figma.createFrame());n.name=name;parent.appendChild(n);n.layoutMode=dir;n.resize(Math.max(1,width),1);
@@ -282,7 +298,7 @@ async function buildClipThat(figma, D, progress = () => {}) {
     const [py,px]=Array.isArray(pad)?pad:[pad,pad];for(const [prop,val]of [['paddingTop',py],['paddingBottom',py],['paddingLeft',px],['paddingRight',px],['itemSpacing',gap]])bindSpace(n,prop,val);
     surface(n,bg,border,radius);return n;
   }
-  const hugWidth=d=>d.kind==='button'?Math.max(68,d.label.length*8.1+36):d.kind==='badge'?d.label.length*7.1+24:d.kind==='icon'?d.w:120;
+  const hugWidth=d=>d.kind==='button'?Math.max(68,d.label.length*8.1+36):d.kind==='badge'?d.label.length*8+28:d.kind==='icon'?d.w:120;
   function widths(d,width){const pad=Array.isArray(d.pad)?d.pad[1]:(d.pad||0),inner=width-pad*2;const kids=(d.children||[]).filter(Boolean);if(d.dir!=='row')return kids.map(k=>typeof k.w==='number'?k.w:k.w==='hug'?Math.min(inner,hugWidth(k)):inner);
     const fixed=kids.reduce((sum,k)=>sum+(typeof k.w==='number'?k.w:k.w==='hug'?hugWidth(k):0),0),flex=kids.filter(k=>!k.w||k.w==='fill').length;
     const room=inner-fixed-Math.max(0,kids.length-1)*(d.gap||0);
@@ -312,30 +328,38 @@ async function buildClipThat(figma, D, progress = () => {}) {
     const label=await text(c,e.state==='Loading'?'Memproses…':'Label tombol','label',e.state==='Disabled'?'muted':['primary','danger'].includes(e.variant)?'surface':e.variant==='ghost'?'primary':'ink',204);label.textAlignHorizontal='CENTER';label.layoutSizingHorizontal='FILL';
     const p=c.addComponentProperty('Label','TEXT',label.characters);label.componentPropertyReferences={characters:p};components['button/'+e.variant+'/'+e.state]={node:c,label:p};
   });
-  for(const variant of ['primary','secondary','ghost','danger']){
-    const normal=components['button/'+variant+'/Default'].node,hover=components['button/'+variant+'/Hover'].node;
-    await normal.setReactionsAsync([{trigger:{type:'ON_HOVER'},actions:[{type:'NODE',destinationId:hover.id,navigation:'CHANGE_TO',transition:null}]}]);
-  }
+  // Hover variants remain editable examples. Navigation must not swap its click target.
   await makeSet('Badge',['sage','peach','errorBg'].map(tone=>({name:'Tone='+tone,tone})),async(c,e)=>{
     c.layoutMode='HORIZONTAL';c.resize(188,30);c.primaryAxisSizingMode='FIXED';c.counterAxisSizingMode='AUTO';surface(c,e.tone,null,10);for(const p of ['paddingTop','paddingBottom'])bindSpace(c,p,6);for(const p of ['paddingLeft','paddingRight'])bindSpace(c,p,12);
-    const label=await text(c,'Tersimpan','caption',e.tone==='peach'?'review':e.tone==='errorBg'?'error':'primary',164);const p=c.addComponentProperty('Label','TEXT','Tersimpan');label.componentPropertyReferences={characters:p};components['badge/'+e.tone]={node:c,label:p};
+    const label=await text(c,'Tersimpan','caption',e.tone==='peach'?'review':e.tone==='errorBg'?'error':'primary',164);label.layoutSizingHorizontal='FILL';const p=c.addComponentProperty('Label','TEXT','Tersimpan');label.componentPropertyReferences={characters:p};components['badge/'+e.tone]={node:c,label:p};
   });
   await makeSet('Field',['Default','Multiline'].map(state=>({name:'State='+state,state})),async(c,e)=>{
     c.layoutMode='VERTICAL';c.resize(320,56);c.primaryAxisSizingMode='AUTO';c.counterAxisSizingMode='FIXED';c.minHeight=e.state==='Multiline'?124:52;surface(c,'surface','control',12);for(const p of ['paddingTop','paddingBottom'])bindSpace(c,p,14);for(const p of ['paddingLeft','paddingRight'])bindSpace(c,p,16);
     const label=await text(c,'Nilai input','body','ink',288);label.layoutSizingHorizontal='FILL';const p=c.addComponentProperty('Value','TEXT','Nilai input');label.componentPropertyReferences={characters:p};components['input/'+e.state]={node:c,label:p};
   });
-  async function instance(parent,master,value,width){const n=track(master.node.createInstance());for(const child of n.findAll(()=>true))created.push(child.id);parent.appendChild(n);n.resize(Math.max(20,width),n.height);n.setProperties({[master.label]:value});return n;}
+  async function instance(parent,master,value,width){
+    const n=track(master.node.createInstance());for(const child of n.findAll(()=>true))created.push(child.id);parent.appendChild(n);n.resize(Math.max(20,width),n.height);
+    // combineAsVariants can consolidate same-named properties; resolve the live instance API.
+    const props=n.componentProperties;const label=Object.prototype.hasOwnProperty.call(props,master.label)?master.label:Object.keys(props).find(key=>props[key].type==='TEXT'&&/^(Label|Value)#/.test(key));
+    if(!label)throw Error('Properti teks instance tidak ditemukan: '+master.node.name);
+    n.setProperties({[label]:value});
+    if(n.layoutMode==='HORIZONTAL')n.counterAxisSizingMode='AUTO';
+    else if(n.layoutMode==='VERTICAL')n.primaryAxisSizingMode='AUTO';
+    return n;
+  }
   async function render(d,parent,width){
     if(!d)return null;let n;
     if(d.kind==='text')n=await text(parent,d.text,d.style,d.color,width);
     else if(d.kind==='button'){
-      const state=d.disabled?'Disabled':'Default';n=await instance(parent,components['button/'+d.variant+'/'+state],d.label,width);
+      const state=d.disabled?'Disabled':'Default';
+      n=frame(parent,'Action / '+d.label,width,'HORIZONTAL');
+      await instance(n,components['button/'+d.variant+'/'+state],d.label,width);
       if(d.target&&!d.disabled)links.push({node:n,target:d.target});
     }else if(d.kind==='badge')n=await instance(parent,components['badge/'+d.tone],d.label,width);
     else if(d.kind==='input')n=await instance(parent,components['input/'+(d.multiline?'Multiline':'Default')],d.value,width);
     else if(d.kind==='icon'){
       const svg='<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="'+D.icons[d.icon]+'" fill="none" stroke="'+D.colors[d.color]+'" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-      n=track(figma.createNodeFromSvg(svg));parent.appendChild(n);n.name='Icon / '+d.icon;n.resize(d.w,d.h);for(const child of n.findAll(()=>true)){created.push(child.id);if('strokes'in child&&child.strokes.length)child.strokes=[paint(d.color)];}
+      n=track(figma.createNodeFromSvg(svg));parent.appendChild(n);n.name='Icon / '+d.icon;n.rescale(d.w/n.width);for(const child of n.findAll(()=>true)){created.push(child.id);if('strokes'in child&&child.strokes.length)child.strokes=[paint(d.color)];}
     }else if(d.kind==='divider'){
       n=track(figma.createRectangle());parent.appendChild(n);n.resize(width,1);n.fills=[paint(d.color)];
     }else if(d.kind==='meter'){
@@ -344,7 +368,7 @@ async function buildClipThat(figma, D, progress = () => {}) {
       n=frame(parent,'Week',width,'HORIZONTAL',0,8);for(const [i,label]of ['Sen\n05','Sel\n06','Rab\n07','Kam\n08','Jum\n09','Sab\n10','Min\n11'].entries()){const day=frame(n,label,(width-48)/7,'VERTICAL',12,0,i===3?'sage':'app',null,12);const t=await text(day,label,'small',i===3?'primary':'muted',(width-48)/7-24);t.textAlignHorizontal='CENTER';}
     }else if(d.kind==='graph'){
       n=frame(parent,'Concept map',width,'VERTICAL',20,24,'app',null,16);
-      for(const [label,target,selected]of [['Basis dan dimensi',d.edit?'m-graph-edit':'s-graph-basis',d.selected==='basis'],['Representasi matriks',d.edit?'m-graph-edit':'s-graph',d.selected!=='basis'],['Kernel dan image',d.edit?'m-graph-edit':'s-source',false]]){
+      for(const [label,target,selected]of [['Basis dan dimensi',d.edit?'m-graph-edit':'s-graph-basis',d.selected==='basis'],['Representasi matriks',d.edit?'m-graph-edit':'s-graph',d.selected==='matrix'],['Kernel dan image',d.edit?'m-graph-edit':'s-graph-kernel',d.selected==='kernel']]){
         const node=frame(n,label,width-40,'HORIZONTAL',16,12,selected?'sage':'surface',selected?'primary':'border',12);await text(node,label,'label',selected?'primary':'ink',width-72);links.push({node,target});
         if(label!=='Kernel dan image')await text(n,'↓  '+(label==='Basis dan dimensi'?'prasyarat':'berkaitan'),'small','muted',width-40);
       }
@@ -373,9 +397,14 @@ async function buildClipThat(figma, D, progress = () => {}) {
   for(const [i,s]of D.screens.entries()){
     progress(Math.round(15+i/D.screens.length*65),'Membuat '+s.title+' ('+(i+1)+'/'+D.screens.length+')');
     const root=await render(D.tree(s),page,s.modal?640:1440);root.name=prefix+s.id+' / '+s.title;root.x=right+(i%4)*1640;root.y=originY+Math.floor(i/4)*1600;
-    if(!s.modal){root.resize(1440,1000);root.counterAxisSizingMode='FIXED';root.primaryAxisSizingMode='FIXED';root.clipsContent=true;root.overflowDirection='VERTICAL_SCROLLING';}
-    frames[s.id]=root;ledger.screenIds[s.id]=root.id;
+    if(!s.modal){root.resize(1440,1000);root.counterAxisSizingMode='FIXED';root.primaryAxisSizingMode='FIXED';root.clipsContent=true;root.overflowDirection='VERTICAL';}
+    root.setPluginData('clipthat-screen',s.id);frames[s.id]=root;ledger.screenIds[s.id]=root.id;ledger.screenCount++;
   }
+  // Reveal the actual screens before optional prototype setup can fail.
+  await arrangeClipThatScreens(figma,D);
+  const edge=Math.max(...Object.values(frames).map(n=>n.x+n.width))+240;
+  foundation.x=edge;foundation.y=160;cover.x=edge;cover.y=foundation.y+foundation.height+120;index.x=edge;index.y=cover.y+cover.height+120;
+  page.selection=[];
   progress(82,'Menghubungkan navigasi dan dialog…');
   for(const link of links){
     const dest=frames[link.target];let action;
@@ -383,24 +412,86 @@ async function buildClipThat(figma, D, progress = () => {}) {
     else if(!dest)throw Error('Tujuan prototype tidak ditemukan: '+link.target);
     else action={type:'NODE',destinationId:dest.id,navigation:D.screens.find(s=>s.id===link.target).modal?'OVERLAY':'NAVIGATE',transition:null,resetScrollPosition:true};
     await link.node.setReactionsAsync([{trigger:{type:'ON_CLICK'},actions:[action]}]);
+    link.node.setPluginData('clipthat-target',link.target);
+    if(!link.node.reactions.some(r=>r.trigger?.type==='ON_CLICK'&&(r.actions||(r.action?[r.action]:[])).some(a=>a.type===action.type&&(action.type==='CLOSE'||a.destinationId===action.destinationId))))throw Error('Koneksi tombol tidak tersimpan: '+link.node.name);
+    ledger.linkCount++;
   }
   page.flowStartingPoints=[...page.flowStartingPoints,{nodeId:frames['s-home'].id,name:'ClipThat · Mahasiswa'},{nodeId:frames['d-home'].id,name:'ClipThat · Dosen'},{nodeId:index.id,name:'ClipThat · Skenario'}];ledger.mutatedNodeIds.push(page.id);
-  const nodeTypes={};for(const id of created){const n=await figma.getNodeByIdAsync(id);if(n)nodeTypes[n.type]=(nodeTypes[n.type]||0)+1;}
-  const allText=page.findAllWithCriteria({types:['TEXT']}).filter(n=>created.includes(n.id));
-  for(const t of allText)if(t.width<1||t.height<1)errors.push('Invalid text bounds: '+t.id);
+  const createdSet=new Set(created),nodeTypes={};const createdNodes=page.findAll(n=>createdSet.has(n.id));
+  for(const n of createdNodes)nodeTypes[n.type]=(nodeTypes[n.type]||0)+1;
+  const allText=createdNodes.filter(n=>n.type==='TEXT');
+  for(const t of allText)if(t.width<1||t.height<10)errors.push('Tinggi teks tidak valid: '+t.id);
+  for(const n of createdNodes){
+    if(!('children'in n)||n.type==='COMPONENT_SET'||n.parent?.type==='PAGE')continue;
+    for(const child of n.children)if(child.visible!==false&&child.x>=0&&child.x+child.width>n.width+2)warnings.push('Periksa lebar '+child.id+' dalam '+n.id+' ('+n.name+')');
+  }
   ledger.coverId=cover.id;ledger.scenarioId=index.id;ledger.screenCount=D.screens.length;ledger.linkCount=links.length;ledger.nodeTypes=nodeTypes;ledger.completed=errors.length===0;
-  page.selection=[cover];figma.viewport.scrollAndZoomIntoView([cover]);progress(100,'Desain selesai dibuat.');
+  progress(100,'Seluruh layar selesai dibuat.');
   return ledger;
-  } catch(error) { ledger.errors.push(error.message);error.report=ledger;throw error; }
+  } catch(error) { if(Object.keys(frames).length){page.selection=[];figma.viewport.scrollAndZoomIntoView(Object.values(frames));}ledger.errors.push(error.message);error.report=ledger;throw error; }
 }
-if(typeof figma!=='undefined'){
-  figma.showUI(__html__,{width:420,height:620});let busy=false;
+async function arrangeClipThatScreens(figma,D) {
+  const page=figma.currentPage,prefix='ClipThat UIUX 1.0 / ';
+  const ordered=[...D.screens.filter(s=>!s.state&&!s.modal&&s.role==='student'),...D.screens.filter(s=>!s.state&&!s.modal&&s.role==='lecturer'),...D.screens.filter(s=>s.state&&!s.modal),...D.screens.filter(s=>s.modal)];
+  const screens=ordered.map(s=>page.children.find(n=>n.name===prefix+s.id+' / '+s.title)).filter(Boolean);
+  if(!screens.length)throw Error('Layar ClipThat tidak ditemukan di halaman ini. Buka halaman yang berisi desain terlebih dahulu.');
+  const baseX=Math.min(...screens.map(n=>n.x)),baseY=Math.min(...screens.map(n=>n.y));
+  const columns=5,columnGap=1560;let rowY=baseY;
+  for(let start=0;start<screens.length;start+=columns){const row=screens.slice(start,start+columns);row.forEach((node,index)=>{node.x=baseX+index*columnGap;node.y=rowY;});rowY+=Math.max(...row.map(n=>n.height))+180;}
+  figma.viewport.scrollAndZoomIntoView(screens);
+  return {screenCount:screens.length,columns,rows:Math.ceil(screens.length/columns)};
+}
+async function openClipThat(figma,D,progress=()=>{}) {
+  const previous=figma.root.children.find(p=>p.getPluginData('clipthat-build')===CLIPTHAT_BUILD_REVISION&&p.getPluginData('clipthat-status')==='complete');
+  if(previous){
+    await figma.setCurrentPageAsync(previous);
+    const saved=JSON.parse(previous.getPluginData('clipthat-report'));
+    const frames=[];
+    for(const screen of D.screens){const node=await figma.getNodeByIdAsync(saved.screenIds[screen.id]);if(!node||node.parent!==previous)throw Error('Layar '+screen.title+' pada hasil sebelumnya sudah dipindahkan atau dihapus. Buka kembali page hasil ClipThat untuk memeriksanya.');frames.push(node);}
+    previous.selection=[];figma.viewport.scrollAndZoomIntoView(frames);
+    return {...saved,reused:true,completed:true};
+  }
+  let page;
+  try{page=figma.createPage();}catch(e){throw Error('Figma tidak dapat menambahkan page UI/UX di file ini: '+e.message);}
+  const baseName='ClipThat — UI UX Desktop',existingNames=new Set(figma.root.children.filter(p=>p!==page).map(p=>p.name));
+  let name=baseName,number=2;while(existingNames.has(name))name=baseName+' ('+(number++)+')';
+  page.name=name;page.setPluginData('clipthat-build',CLIPTHAT_BUILD_REVISION);page.setPluginData('clipthat-status','building');
+  await figma.setCurrentPageAsync(page);
+  try{
+    const report=await buildClipThat(figma,D,progress);
+    if(!report.completed){const error=Error('Pemeriksaan desain belum lolos. '+report.errors.join('; '));error.report=report;throw error;}
+    report.pageName=page.name;report.buildRevision=CLIPTHAT_BUILD_REVISION;
+    page.setPluginData('clipthat-report',JSON.stringify({pageId:page.id,pageName:page.name,screenIds:report.screenIds,screenCount:report.screenCount,linkCount:report.linkCount,fonts:report.fonts,buildRevision:CLIPTHAT_BUILD_REVISION}));
+    page.setPluginData('clipthat-status','complete');return report;
+  }catch(e){page.setPluginData('clipthat-status','incomplete');throw e;}
+}
+function startClipThatUI(figma,D,html){
+  figma.showUI(html,{width:400,height:600});let busy=false,report=null,selectedScreen='s-home';
+  async function focus(ids){
+    if(!report)throw Error('Tunggu sampai pembuatan layar selesai.');
+    const page=await figma.getNodeByIdAsync(report.pageId);if(!page||page.type!=='PAGE')throw Error('Page UI/UX tidak ditemukan.');
+    await figma.setCurrentPageAsync(page);
+    const frames=[];for(const id of ids){if(!report.screenIds[id])throw Error('Layar tidak dikenal: '+id);const node=await figma.getNodeByIdAsync(report.screenIds[id]);if(!node||node.parent!==page)throw Error('Layar tidak ditemukan: '+id);frames.push(node);}
+    page.selection=frames.length===1?frames:[];figma.viewport.scrollAndZoomIntoView(frames);
+  }
   figma.ui.onmessage=async msg=>{
     if(msg.type==='close'){figma.closePlugin();return;}
-    if(msg.type!=='build'||busy)return;busy=true;
-    try{const report=await buildClipThat(figma,ClipThatDesign,(percent,message)=>figma.ui.postMessage({type:'progress',percent,message}));figma.ui.postMessage({type:'complete',report,message:report.screenCount+' layar/dialog dan '+report.linkCount+' koneksi dibuat. Font: '+report.fonts.regular.family+'. Buka Present untuk mencoba prototype. Unduh laporan untuk menyimpan ID hasil.'});}
-    catch(e){figma.ui.postMessage({type:'error',report:e.report,message:'Pembuatan berhenti: '+e.message+'\nKonten yang sudah ada tidak dihapus. Jika ada hasil parsial, gunakan halaman kosong untuk mencoba ulang.'});}
+    if(busy)return;busy=true;
+    try{
+      if(msg.type==='ready'||msg.type==='retry'){
+        report=await openClipThat(figma,D,(percent,message)=>figma.ui.postMessage({type:'progress',percent,message}));
+        figma.ui.postMessage({type:'complete',report,screens:D.screens.map(s=>({id:s.id,title:s.title,role:s.role,kind:s.modal?'Dialog':s.state?'Variasi':'Layar utama'})),message:report.screenCount+' layar dan dialog tersedia di page “'+report.pageName+'”.'});
+      }else if(msg.type==='focus'){
+        const ids=msg.id==='all'?D.screens.filter(s=>report?.screenIds?.[s.id]).map(s=>s.id):msg.id==='main'?D.screens.filter(s=>!s.modal&&!s.state&&report?.screenIds?.[s.id]).map(s=>s.id):[msg.id];
+        await focus(ids);if(ids.length===1)selectedScreen=ids[0];figma.ui.postMessage({type:'focused',id:msg.id});
+      }else if(msg.type==='present'){
+        if(D.screens.find(s=>s.id===selectedScreen)?.modal)selectedScreen='s-home';
+        await focus([selectedScreen]);figma.closePlugin('Layar dipilih. Klik tombol ▶ di kanan atas Figma untuk mencoba prototype.');
+      }
+    }
+    catch(e){report=e.report||report;const screens=D.screens.filter(s=>report?.screenIds?.[s.id]).map(s=>({id:s.id,title:s.title,role:s.role,kind:s.modal?'Dialog':s.state?'Variasi':'Layar utama'}));figma.ui.postMessage({type:'error',report,screens,message:e.message+'\n'+(screens.length?screens.length+' layar sudah dibuat dan dapat dibuka lewat daftar. ':'')+'Unduh laporan di bawah jika perlu diperiksa.'});}
     finally{busy=false;}
   };
 }
-if(typeof module!=='undefined')module.exports=buildClipThat;
+if(typeof figma!=='undefined')startClipThatUI(figma,ClipThatDesign,__html__);
+if(typeof module!=='undefined'){module.exports=buildClipThat;module.exports.open=openClipThat;module.exports.startUI=startClipThatUI;}

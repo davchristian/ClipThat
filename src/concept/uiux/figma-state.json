@@ -6,18 +6,111 @@
   "planKey": "team::1566467785453107495",
   "requestedPlatform": "Desktop web app for students and lecturers",
   "palette": "Oat cream, soft ivory, muted forest, sage and peach",
-  "status": "file_created_canvas_blocked_by_starter_mcp_limit",
-  "canvasContentCreated": false,
+  "status": "scroll_enum_fixed_awaiting_figma_rerun",
+  "canvasContentCreated": null,
   "createdNodeIds": [],
-  "pendingValidations": ["Figma structure", "Figma visual review", "Prototype interactions"],
+  "pendingValidations": [
+    "Figma structure",
+    "Figma visual review",
+    "Prototype interactions"
+  ],
   "discovery": {
     "requirements": "../../../docs/FuncReq.md",
     "existingPrototype": "../wireframe/",
     "codeConnectFiles": "No matching files found in ClipThat",
     "libraries": "get_libraries failed due to Starter MCP tool call limit; availability unknown",
     "canvas": "use_figma read failed due to the same tool call limit",
-    "font": "Nunito Sans proposed; available font family and styles not yet verified"
+    "font": "Runtime checks available Regular/Bold fonts: Nunito Sans, DM Sans, Arial, then Inter; actual Figma choice pending"
   },
-  "completedSteps": ["Read functional requirements", "Created target Figma file", "Prepared UX and visual design brief"],
-  "nextStep": "Resolve Figma tool access or select a local plugin handoff; preserve this target file"
+  "completedSteps": [
+    "Read functional requirements",
+    "Created target Figma file",
+    "Prepared UX and visual design brief",
+    "Built local plugin and browser preview",
+    "Validated routing and coverage FR-001 through FR-030",
+    "Validated contrast and all browser screens",
+    "Validated runtime with API double, including duplicate prevention and failure reporting",
+    "Prepared desktop import instructions"
+  ],
+  "nextStep": "In the existing wireframe file, import plugin/manifest.json from the workspace and run ClipThat — Semua Layar Desktop v3; startup generates and reveals the grid automatically.",
+  "localPackage": "plugin/manifest.json",
+  "localPreview": "preview.html",
+  "packageVersion": "3.1.0",
+  "lastMcpCheck": "2026-10-05: Starter MCP tool call limit still blocks read/write",
+  "userSetup": "User imported an earlier plugin; reports inaccessible screens and no response to Mahasiswa in Present. v3 execution in their Figma file is still unverified.",
+  "localValidation": {
+    "browser": {
+      "screens": 89,
+      "issues": [],
+      "browserErrors": [],
+      "journeys": 4
+    },
+    "pluginApiDouble": {
+      "buildRevision": "desktop-3.1",
+      "screens": 89,
+      "prototypeLinks": 747,
+      "nodeTypes": {
+        "FRAME": 3013,
+        "TEXT": 2370,
+        "COMPONENT_SET": 3,
+        "COMPONENT": 25,
+        "INSTANCE": 603,
+        "VECTOR": 580,
+        "RECTANGLE": 75
+      },
+      "createdNodes": 6669,
+      "variables": 61,
+      "textStyles": 8,
+      "checks": [
+        "runtime completed with supported API double",
+        "all nodes tracked",
+        "navigation destinations top-level",
+        "Figma overflow enum validated",
+        "variables scoped",
+        "existing content retained",
+        "rerun refused without duplicates",
+        "missing fonts fail before canvas mutation",
+        "partial failure report preserves IDs",
+        "text sizing restored after resize",
+        "click wrappers and cover destinations verified",
+        "all screens revealed on completion",
+        "UI ready automatically builds a new page in existing file",
+        "reopen reuses completed page",
+        "screen picker and Present select real destination",
+        "page limit reports failure without claiming success"
+      ],
+      "warnings": [],
+      "limitation": "API double only; not executed inside Figma"
+    },
+    "requirementsCovered": 30,
+    "nativeFigmaExecution": false,
+    "pluginPanel": {
+      "checks": [
+        "automatic startup message",
+        "89 selectable screens",
+        "student button sends focus",
+        "screen picker sends selected destination",
+        "controls unlock after focus",
+        "failure is visible with retry",
+        "no horizontal overflow at 400px"
+      ],
+      "browserErrors": [],
+      "limitation": "Browser panel only; no Figma canvas or Present execution"
+    }
+  },
+  "userReportedCanvasContent": true,
+  "requestedTarget": {
+    "fileKey": "GIWuSKUmk2LfEodDMjdFuA",
+    "fileUrl": "https://www.figma.com/design/GIWuSKUmk2LfEodDMjdFuA",
+    "pageName": "ClipThat — UI UX Desktop"
+  },
+  "buildRevision": "desktop-3.1",
+  "lastNativeFailure": {
+    "pageId": "28:727",
+    "screenCount": 0,
+    "linkCount": 0,
+    "error": "Invalid overflowDirection VERTICAL_SCROLLING; Figma requires VERTICAL",
+    "source": "User-provided clipthat-v3-report.json",
+    "resolution": "Changed to VERTICAL; regression test reproduced failure before fix and passed after fix."
+  }
 }

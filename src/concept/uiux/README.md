@@ -2,9 +2,20 @@
 
 Rancangan visual baru berdasarkan [Functional Request](../../../docs/FuncReq.md), untuk mahasiswa dan dosen pada web app desktop.
 
-**File tujuan:** [ClipThat — UI/UX Desktop](https://www.figma.com/design/MzuPBWCaHylLmsdLu67CLm), di Davin Farel Santoso's team.
+**File tujuan:** page baru di [file wireframe ClipThat](https://www.figma.com/design/GIWuSKUmk2LfEodDMjdFuA). Plugin v3 bekerja di file Figma yang sedang terbuka.
 
-**Status Figma:** file baru berhasil dibuat pada 4 Oktober 2026, tetapi masih kosong. Pembacaan dan penulisan desain melalui MCP diblokir kuota Starter. Dokumen ini adalah rancangan yang disiapkan, bukan laporan layar yang telah dibuat di Figma.
+**Status:** pengguna sudah menjalankan versi lama dan melaporkan tampilan yang sulit diakses serta tombol Present tidak bereaksi. Plugin v3 kini membuat page dan seluruh layar secara otomatis saat dijalankan, menampilkan grid, serta menyediakan daftar layar yang bisa dipilih langsung. Versi v3 lolos pemeriksaan lokal; hasil canvas dan Present Figma masih perlu diverifikasi karena kuota MCP membatasi akses langsung.
+
+## Mulai di sini
+
+- [Petunjuk instalasi plugin](plugin/README.md): langkah menjalankan di Figma desktop, termasuk alternatif bila diminta ID plugin.
+- [Manifest siap diimpor](plugin/manifest.json): simpan bersama `code.js` dan `ui.html` dalam folder yang sama.
+- [Pratinjau lokal](preview.html): buka di browser untuk melihat tampilan dan alur dari sumber desain yang sama. Ini bukan screenshot hasil Figma.
+- [Paket ZIP](ClipThat-UIUX-Figma-Plugin.zip): salinan paket plugin; ekstrak sebelum diimpor.
+
+Plugin berisi **24 layar utama desktop, 20 dialog, dan 45 variasi kondisi**, fondasi warna, text styles, komponen, serta koneksi prototype. Desain mendukung kebutuhan FR-001–030 melalui layar dan state contoh. Form prototype menggunakan data tetap; AI, audio, login, dan sinkronisasi nyata belum diimplementasikan.
+
+Font dipilih saat plugin berjalan: Nunito Sans → DM Sans → Arial → Inter, memakai pasangan Regular/Bold yang tersedia. Pratinjau browser mengikuti font lokal yang tersedia, sehingga metrik font dapat berbeda dengan hasil Figma.
 
 ## Arah pengalaman
 
@@ -127,4 +138,17 @@ Komponen menggunakan auto-layout, text styles, color/spacing/radius variables, d
 - Screenshot hasil Figma ditinjau pada layar kelas, catatan, agenda, rekap dosen, dan dialog.
 - Jumlah layar, komponen, koneksi, pilihan font aktual, dan ID objek dicatat setelah penulisan berhasil.
 
-Saat ini pemeriksaan Figma tersebut **belum dapat dilakukan** karena batas kuota alat desain.
+Pemeriksaan langsung hasil Figma v3 **belum dapat dilakukan** karena batas kuota alat desain. Pengguna telah mencoba plugin versi lama; screenshot dan laporan pengguna menunjukkan perlunya perbaikan layout, akses layar, dan prototype.
+
+## File sumber dan validasi
+
+- `design.js`: sumber layar, isi, warna, ikon, dan target navigasi.
+- `figma-runtime.js`: renderer native Figma, fondasi komponen, bindings, dan prototype.
+- `plugin/code.js`: hasil bundel kedua file di atas; sudah siap dipakai tanpa instalasi dependensi.
+- `plugin/ui.html`: panel pembuat desain dan unduhan laporan hasil/error.
+- `preview.html` / `preview.js`: pratinjau browser dari sumber desain yang sama.
+- `browser-validation.json`: hasil pemeriksaan browser; tidak setara validasi canvas Figma.
+- `plugin-validation.json`: hasil pemeriksaan runtime dengan API double; bukan eksekusi pada Figma.
+- `figma-state.json`: status file tujuan dan langkah yang masih perlu dilakukan.
+
+Untuk pengembang, jalankan `node build.cjs` setelah mengubah desain/runtime, lalu `node validate.cjs` dan `node validate-plugin.cjs`. API double menguji startup, ukuran teks, hotspot navigasi, pengungkapan semua layar, pemakaian ulang page, dan pelaporan kegagalan. `plugin-ui-validation.json` mencatat pengujian panel di browser. Jalankan dari folder ini. ZIP harus dikemas ulang setelah bundel berubah.

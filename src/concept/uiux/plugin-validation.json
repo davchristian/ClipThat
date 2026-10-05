@@ -1,27 +1,36 @@
 {
-  "screens": 82,
-  "prototypeLinks": 675,
+  "buildRevision": "desktop-3.1",
+  "screens": 89,
+  "prototypeLinks": 747,
   "nodeTypes": {
-    "FRAME": 2364,
-    "TEXT": 2158,
-    "COMPONENT": 25,
+    "FRAME": 3013,
+    "TEXT": 2370,
     "COMPONENT_SET": 3,
-    "INSTANCE": 549,
-    "VECTOR": 526,
-    "RECTANGLE": 70
+    "COMPONENT": 25,
+    "INSTANCE": 603,
+    "VECTOR": 580,
+    "RECTANGLE": 75
   },
-  "createdNodes": 5695,
+  "createdNodes": 6669,
   "variables": 61,
   "textStyles": 8,
   "checks": [
     "runtime completed with supported API double",
     "all nodes tracked",
     "navigation destinations top-level",
+    "Figma overflow enum validated",
     "variables scoped",
     "existing content retained",
     "rerun refused without duplicates",
     "missing fonts fail before canvas mutation",
-    "partial failure report preserves IDs"
+    "partial failure report preserves IDs",
+    "text sizing restored after resize",
+    "click wrappers and cover destinations verified",
+    "all screens revealed on completion",
+    "UI ready automatically builds a new page in existing file",
+    "reopen reuses completed page",
+    "screen picker and Present select real destination",
+    "page limit reports failure without claiming success"
   ],
   "warnings": [],
   "limitation": "API double only; not executed inside Figma"

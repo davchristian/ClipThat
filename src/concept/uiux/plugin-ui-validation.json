@@ -1,0 +1,13 @@
+{
+  "checks": [
+    "automatic startup message",
+    "89 selectable screens",
+    "student button sends focus",
+    "screen picker sends selected destination",
+    "controls unlock after focus",
+    "failure is visible with retry",
+    "no horizontal overflow at 400px"
+  ],
+  "browserErrors": [],
+  "limitation": "Browser panel only; no Figma canvas or Present execution"
+}
