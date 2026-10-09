@@ -8,6 +8,7 @@ import {
   Bookmark,
   CalendarDays,
   GraduationCap,
+  LogIn,
   Menu,
   Search,
   Settings2,
@@ -24,6 +25,7 @@ const navigation = [
 ];
 export function Shell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const authPage = pathname === "/login" || pathname === "/register";
   const { data } = useApp();
   const mainRef = useRef<HTMLDivElement>(null);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -36,6 +38,7 @@ export function Shell({ children }: { children: ReactNode }) {
       (s.title + courseFor(s.courseId).name).toLowerCase().includes(query.toLowerCase()),
   );
   useEffect(() => {
+    if (authPage) return;
     function keydown(e: KeyboardEvent) {
       if (e.key === "Escape") setMobile(false);
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -45,11 +48,12 @@ export function Shell({ children }: { children: ReactNode }) {
     }
     document.addEventListener("keydown", keydown);
     return () => document.removeEventListener("keydown", keydown);
-  }, []);
+  }, [authPage]);
   useEffect(() => {
     setMobile(false);
     mainRef.current?.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, [pathname]);
+  if (authPage) return <main className="auth-page">{children}</main>;
   return (
     <div className="app-layout">
       <a className="skip-link" href="#main-content">
@@ -102,6 +106,10 @@ export function Shell({ children }: { children: ReactNode }) {
           <Link className={`nav-item ${pathname === "/settings" ? "active" : ""}`} href="/settings">
             <Settings2 size={19} strokeWidth={1.7} />
             Pengaturan
+          </Link>
+          <Link className="nav-item" href="/login">
+            <LogIn size={19} strokeWidth={1.7} />
+            Masuk
           </Link>
           <div className="profile">
             <span className="avatar">{lecturer ? "NP" : "DF"}</span>

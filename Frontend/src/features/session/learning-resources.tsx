@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Download, FileText, Upload } from "lucide-react";
 import { useApp } from "@/state/app-provider";
@@ -9,10 +9,23 @@ import { notesForLesson } from "@/lib/demo-data";
 import { downloadText, readFile } from "@/lib/files";
 import type { Lesson } from "@/lib/types";
 
-export function MaterialsPanel({ lesson }: { lesson: Lesson }) {
+export function MaterialsPanel({
+  lesson,
+  onSource,
+  focusMap = false,
+}: {
+  lesson: Lesson;
+  onSource: () => void;
+  focusMap?: boolean;
+}) {
   const { data, update, notify } = useApp();
   const input = useRef<HTMLInputElement>(null);
+  const files = useRef<HTMLElement>(null);
+  const map = useRef<HTMLElement>(null);
   const notes = notesForLesson(lesson);
+  useEffect(() => {
+    if (focusMap) map.current?.scrollIntoView({ block: "start" });
+  }, [focusMap]);
   async function upload(file?: File) {
     if (!file) return;
     if (
@@ -40,62 +53,78 @@ export function MaterialsPanel({ lesson }: { lesson: Lesson }) {
     }
   }
   return (
-    <section className="panel">
-      <SectionTitle
-        action={
-          data.role === "lecturer" && (
-            <button className="button secondary small" onClick={() => input.current?.click()}>
-              <Upload size={15} />
-              Tambah materi
-            </button>
-          )
-        }
-      >
-        Materi
-      </SectionTitle>
-      <input
-        ref={input}
-        type="file"
-        hidden
-        aria-label="Unggah materi"
-        accept=".pdf,.txt,.png,.jpg,.jpeg"
-        onChange={(e) => {
-          void upload(e.target.files?.[0]);
-          e.target.value = "";
-        }}
-      />
-      <div className="material-row">
-        <FileText size={22} />
-        <span>
-          <strong>{lesson.title}.txt</strong>
-          <small>Materi contoh</small>
-        </span>
-        <button
-          className="icon-button"
-          aria-label="Unduh materi contoh"
-          onClick={() =>
-            downloadText(
-              `${lesson.title}.txt`,
-              `${lesson.title}\n\n${notes.map((n) => `${n.title}\n${n.body}${n.formula ? `\n${n.formula}` : ""}`).join("\n\n")}`,
+    <div className="learning-materials">
+      <section className="panel" ref={files} aria-label="Berkas kelas">
+        <SectionTitle
+          action={
+            data.role === "lecturer" && (
+              <button className="button secondary small" onClick={() => input.current?.click()}>
+                <Upload size={15} />
+                Tambah materi
+              </button>
             )
           }
         >
-          <Download size={18} />
-        </button>
-      </div>
-      {(data.materials[lesson.id] || []).map((m) => (
-        <div className="material-row" key={m.id}>
+          Berkas kelas
+        </SectionTitle>
+        <input
+          ref={input}
+          type="file"
+          hidden
+          aria-label="Unggah materi"
+          accept=".pdf,.txt,.png,.jpg,.jpeg"
+          onChange={(e) => {
+            void upload(e.target.files?.[0]);
+            e.target.value = "";
+          }}
+        />
+        <div className="material-row">
           <FileText size={22} />
           <span>
-            <strong>{m.name}</strong>
-            <small>Berkas lokal</small>
+            <strong>{lesson.title}.txt</strong>
+            <small>Materi contoh</small>
           </span>
-          <a className="icon-button" href={m.url} download={m.name} aria-label={`Unduh ${m.name}`}>
+          <button
+            className="icon-button"
+            aria-label="Unduh materi contoh"
+            onClick={() =>
+              downloadText(
+                `${lesson.title}.txt`,
+                `${lesson.title}\n\n${notes.map((n) => `${n.title}\n${n.body}${n.formula ? `\n${n.formula}` : ""}`).join("\n\n")}`,
+              )
+            }
+          >
             <Download size={18} />
-          </a>
+          </button>
         </div>
-      ))}
-    </section>
+        {(data.materials[lesson.id] || []).map((m) => (
+          <div className="material-row" key={m.id}>
+            <FileText size={22} />
+            <span>
+              <strong>{m.name}</strong>
+              <small>Berkas lokal</small>
+            </span>
+            <a
+              className="icon-button"
+              href={m.url}
+              download={m.name}
+              aria-label={`Unduh ${m.name}`}
+            >
+              <Download size={18} />
+            </a>
+          </div>
+        ))}
+      </section>
+      <section className="materials-map" ref={map} aria-label="Peta konsep">
+        <SectionTitle>Peta konsep</SectionTitle>
+        <p className="materials-map-hint">Pilih subbab untuk melihat kaitannya.</p>
+        <GraphPanel
+          lesson={lesson}
+          onSource={onSource}
+          onMaterial={() => files.current?.scrollIntoView({ block: "start" })}
+        />
+      </section>
+    </div>
   );
 }
 
@@ -112,6 +141,8 @@ export function GraphPanel({
   const [concept, setConcept] = useState(1);
   const [editing, setEditing] = useState(false);
   const [relation, setRelation] = useState("prasyarat");
+  const layout = useRef<HTMLDivElement>(null);
+  const detail = useRef<HTMLElement>(null);
   const notes = notesForLesson(lesson);
   const titles =
     lesson.id === "linear-05"
@@ -119,7 +150,7 @@ export function GraphPanel({
       : notes.map((n) => n.title);
   const graph = data.graphBySession?.[lesson.id] || data.graph;
   return (
-    <div className="graph-layout">
+    <div className="graph-layout" ref={layout}>
       <div className="concept-canvas" aria-label="Hubungan subbab">
         {titles.map((title, i) => (
           <div className="concept-step" key={title}>
@@ -131,14 +162,19 @@ export function GraphPanel({
             <button
               className={`concept-node ${concept === i ? "active" : ""}`}
               aria-pressed={concept === i}
-              onClick={() => setConcept(i)}
+              onClick={() => {
+                setConcept(i);
+                if ((layout.current?.clientWidth ?? 0) <= 600) {
+                  requestAnimationFrame(() => detail.current?.scrollIntoView({ block: "start" }));
+                }
+              }}
             >
               {title}
             </button>
           </div>
         ))}
       </div>
-      <aside className="panel concept-detail">
+      <aside className="panel concept-detail" ref={detail}>
         <h3>{titles[concept]}</h3>
         <p>
           {concept === 0 && lesson.id === "linear-05"

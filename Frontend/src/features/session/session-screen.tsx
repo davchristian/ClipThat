@@ -1,35 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Bookmark,
-  FileText,
-  Link2,
-  LoaderCircle,
-  Network,
-  Play,
-  Square,
-} from "lucide-react";
-import { ActionMenu, Empty, Modal } from "@/components/ui";
+import { ArrowLeft, ArrowRight, Bookmark, Link2, LoaderCircle, Play, Square } from "lucide-react";
+import { Empty, Modal } from "@/components/ui";
 import { dateLabel, seconds } from "@/lib/format";
 import { SavedDetail } from "@/features/saved/saved-detail";
 import { useSession } from "./use-session";
 import { TranscriptPanel } from "./transcript-panel";
 import { NotesPanel } from "./notes-panel";
 import { QuestionsPanel } from "./questions-panel";
-import { GraphPanel, MaterialsPanel } from "./learning-resources";
+import { MaterialsPanel } from "./learning-resources";
 import { PhotoDialog } from "./photo-dialog";
+import { CapturePreview } from "./capture-preview";
 
 const primaryTabs = [
   { id: "transcript", label: "Transkrip" },
   { id: "notes", label: "Catatan" },
   { id: "questions", label: "Pertanyaan" },
+  { id: "materials", label: "Materi" },
 ];
-const allowedTabs = [...primaryTabs.map((t) => t.id), "graph", "materials"];
+const allowedTabs = primaryTabs.map((t) => t.id);
 
 export function SessionView({ id }: { id: string }) {
   const query = useSearchParams().get("tab");
@@ -39,14 +31,18 @@ export function SessionView({ id }: { id: string }) {
   const [savedOpen, setSavedOpen] = useState(false);
   const [photo, setPhoto] = useState(false);
   const [end, setEnd] = useState(false);
+  const tabs = useRef<HTMLDivElement>(null);
   const currentTab =
-    query && allowedTabs.includes(query)
-      ? query
-      : lesson?.status === "done"
-        ? "notes"
-        : "transcript";
+    query === "graph"
+      ? "materials"
+      : query && allowedTabs.includes(query)
+        ? query
+        : lesson?.status === "done"
+          ? "notes"
+          : "transcript";
   function changeTab(tab: string) {
     window.history.replaceState(null, "", `?tab=${tab}`);
+    requestAnimationFrame(() => tabs.current?.scrollIntoView({ block: "start" }));
   }
   if (!ready)
     return (
@@ -68,8 +64,14 @@ export function SessionView({ id }: { id: string }) {
     );
   const upcoming = lesson.status === "upcoming";
   const live = lesson.status === "live";
+  const captureVisible = !!session.pendingCapture;
+  function focusCapture() {
+    requestAnimationFrame(() =>
+      document.getElementById("capture-trigger")?.focus({ preventScroll: true }),
+    );
+  }
   return (
-    <div className="classroom">
+    <div className={`classroom ${captureVisible ? "preview-open" : ""}`}>
       <Link className="back-link" href={`/classes/${course.id}`}>
         <ArrowLeft size={15} />
         {course.name}
@@ -127,7 +129,7 @@ export function SessionView({ id }: { id: string }) {
           )}
         </div>
       </div>
-      <div className="class-tabs">
+      <div className="class-tabs" ref={tabs}>
         <div className="tabs" aria-label="Bagian kelas">
           {primaryTabs.map((t) => (
             <button
@@ -140,16 +142,6 @@ export function SessionView({ id }: { id: string }) {
             </button>
           ))}
         </div>
-        <ActionMenu label="Lainnya di kelas">
-          <button onClick={() => changeTab("materials")}>
-            <FileText size={16} />
-            Materi
-          </button>
-          <button onClick={() => changeTab("graph")}>
-            <Network size={16} />
-            Peta konsep
-          </button>
-        </ActionMenu>
       </div>
       {lesson.status === "processing" ? (
         <div className="processing" role="status">
@@ -157,46 +149,64 @@ export function SessionView({ id }: { id: string }) {
           <h2>Menyiapkan catatan…</h2>
         </div>
       ) : (
-        <>
-          {currentTab === "transcript" &&
-            (upcoming ? (
-              <section className="panel waiting-room">
-                <span className="badge">Terjadwal · {lesson.time}</span>
-                <h2>Kelas belum dimulai</h2>
-                <button className="button secondary" onClick={() => changeTab("materials")}>
-                  Buka materi
-                  <ArrowRight size={16} />
-                </button>
-              </section>
-            ) : (
-              <TranscriptPanel
-                {...session}
-                onPhoto={() => setPhoto(true)}
-                onSaved={() => setSavedOpen(true)}
-                onAsk={() => changeTab("questions")}
-              />
-            ))}
-          {currentTab === "notes" &&
-            (upcoming ? (
-              <Empty title="Catatan tersedia setelah kelas" />
-            ) : (
-              <NotesPanel
+        <div className={`session-workspace ${captureVisible ? "has-preview" : ""}`}>
+          <div className="session-content">
+            {currentTab === "transcript" &&
+              (upcoming ? (
+                <section className="panel waiting-room">
+                  <span className="badge">Terjadwal · {lesson.time}</span>
+                  <h2>Kelas belum dimulai</h2>
+                  <button className="button secondary" onClick={() => changeTab("materials")}>
+                    Buka materi
+                    <ArrowRight size={16} />
+                  </button>
+                </section>
+              ) : (
+                <TranscriptPanel
+                  {...session}
+                  onPhoto={() => setPhoto(true)}
+                  onSaved={() => setSavedOpen(true)}
+                  onAsk={() => changeTab("questions")}
+                />
+              ))}
+            {currentTab === "notes" &&
+              (upcoming ? (
+                <Empty title="Catatan tersedia setelah kelas" />
+              ) : (
+                <NotesPanel
+                  lesson={lesson}
+                  saved={saved}
+                  onSource={() => changeTab("transcript")}
+                  onSaved={setDetail}
+                />
+              ))}
+            {currentTab === "questions" && (
+              <QuestionsPanel sessionId={id} teacher={course.teacher} />
+            )}
+            {currentTab === "materials" && (
+              <MaterialsPanel
                 lesson={lesson}
-                saved={saved}
                 onSource={() => changeTab("transcript")}
-                onSaved={setDetail}
+                focusMap={query === "graph"}
               />
-            ))}
-          {currentTab === "questions" && <QuestionsPanel sessionId={id} teacher={course.teacher} />}
-          {currentTab === "materials" && <MaterialsPanel lesson={lesson} />}
-          {currentTab === "graph" && (
-            <GraphPanel
-              lesson={lesson}
-              onSource={() => changeTab("transcript")}
-              onMaterial={() => changeTab("materials")}
+            )}
+          </div>
+          {session.pendingCapture && (
+            <CapturePreview
+              key={session.pendingCapture.id}
+              item={session.pendingCapture}
+              onSave={(draft) => {
+                session.saveCapture(draft);
+                focusCapture();
+              }}
+              onDiscard={() => {
+                session.discardCapture();
+                focusCapture();
+              }}
+              onAsk={session.sendCaptureQuestion}
             />
           )}
-        </>
+        </div>
       )}
       {!lecturer && (
         <>

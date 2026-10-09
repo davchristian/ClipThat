@@ -1,6 +1,6 @@
 # ClipThat · Frontend
 
-Alur utama: **Kelas → Capture/Simpan → Tersimpan**. Navigasi mahasiswa hanya Kelas, Tersimpan, dan Agenda. Materi, peta konsep, dan detail tambahan dibuka saat dibutuhkan.
+Alur utama: **Kelas → Capture → Preview → Simpan atau Buang → Tersimpan**. Navigasi mahasiswa hanya Kelas, Tersimpan, dan Agenda. Materi, peta konsep, dan detail tambahan dibuka saat dibutuhkan.
 
 ## Jalankan
 
@@ -15,10 +15,12 @@ Buka alamat Local di terminal, biasanya http://localhost:3000. Coba kode **ALG05
 
 ## Coba fitur
 
-- **Capture 90 detik** langsung menyimpan, tanpa dialog yang mengganggu kelas.
+- **Capture 90 detik** membuka panel preview yang lebih lebar di kanan transkrip. Ringkasan, sumber, dan saran pertanyaan dapat ditinjau sebelum memilih **Simpan capture** atau ikon tempat sampah. Di layar kecil atau pendek, preview tampil sebagai dialog dengan tombol aksi tetap terlihat.
+- Preview belum disimpan ke browser. Menutup, membuang, atau memuat ulang halaman tidak menambah simpanan; **Simpan capture** menyimpan hasilnya satu kali. Saran pertanyaan hanya dikirim melalui **Kirim anonim**.
 - Ikon bookmark menandai pembahasan untuk diulang. Penanda lama tetap tersimpan.
 - **Tersimpan** membuka ringkasan atau foto; pengiriman pertanyaan menjadi pilihan tambahan.
-- Ruang kelas memakai tiga tab: Transkrip, Catatan, Pertanyaan. Menu **⋯** membuka Materi dan Peta konsep.
+- Ruang kelas memakai empat tab yang terlihat langsung: **Transkrip, Catatan, Pertanyaan, Materi** untuk mahasiswa dan dosen. Di Materi, berkas kelas diikuti peta konsep; pilih subbab untuk membuka penjelasan dan pembahasan terkait.
+- Halaman **/login** dan **/register** memuat form dengan validasi, tombol tampilkan kata sandi, serta pilihan peran saat daftar. Tombol masuk/daftar membuka demo; belum membuat atau memverifikasi akun. Kredensial tidak disimpan atau dikirim.
 - Agenda berbentuk daftar. Usulan dari kelas harus dikonfirmasi; form awal hanya judul, tanggal, dan waktu.
 - Dosen bisa membuat/mulai/akhiri sesi, menjawab pertanyaan, menambah materi, mengoreksi peta, dan mengarsipkan sesi selesai.
 
@@ -28,7 +30,7 @@ Buka alamat Local di terminal, biasanya http://localhost:3000. Coba kode **ALG05
 src/
   app/          Rute Next.js
   components/   UI bersama dan layout aplikasi
-  features/     classes, session, saved, agenda, settings
+  features/     auth, classes, session, saved, agenda, settings
   state/        AppProvider dan penyimpanan lokal
   lib/          Tipe domain, data demo, format, file, kalender
   styles/       Token warna dan stylesheet
@@ -49,6 +51,8 @@ npm.cmd run format
 ```
 
 Playwright memakai Chrome terpasang dan port **3100** untuk memisahkan pengujian dari server kerja di 3000. Jika Chrome belum terpasang, jalankan `npx.cmd playwright install chrome`.
+
+Pengujian responsif mencakup lebar 320, 390, 768, 1024, 1366, dan 1440 px, termasuk landscape 844 × 390. Alur empat tab dan peta konsep diperiksa untuk mahasiswa dan dosen; panel capture diperiksa hingga 1280 px. Ini pengujian browser dengan ukuran layar simulasi, belum pengujian pada perangkat fisik.
 
 ## Mode demo
 

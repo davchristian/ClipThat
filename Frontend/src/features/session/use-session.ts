@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { courseFor, notesForLesson, transcript } from "@/lib/demo-data";
 import { seconds } from "@/lib/format";
 import type { SavedItem, Segment } from "@/lib/types";
@@ -19,6 +19,11 @@ export function useSession(id: string) {
   const elapsed = 1110;
   const saved = data.saved.filter((s) => s.sessionId === id);
   const questions = data.questions.filter((q) => q.sessionId === id);
+  const [captureDraft, setCaptureDraft] = useState<SavedItem | null>(null);
+  const pendingCapture = captureDraft?.sessionId === id && !lecturer ? captureDraft : null;
+  useEffect(() => {
+    setCaptureDraft(null);
+  }, [id, lecturer]);
   useEffect(() => {
     if (lesson?.status !== "processing") return;
     const timer = setTimeout(() => {
@@ -55,18 +60,24 @@ export function useSession(id: string) {
     notify(exists ? "Penanda dihapus." : "Bagian tersimpan.");
   }
   function capture() {
-    const excerpt = segments.filter((s) => s.time >= elapsed - 90 && s.time <= elapsed);
+    if (lecturer || pendingCapture) return;
+    const start = Math.max(0, elapsed - 90);
+    const excerpt = segments.filter((s) => s.time >= start && s.time <= elapsed);
+    if (!excerpt.length) {
+      notify("Belum ada pembahasan untuk dicapture.");
+      return;
+    }
     const item: SavedItem = {
       id: crypto.randomUUID(),
       sessionId: id,
       type: "capture",
-      title: `Capture · ${seconds(elapsed - 90)}`,
+      title: `Capture · ${seconds(start)}`,
       text: excerpt.map((s) => s.text).join(" "),
       summary:
         id === "linear-05"
           ? "Susun matriks transformasi dari hasil pemetaan vektor basis. Setiap hasil pemetaan menjadi satu kolom matriks."
           : excerpt.map((s) => s.topic).join(" · "),
-      time: elapsed - 90,
+      time: start,
       end: elapsed,
       reviewed: false,
       draft:
@@ -74,8 +85,39 @@ export function useSession(id: string) {
           ? "Bagaimana menentukan kolom matriks dari pemetaan vektor basis?"
           : `Bisa dijelaskan kembali bagian ${excerpt[0]?.topic.toLowerCase() || "ini"}?`,
     };
-    update((d) => ({ ...d, saved: [...d.saved, item] }));
+    setCaptureDraft(item);
+  }
+  function saveCapture(draft: string) {
+    if (!pendingCapture) return;
+    const item = { ...pendingCapture, draft: draft.trim() };
+    update((d) =>
+      d.saved.some((savedItem) => savedItem.id === item.id)
+        ? d
+        : { ...d, saved: [...d.saved, item] },
+    );
+    setCaptureDraft(null);
     notify("Capture tersimpan.");
+  }
+  function discardCapture() {
+    setCaptureDraft(null);
+  }
+  function sendCaptureQuestion(text: string) {
+    if (!pendingCapture || !text.trim()) return;
+    update((d) => ({
+      ...d,
+      questions: [
+        ...d.questions,
+        {
+          id: crypto.randomUUID(),
+          sessionId: id,
+          text: text.trim(),
+          time: seconds(pendingCapture.time),
+          votes: 0,
+          supported: false,
+        },
+      ],
+    }));
+    notify("Pertanyaan terkirim.");
   }
   return {
     data,
@@ -92,5 +134,9 @@ export function useSession(id: string) {
     questions,
     bookmark,
     capture,
+    pendingCapture,
+    saveCapture,
+    discardCapture,
+    sendCaptureQuestion,
   };
 }

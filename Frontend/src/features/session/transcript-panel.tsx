@@ -10,6 +10,7 @@ export function TranscriptPanel({
   lecturer,
   bookmark,
   capture,
+  pendingCapture,
   onPhoto,
   onSaved,
   onAsk,
@@ -19,6 +20,7 @@ export function TranscriptPanel({
   lecturer: boolean;
   bookmark: (segment: Segment) => void;
   capture: () => void;
+  pendingCapture: SavedItem | null;
   onPhoto: () => void;
   onSaved: () => void;
   onAsk: () => void;
@@ -37,10 +39,14 @@ export function TranscriptPanel({
       <div className="transcript-content">
         {segments.map((segment) => {
           const marked = saved.some((s) => s.type === "bookmark" && s.time === segment.time);
+          const inCapture =
+            pendingCapture &&
+            segment.time >= pendingCapture.time &&
+            segment.time <= (pendingCapture.end ?? pendingCapture.time);
           return (
             <article
               key={segment.id}
-              className={`transcript-segment ${!lecturer && marked ? "marked" : ""}`}
+              className={`transcript-segment ${!lecturer && marked ? "marked" : ""} ${inCapture ? "in-capture" : ""}`}
             >
               <time>{seconds(segment.time)}</time>
               <p>{segment.text}</p>
@@ -61,22 +67,34 @@ export function TranscriptPanel({
       </div>
       {!lecturer && (
         <div className="capture-bar">
-          <button className="button primary" onClick={capture}>
-            <ScanLine size={17} />
-            Capture 90 detik
-          </button>
-          <button className="button secondary" onClick={onAsk}>
-            <MessageCircle size={16} />
-            Tanya
-          </button>
-          <button
-            className="icon-button"
-            aria-label="Tambahkan foto"
-            title="Tambahkan foto"
-            onClick={onPhoto}
-          >
-            <Camera size={20} />
-          </button>
+          <div className="capture-action">
+            <button
+              id="capture-trigger"
+              className="button primary"
+              onClick={capture}
+              disabled={!!pendingCapture}
+              aria-expanded={!!pendingCapture}
+              aria-controls={pendingCapture ? "capture-preview" : undefined}
+            >
+              <ScanLine size={17} />
+              Capture 90 detik
+            </button>
+            <small>Lihat preview sebelum menyimpan</small>
+          </div>
+          <div className="capture-tools">
+            <button className="button secondary" onClick={onAsk}>
+              <MessageCircle size={16} />
+              Tanya
+            </button>
+            <button
+              className="icon-button"
+              aria-label="Tambahkan foto"
+              title="Tambahkan foto"
+              onClick={onPhoto}
+            >
+              <Camera size={20} />
+            </button>
+          </div>
         </div>
       )}
     </section>
