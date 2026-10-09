@@ -1,0 +1,8 @@
+# Local dependencies and generated output
+**/node_modules/
+**/.next/
+**/*.tsbuildinfo
+**/test-results/
+**/playwright-report/
+.env*
+!.env.example

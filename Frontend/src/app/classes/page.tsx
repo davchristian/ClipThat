@@ -1,2 +1,4 @@
-import { CoursesView } from "@/components/courses";
-export default function Page() { return <CoursesView />; }
+import { CoursesView } from "@/features/classes/course-list";
+export default function Page() {
+  return <CoursesView />;
+}

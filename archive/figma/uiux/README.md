@@ -1,3 +1,5 @@
+> Arsip eksperimen Figma. Frontend aktif ada di [`../../../Frontend`](../../../Frontend/README.md).
+
 # ClipThat — UI/UX Desktop
 
 Rancangan visual baru berdasarkan [Functional Request](../../../docs/FuncReq.md), untuk mahasiswa dan dosen pada web app desktop.
@@ -11,7 +13,7 @@ Rancangan visual baru berdasarkan [Functional Request](../../../docs/FuncReq.md)
 - [Petunjuk instalasi plugin](plugin/README.md): langkah menjalankan di Figma desktop, termasuk alternatif bila diminta ID plugin.
 - [Manifest siap diimpor](plugin/manifest.json): simpan bersama `code.js` dan `ui.html` dalam folder yang sama.
 - [Pratinjau lokal](preview.html): buka di browser untuk melihat tampilan dan alur dari sumber desain yang sama. Ini bukan screenshot hasil Figma.
-- [Paket ZIP](ClipThat-UIUX-Figma-Plugin.zip): salinan paket plugin; ekstrak sebelum diimpor.
+- [Paket ZIP](packages/ClipThat-UIUX-Figma-Plugin.zip): salinan paket plugin; ekstrak sebelum diimpor.
 
 Plugin berisi **24 layar utama desktop, 20 dialog, dan 45 variasi kondisi**, fondasi warna, text styles, komponen, serta koneksi prototype. Desain mendukung kebutuhan FR-001–030 melalui layar dan state contoh. Form prototype menggunakan data tetap; AI, audio, login, dan sinkronisasi nyata belum diimplementasikan.
 

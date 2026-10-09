@@ -1,2 +1,4 @@
-import { SettingsView } from "@/components/settings";
-export default function Page() { return <SettingsView />; }
+import { SettingsView } from "@/features/settings/settings-screen";
+export default function Page() {
+  return <SettingsView />;
+}

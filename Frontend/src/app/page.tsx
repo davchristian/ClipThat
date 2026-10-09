@@ -1,2 +1,4 @@
-import { Dashboard } from "@/components/dashboard";
-export default function Home() { return <Dashboard />; }
+import { Dashboard } from "@/features/classes/class-home";
+export default function Home() {
+  return <Dashboard />;
+}

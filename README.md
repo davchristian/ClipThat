@@ -1,11 +1,19 @@
 # ClipThat
 
-Frontend web app baru tersedia di **[Frontend](Frontend/README.md)**. Dibangun dengan Next.js, TypeScript, dan Tailwind CSS; konsep visual baru untuk pengalaman belajar yang lebih sederhana.
+Web app untuk mengikuti kelas, menyimpan pembahasan, dan mengulang materi.
 
-```sh
+```powershell
 cd Frontend
-npm install
-npm run dev
+npm.cmd install
+npm.cmd run dev
 ```
 
-Buka http://localhost:3000. Data demo tersimpan di browser; backend dan layanan AI belum terhubung.
+Buka alamat **Local** di terminal, biasanya http://localhost:3000. Kode kelas contoh: **ALG05**.
+
+| Folder | Kegunaan |
+| --- | --- |
+| [Frontend](Frontend/README.md) | Aplikasi Next.js + TypeScript + Tailwind CSS yang aktif |
+| `docs/` | PRD dan functional requirements |
+| [archive](archive/README.md) | Wireframe, eksperimen Figma, plugin, dan hasil validasi lama |
+
+Dependency aplikasi hanya dikelola di `Frontend/`. Mode demo menyimpan data di browser; backend, AI, dan sinkronisasi akun belum terhubung.
