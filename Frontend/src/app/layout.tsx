@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import "@fontsource-variable/dm-sans";
+import "@fontsource-variable/plus-jakarta-sans";
 import "@/styles/globals.css";
 import { AppProvider } from "@/state/app-provider";
-import { Shell } from "@/components/layout/app-shell";
+import { Shell } from "./components/app-shell";
 export const metadata: Metadata = {
   title: "ClipThat — Ruang belajarmu",
   description: "Ikuti kelas. Simpan momen penting. Pahami dengan ritmemu.",

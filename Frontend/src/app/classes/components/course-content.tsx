@@ -1,0 +1,225 @@
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import { Archive, ArrowRight, Bookmark, ChevronRight, RotateCcw } from "lucide-react";
+import { courses, demoNow } from "@/data";
+import type { Lesson } from "@/lib/types";
+import { useApp } from "@/state/app-provider";
+import { CourseIcon, Empty, Modal, PageHeading, SectionTitle } from "@/components/ui";
+import { SavedDetail } from "@/components/saved-detail";
+import { SessionEntry } from "./session-entry";
+import { CourseSessionCard } from "./course-session-card";
+import { CourseOverview } from "./course-overview";
+
+export function CoursesView({ courseId }: { courseId?: string }) {
+  const { data, update, notify } = useApp();
+  const lecturer = data.role === "lecturer";
+  const [archive, setArchive] = useState<Lesson | null>(null);
+  const [showArchive, setShowArchive] = useState(false);
+  const [selectedSaved, setSelectedSaved] = useState<string | null>(null);
+  const course = courses.find((c) => c.id === courseId);
+  const visible = courses.filter((c) => !lecturer || c.id === "aljabar");
+  if (courseId && (!course || (lecturer && course.id !== "aljabar")))
+    return (
+      <Empty
+        title="Mata kuliah tidak tersedia"
+        action={
+          <Link className="button secondary" href="/">
+            Kembali ke kelas
+          </Link>
+        }
+      />
+    );
+  const lessons = data.lessons.filter(
+    (s) => (!course || s.courseId === course.id) && (!lecturer || s.courseId === "aljabar"),
+  );
+  const currentLessons = lessons.filter((lesson) => lesson.status !== "done");
+  const previousLessons = lessons
+    .filter((lesson) => lesson.status === "done")
+    .sort((a, b) => b.number - a.number);
+  const courseLessons = [...data.lessons, ...data.archived.map((entry) => entry.lesson)];
+  const courseSaved = course
+    ? data.saved.filter((item) =>
+        courseLessons.some(
+          (lesson) => lesson.id === item.sessionId && lesson.courseId === course.id,
+        ),
+      )
+    : [];
+  const archivedPersonal = courseSaved.filter((item) =>
+    data.archived.some((entry) => entry.lesson.id === item.sessionId),
+  );
+  function archiveLesson() {
+    if (!archive || ["live", "processing"].includes(archive.status)) return;
+    update((d) => ({
+      ...d,
+      lessons: d.lessons.filter((s) => s.id !== archive.id),
+      archived: [...d.archived, { lesson: archive, archivedAt: new Date(demoNow).toISOString() }],
+    }));
+    setArchive(null);
+    notify("Sesi diarsipkan.");
+  }
+  return (
+    <>
+      <PageHeading
+        title={course?.name || "Course"}
+        action={lecturer ? <SessionEntry /> : undefined}
+      />
+      {!course && (
+        <p className="page-intro">
+          Pilih course untuk melihat materi, rangkuman, dan kelas yang sedang berlangsung.
+        </p>
+      )}
+      {!course && (
+        <div className="course-grid">
+          {visible.map((c) => (
+            <Link className="course-tile" key={c.id} href={`/classes/${c.id}`}>
+              <CourseIcon course={c} />
+              <div>
+                <h3>{c.name}</h3>
+                <p>Materi dan rangkuman pertemuan</p>
+              </div>
+              <ChevronRight size={17} />
+            </Link>
+          ))}
+        </div>
+      )}
+      {course && <CourseOverview course={course} lessons={lessons} agenda={data.agenda} />}
+      {course && (
+        <>
+          {currentLessons.length > 0 && (
+            <section className="course-session-section">
+              <SectionTitle>
+                {currentLessons.some((lesson) => lesson.status === "live")
+                  ? "Kelas sedang berlangsung"
+                  : "Pertemuan berikutnya"}
+              </SectionTitle>
+              <div className="course-session-list">
+                {currentLessons.map((lesson) => (
+                  <CourseSessionCard
+                    lesson={lesson}
+                    personal={data.saved.filter((item) => item.sessionId === lesson.id)}
+                    questionCount={
+                      data.questions.filter((item) => item.sessionId === lesson.id).length
+                    }
+                    lecturer={lecturer}
+                    onArchive={() => setArchive(lesson)}
+                    key={lesson.id}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+          <SectionTitle
+            action={
+              lecturer && (
+                <button className="text-button" onClick={() => setShowArchive((v) => !v)}>
+                  <Archive size={15} />
+                  {showArchive ? "Tutup arsip" : `Arsip (${data.archived.length})`}
+                </button>
+              )
+            }
+          >
+            Pertemuan sebelumnya
+          </SectionTitle>
+          <div className="course-session-list">
+            {previousLessons.map((lesson) => (
+              <CourseSessionCard
+                lesson={lesson}
+                personal={data.saved.filter((item) => item.sessionId === lesson.id)}
+                questionCount={data.questions.filter((item) => item.sessionId === lesson.id).length}
+                lecturer={lecturer}
+                onArchive={() => setArchive(lesson)}
+                key={lesson.id}
+              />
+            ))}
+          </div>
+          {!previousLessons.length && <Empty title="Belum ada pertemuan sebelumnya" />}
+          {!lecturer && archivedPersonal.length > 0 && (
+            <section className="archived-personal panel">
+              <SectionTitle>Bagian pribadi dari sesi diarsipkan</SectionTitle>
+              <p className="muted">
+                Salinanmu tetap tersedia meski sumber kelasnya sudah diarsipkan.
+              </p>
+              {archivedPersonal.map((item) => (
+                <button
+                  className="saved-preview"
+                  key={item.id}
+                  onClick={() => setSelectedSaved(item.id)}
+                >
+                  <Bookmark size={16} />
+                  <strong>{item.title}</strong>
+                  <ArrowRight size={14} />
+                </button>
+              ))}
+            </section>
+          )}
+        </>
+      )}
+      {showArchive && (
+        <section className="panel mt-6">
+          <SectionTitle>Arsip</SectionTitle>
+          {data.archived.length ? (
+            data.archived.map((item) => {
+              const remaining = Math.max(
+                0,
+                30 -
+                  Math.floor(
+                    (new Date(demoNow).getTime() - new Date(item.archivedAt).getTime()) / 86400000,
+                  ),
+              );
+              return (
+                <div className="material-row" key={item.lesson.id}>
+                  <Archive size={18} />
+                  <span>
+                    <strong>{item.lesson.title}</strong>
+                    <small>
+                      {remaining ? `${remaining} hari untuk memulihkan` : "Masa pemulihan berakhir"}
+                    </small>
+                  </span>
+                  <button
+                    className="button secondary small"
+                    disabled={!remaining}
+                    onClick={() => {
+                      update((d) => ({
+                        ...d,
+                        lessons: [...d.lessons, item.lesson],
+                        archived: d.archived.filter((a) => a.lesson.id !== item.lesson.id),
+                      }));
+                      notify("Sesi dipulihkan.");
+                    }}
+                  >
+                    <RotateCcw size={14} />
+                    Pulihkan
+                  </button>
+                </div>
+              );
+            })
+          ) : (
+            <p className="muted">Arsip kosong.</p>
+          )}
+        </section>
+      )}
+      <Modal
+        open={!!archive}
+        title="Arsipkan sesi?"
+        subtitle={archive?.title}
+        onClose={() => setArchive(null)}
+      >
+        <p className="muted">Bisa dipulihkan dalam 30 hari. Simpanan pribadi tetap ada.</p>
+        <div className="dialog-actions">
+          <button className="button secondary" onClick={() => setArchive(null)}>
+            Batal
+          </button>
+          <button className="button danger" onClick={archiveLesson}>
+            Arsipkan
+          </button>
+        </div>
+      </Modal>
+      <SavedDetail
+        item={data.saved.find((item) => item.id === selectedSaved) || null}
+        onClose={() => setSelectedSaved(null)}
+      />
+    </>
+  );
+}

@@ -1,4 +1,4 @@
-import { ReviewView } from "@/features/saved/saved-screen";
+import { redirect } from "next/navigation";
 export default function Page() {
-  return <ReviewView />;
+  redirect("/classes");
 }

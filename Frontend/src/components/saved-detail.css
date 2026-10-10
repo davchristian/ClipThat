@@ -1,0 +1,33 @@
+/* Saved moments */
+.saved-kind {
+  width: 41px;
+  height: 43px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.saved-row .row-main h3 {
+  font-size: 14px;
+}
+.saved-row.reviewed {
+  opacity: 0.7;
+}
+.saved-row.reviewed .icon-button[aria-pressed="true"] {
+  background: var(--sage);
+  color: #557941;
+}
+.capture-excerpt {
+  font-size: 14px;
+  line-height: 1.9;
+  color: #60764e;
+  margin-bottom: 20px;
+}
+.photo-preview {
+  width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+  border-radius: 9px;
+  background: #f1f4e8;
+  margin-bottom: 20px;
+}

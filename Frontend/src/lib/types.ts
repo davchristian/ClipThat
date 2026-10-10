@@ -10,6 +10,7 @@ export type Course = {
   color: string;
   glyph: string;
   days: string;
+  scheduleTime: string;
 };
 
 export type Lesson = {
@@ -20,7 +21,6 @@ export type Lesson = {
   date: string;
   time: string;
   status: LessonStatus;
-  code: string;
   duration: string;
 };
 
@@ -67,6 +67,7 @@ export type Agenda = {
 
 export type DemoState = {
   role: Role;
+  handledNotifications?: string[];
   lessons: Lesson[];
   questions: Question[];
   saved: SavedItem[];

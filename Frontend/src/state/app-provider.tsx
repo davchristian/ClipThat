@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
-import { initialState } from "@/lib/demo-data";
+import { initialState } from "@/data";
+import { readStoredState, writeStoredState } from "@/data/client-storage";
 import type { DemoState } from "@/lib/types";
 type Context = {
   data: DemoState;
@@ -11,7 +12,6 @@ type Context = {
   reset: () => void;
 };
 const AppContext = createContext<Context | null>(null);
-const storageKey = "clipthat-frontend-v1";
 export function AppProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<DemoState>(initialState);
   const [ready, setReady] = useState(false);
@@ -19,19 +19,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const notify = useCallback((text: string) => setToast({ text, id: Date.now() }), []);
   useEffect(() => {
     try {
-      const value = localStorage.getItem(storageKey);
-      if (value) {
-        const saved = JSON.parse(value) as DemoState;
-        if (
-          ["student", "lecturer"].includes(saved.role) &&
-          ["lessons", "questions", "saved", "agenda", "archived", "graph"].every((k) =>
-            Array.isArray(saved[k as keyof DemoState]),
-          ) &&
-          saved.notes &&
-          saved.materials
-        )
-          setData(saved);
-      }
+      const saved = readStoredState();
+      if (saved) setData(saved);
     } catch {
       notify("Data contoh tidak bisa dibaca. Ruang belajarmu dimuat ulang.");
     }
@@ -40,7 +29,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!ready) return;
     try {
-      localStorage.setItem(storageKey, JSON.stringify(data));
+      writeStoredState(data);
     } catch {
       notify("Penyimpanan browser penuh. Perubahan tersedia sampai halaman ditutup.");
     }

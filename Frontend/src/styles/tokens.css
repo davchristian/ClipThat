@@ -10,4 +10,7 @@
   --blue: #eaf0f4;
   --sand: #f3efdf;
   --sidebar-width: 216px;
+  --shadow-surface: 0 3px 10px #254a3512, 0 16px 32px #254a350a;
+  --shadow-lift: 0 8px 18px #254a351a, 0 20px 38px #254a3512;
+  --shadow-modal: 0 28px 80px #17332836, 0 8px 24px #17332817;
 }

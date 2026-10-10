@@ -1,0 +1,61 @@
+/* Settings */
+.settings-layout {
+  max-width: 750px;
+}
+.settings-layout > .panel {
+  margin-bottom: 22px;
+}
+.settings-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+}
+.settings-line select {
+  width: 150px;
+  font-size: 13px;
+}
+.settings-calendars > summary {
+  font-size: 15px;
+}
+.integration-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 23px 0;
+  border-bottom: 1px solid var(--line);
+}
+.integration-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.integration-logo {
+  width: 37px;
+  height: 37px;
+  display: grid;
+  place-items: center;
+  background: #f2f5ec;
+  color: #63785d;
+  font-size: 17px;
+  font-weight: 600;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.integration-row .row-main h3 {
+  font-size: 13px;
+}
+.integration-row .row-main p {
+  font-size: 11px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.reset-button {
+  padding: 12px 0;
+  color: #887454;
+}
+.demo-note {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.8;
+  margin-top: 22px;
+}
