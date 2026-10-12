@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Bookmark, Camera, Check, ChevronRight, ScanLine } from "lucide-react";
+import { Bookmark, Camera, Check, CircleCheck, ChevronRight, Lock, ScanLine } from "lucide-react";
 import { useApp } from "@/state/app-provider";
 import { Empty, PageHeading } from "@/components/ui";
 import { courseFor } from "@/lib/demo-data";
@@ -16,7 +16,9 @@ export function ReviewView() {
   if (data.role === "lecturer")
     return (
       <Empty
+        icon={Lock}
         title="Simpanan mahasiswa bersifat pribadi"
+        text="Bagian yang ditandai dan capture hanya terlihat oleh mahasiswa yang menyimpannya."
         action={
           <Link className="button secondary" href="/">
             Kembali ke kelas
@@ -56,7 +58,7 @@ export function ReviewView() {
           return (
             <article className={`saved-row ${item.reviewed ? "reviewed" : ""}`} key={item.id}>
               <span className={`saved-kind ${courseFor(lesson?.courseId || "aljabar").color}`}>
-                <Icon size={19} />
+                <Icon size={20} />
               </span>
               <button className="row-main" onClick={() => setSelected(item.id)}>
                 <h3>{item.title}</h3>
@@ -78,7 +80,7 @@ export function ReviewView() {
                   notify(item.reviewed ? "Masuk daftar review." : "Ditandai sudah paham.");
                 }}
               >
-                <Check size={17} />
+                <Check size={18} />
               </button>
               <button
                 className="icon-button"
@@ -93,7 +95,15 @@ export function ReviewView() {
       </div>
       {!filtered.length && (
         <Empty
+          icon={filter === "pending" ? CircleCheck : Bookmark}
           title={filter === "pending" ? "Semua sudah diulang" : "Belum ada simpanan"}
+          text={
+            filter === "pending"
+              ? "Tidak ada yang menunggu diulang. Bagian yang kamu simpan berikutnya muncul di sini."
+              : filter === "all"
+                ? "Saat kelas berlangsung, ketuk penanda di samping kalimat atau tekan Capture 90 detik. Hasilnya tersimpan di sini."
+                : "Tandai simpanan sebagai sudah paham setelah kamu mengulangnya."
+          }
           action={
             <Link href="/" className="button secondary">
               Buka kelas

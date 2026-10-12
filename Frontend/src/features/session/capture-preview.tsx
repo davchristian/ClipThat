@@ -25,7 +25,7 @@ export function CapturePreview({
   const range = `${seconds(item.time)}–${seconds(item.end ?? item.time)}`;
 
   useEffect(() => {
-    const media = window.matchMedia("(max-width: 1280px), (max-height: 700px)");
+    const media = window.matchMedia("(max-width: 1200px), (max-height: 700px)");
     function resize() {
       setCompact(media.matches);
     }
@@ -47,14 +47,14 @@ export function CapturePreview({
         </section>
         <details className="detail-section capture-source">
           <summary>
-            <FileText size={15} aria-hidden="true" />
+            <FileText size={16} aria-hidden="true" />
             Transkrip sumber
           </summary>
           <p>{item.text}</p>
         </details>
         <section className="capture-question">
           <h3>
-            <MessageCircle size={15} aria-hidden="true" />
+            <MessageCircle size={16} aria-hidden="true" />
             Saran pertanyaan
           </h3>
           {editing && !sent ? (
@@ -76,7 +76,7 @@ export function CapturePreview({
                 required
               />
               <button className="button secondary small" disabled={!draft.trim()}>
-                <Send size={14} aria-hidden="true" />
+                <Send size={16} aria-hidden="true" />
                 Kirim anonim
               </button>
             </form>
@@ -85,7 +85,7 @@ export function CapturePreview({
               <p>{draft}</p>
               {sent ? (
                 <span className="capture-question-sent" role="status">
-                  <Check size={14} aria-hidden="true" />
+                  <Check size={16} aria-hidden="true" />
                   Pertanyaan terkirim
                 </span>
               ) : (
@@ -104,10 +104,10 @@ export function CapturePreview({
           title="Buang capture"
           onClick={onDiscard}
         >
-          <Trash2 size={19} aria-hidden="true" />
+          <Trash2 size={20} aria-hidden="true" />
         </button>
         <button className="button primary" onClick={() => onSave(draft)}>
-          <Bookmark size={15} aria-hidden="true" />
+          <Bookmark size={16} aria-hidden="true" />
           Simpan capture
         </button>
       </div>
@@ -119,6 +119,7 @@ export function CapturePreview({
       <Modal
         open
         wide
+        sheet
         title="Preview capture"
         subtitle={`${range} · 90 detik terakhir`}
         onClose={onDiscard}
@@ -143,7 +144,7 @@ export function CapturePreview({
     >
       <div className="capture-preview-heading">
         <span className="capture-preview-icon" aria-hidden="true">
-          <ScanLine size={19} />
+          <ScanLine size={20} />
         </span>
         <div>
           <h2 id="capture-preview-title" ref={heading} tabIndex={-1}>

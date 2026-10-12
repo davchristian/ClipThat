@@ -27,7 +27,7 @@ export function NotesPanel({
         action={
           <button className="text-button" onClick={onSource}>
             Transkrip
-            <ArrowRight size={14} />
+            <ArrowRight size={16} />
           </button>
         }
       >
@@ -52,7 +52,7 @@ export function NotesPanel({
                 <button key={s.id} className="saved-preview" onClick={() => onSaved(s.id)}>
                   <strong>{s.title}</strong>
                   <small>{seconds(s.time)}</small>
-                  <ArrowRight size={14} />
+                  <ArrowRight size={16} />
                 </button>
               ))}
             </details>
@@ -60,7 +60,7 @@ export function NotesPanel({
           {lesson.id === "linear-05" && (
             <Link className="related-lesson" href="/session/basis-04">
               Ulangi: Basis dan dimensi
-              <ArrowRight size={14} />
+              <ArrowRight size={16} />
             </Link>
           )}
           <details className="detail-section personal-note">

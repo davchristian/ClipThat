@@ -32,7 +32,7 @@ export function AuthScreen({ mode }: { mode: "login" | "register" }) {
     if (register) update((data) => ({ ...data, role }));
     // Only demonstrate the frontend flow. Credentials are never stored or sent.
     setPassword("");
-    notify("Demo dibuka. Akun belum dibuat atau diverifikasi.");
+    notify("Demo dibuka. Akun belum dibuat atau diverifikasi.", { kind: "info" });
     router.push("/");
   }
 
@@ -131,14 +131,16 @@ export function AuthScreen({ mode }: { mode: "login" | "register" }) {
                 <legend>Aku seorang</legend>
                 <div>
                   {(["student", "lecturer"] as const).map((value) => (
-                    <button
-                      type="button"
-                      key={value}
-                      aria-pressed={role === value}
-                      onClick={() => setRole(value)}
-                    >
-                      {value === "student" ? "Mahasiswa" : "Dosen"}
-                    </button>
+                    <label className="auth-role-option" key={value}>
+                      <input
+                        type="radio"
+                        name="role"
+                        value={value}
+                        checked={role === value}
+                        onChange={() => setRole(value)}
+                      />
+                      <span>{value === "student" ? "Mahasiswa" : "Dosen"}</span>
+                    </label>
                   ))}
                 </div>
               </fieldset>
@@ -150,7 +152,7 @@ export function AuthScreen({ mode }: { mode: "login" | "register" }) {
             )}
             <button className="button primary auth-submit" type="submit">
               {register ? "Buat akun" : "Masuk"}
-              <ArrowRight size={17} />
+              <ArrowRight size={18} />
             </button>
           </form>
           <p className="auth-switch">
@@ -161,7 +163,7 @@ export function AuthScreen({ mode }: { mode: "login" | "register" }) {
             <span>Mode demo · gunakan data contoh.</span>
             <span>Akun belum dibuat atau diverifikasi.</span>
             <Link href="/">
-              Coba tanpa akun <ArrowRight size={13} />
+              Coba tanpa akun <ArrowRight size={16} />
             </Link>
           </div>
         </div>

@@ -134,7 +134,7 @@ export function AgendaEditor({
               aria-label="Hapus agenda"
               onClick={() => onDelete(item)}
             >
-              <Trash2 size={17} />
+              <Trash2 size={18} />
             </button>
           )}
           <button type="button" className="button secondary" onClick={onClose}>

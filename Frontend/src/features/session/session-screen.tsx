@@ -3,8 +3,17 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ArrowLeft, ArrowRight, Bookmark, Link2, LoaderCircle, Play, Square } from "lucide-react";
-import { Empty, Modal } from "@/components/ui";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Bookmark,
+  FileText,
+  Link2,
+  Play,
+  SearchX,
+  Square,
+} from "lucide-react";
+import { Empty, Modal, NotesSkeleton, PageSkeleton } from "@/components/ui";
 import { dateLabel, seconds } from "@/lib/format";
 import { SavedDetail } from "@/features/saved/saved-detail";
 import { useSession } from "./use-session";
@@ -44,17 +53,13 @@ export function SessionView({ id }: { id: string }) {
     window.history.replaceState(null, "", `?tab=${tab}`);
     requestAnimationFrame(() => tabs.current?.scrollIntoView({ block: "start" }));
   }
-  if (!ready)
-    return (
-      <div className="processing">
-        <LoaderCircle size={24} />
-        <span>Memuat kelas…</span>
-      </div>
-    );
+  if (!ready) return <PageSkeleton label="Memuat kelas…" />;
   if (!lesson)
     return (
       <Empty
+        icon={SearchX}
         title="Kelas tidak tersedia"
+        text="Tautannya mungkin sudah lama, atau sesi ini sudah diarsipkan."
         action={
           <Link className="button secondary" href="/">
             Kembali ke kelas
@@ -73,7 +78,7 @@ export function SessionView({ id }: { id: string }) {
   return (
     <div className={`classroom ${captureVisible ? "preview-open" : ""}`}>
       <Link className="back-link" href={`/classes/${course.id}`}>
-        <ArrowLeft size={15} />
+        <ArrowLeft size={16} />
         {course.name}
       </Link>
       <div className="page-heading session-heading">
@@ -98,17 +103,17 @@ export function SessionView({ id }: { id: string }) {
                   await navigator.clipboard.writeText(lesson.code);
                   notify("Kode disalin.");
                 } catch {
-                  notify(`Kode: ${lesson.code}`);
+                  notify(`Kode: ${lesson.code}`, { kind: "info" });
                 }
               }}
             >
-              <Link2 size={15} />
+              <Link2 size={16} />
               {lesson.code}
             </button>
           )}
           {lecturer && live && (
             <button className="button secondary small" onClick={() => setEnd(true)}>
-              <Square size={13} />
+              <Square size={16} />
               Akhiri
             </button>
           )}
@@ -123,7 +128,7 @@ export function SessionView({ id }: { id: string }) {
                 notify("Kelas demo dimulai.");
               }}
             >
-              <Play size={15} />
+              <Play size={16} />
               Mulai kelas
             </button>
           )}
@@ -144,10 +149,7 @@ export function SessionView({ id }: { id: string }) {
         </div>
       </div>
       {lesson.status === "processing" ? (
-        <div className="processing" role="status">
-          <LoaderCircle size={28} />
-          <h2>Menyiapkan catatan…</h2>
-        </div>
+        <NotesSkeleton label="Menyiapkan catatan dari transkrip…" />
       ) : (
         <div className={`session-workspace ${captureVisible ? "has-preview" : ""}`}>
           <div className="session-content">
@@ -171,7 +173,17 @@ export function SessionView({ id }: { id: string }) {
               ))}
             {currentTab === "notes" &&
               (upcoming ? (
-                <Empty title="Catatan tersedia setelah kelas" />
+                <Empty
+                  icon={FileText}
+                  title="Catatan tersedia setelah kelas"
+                  text="Catatan disusun dari transkrip begitu kelas selesai. Sementara itu, materi kelas sudah bisa dibuka."
+                  action={
+                    <button className="button secondary" onClick={() => changeTab("materials")}>
+                      Buka materi
+                      <ArrowRight size={16} />
+                    </button>
+                  }
+                />
               ) : (
                 <NotesPanel
                   lesson={lesson}
@@ -231,7 +243,7 @@ export function SessionView({ id }: { id: string }) {
                     <Bookmark size={16} />
                     <strong>{s.title}</strong>
                     <small>{seconds(s.time)}</small>
-                    <ArrowRight size={15} />
+                    <ArrowRight size={16} />
                   </button>
                 ))
             ) : (

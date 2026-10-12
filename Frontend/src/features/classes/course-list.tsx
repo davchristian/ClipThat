@@ -2,25 +2,26 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Archive, ArrowLeft, ChevronRight, RotateCcw } from "lucide-react";
+import { Archive, ArrowLeft, CalendarClock, ChevronRight, RotateCcw, SearchX } from "lucide-react";
 import { courses } from "@/lib/demo-data";
 import { dateLabel } from "@/lib/format";
 import type { Lesson } from "@/lib/types";
 import { useApp } from "@/state/app-provider";
-import { ActionMenu, CourseIcon, Empty, Modal, PageHeading, SectionTitle } from "@/components/ui";
+import { ActionMenu, CourseIcon, Empty, PageHeading, SectionTitle } from "@/components/ui";
 import { SessionEntry } from "./session-entry";
 
 export function CoursesView({ courseId }: { courseId?: string }) {
   const { data, update, notify } = useApp();
   const lecturer = data.role === "lecturer";
-  const [archive, setArchive] = useState<Lesson | null>(null);
   const [showArchive, setShowArchive] = useState(false);
   const course = courses.find((c) => c.id === courseId);
   const visible = courses.filter((c) => !lecturer || c.id === "aljabar");
   if (courseId && (!course || (lecturer && course.id !== "aljabar")))
     return (
       <Empty
+        icon={SearchX}
         title="Mata kuliah tidak tersedia"
+        text="Tautannya mungkin sudah lama, atau mata kuliah ini tidak ada di daftar kelasmu."
         action={
           <Link className="button secondary" href="/">
             Kembali ke kelas
@@ -31,20 +32,35 @@ export function CoursesView({ courseId }: { courseId?: string }) {
   const lessons = data.lessons.filter(
     (s) => (!course || s.courseId === course.id) && (!lecturer || s.courseId === "aljabar"),
   );
-  function archiveLesson() {
-    if (!archive || ["live", "processing"].includes(archive.status)) return;
+  function archiveLesson(lesson: Lesson) {
+    if (["live", "processing"].includes(lesson.status)) return;
+    const index = data.lessons.findIndex((s) => s.id === lesson.id);
     update((d) => ({
       ...d,
-      lessons: d.lessons.filter((s) => s.id !== archive.id),
-      archived: [...d.archived, { lesson: archive, archivedAt: new Date().toISOString() }],
+      lessons: d.lessons.filter((s) => s.id !== lesson.id),
+      archived: [...d.archived, { lesson, archivedAt: new Date().toISOString() }],
     }));
-    setArchive(null);
-    notify("Sesi diarsipkan.");
+    notify("Sesi diarsipkan.", {
+      action: {
+        label: "Urungkan",
+        run: () =>
+          update((d) => {
+            if (d.lessons.some((s) => s.id === lesson.id)) return d;
+            const lessons = [...d.lessons];
+            lessons.splice(Math.min(index, lessons.length), 0, lesson);
+            return {
+              ...d,
+              lessons,
+              archived: d.archived.filter((a) => a.lesson.id !== lesson.id),
+            };
+          }),
+      },
+    });
   }
   return (
     <>
       <Link href="/" className="back-link">
-        <ArrowLeft size={15} />
+        <ArrowLeft size={16} />
         Kelas
       </Link>
       <PageHeading
@@ -57,7 +73,7 @@ export function CoursesView({ courseId }: { courseId?: string }) {
             <Link className="course-tile" key={c.id} href={`/classes/${c.id}`}>
               <CourseIcon course={c} />
               <h3>{c.name}</h3>
-              <ChevronRight size={17} />
+              <ChevronRight size={18} />
             </Link>
           ))}
         </div>
@@ -66,7 +82,7 @@ export function CoursesView({ courseId }: { courseId?: string }) {
         action={
           lecturer && (
             <button className="text-button" onClick={() => setShowArchive((v) => !v)}>
-              <Archive size={15} />
+              <Archive size={16} />
               {showArchive ? "Tutup arsip" : `Arsip (${data.archived.length})`}
             </button>
           )
@@ -95,8 +111,8 @@ export function CoursesView({ courseId }: { courseId?: string }) {
             </span>
             {lecturer && !["live", "processing"].includes(s.status) && (
               <ActionMenu label={`Opsi ${s.title}`}>
-                <button onClick={() => setArchive(s)}>
-                  <Archive size={15} />
+                <button onClick={() => archiveLesson(s)}>
+                  <Archive size={16} />
                   Arsipkan {s.title}
                 </button>
               </ActionMenu>
@@ -107,7 +123,17 @@ export function CoursesView({ courseId }: { courseId?: string }) {
           </div>
         ))}
       </div>
-      {!lessons.length && <Empty title="Belum ada pertemuan" />}
+      {!lessons.length && (
+        <Empty
+          icon={CalendarClock}
+          title="Belum ada pertemuan"
+          text={
+            lecturer
+              ? "Buat sesi untuk mendapatkan kode kelas yang bisa dibagikan ke mahasiswa."
+              : "Pertemuan muncul di sini begitu dosen membuat sesi kelas."
+          }
+        />
+      )}
       {showArchive && (
         <section className="panel mt-6">
           <SectionTitle>Arsip</SectionTitle>
@@ -138,7 +164,7 @@ export function CoursesView({ courseId }: { courseId?: string }) {
                       notify("Sesi dipulihkan.");
                     }}
                   >
-                    <RotateCcw size={14} />
+                    <RotateCcw size={16} />
                     Pulihkan
                   </button>
                 </div>
@@ -149,22 +175,6 @@ export function CoursesView({ courseId }: { courseId?: string }) {
           )}
         </section>
       )}
-      <Modal
-        open={!!archive}
-        title="Arsipkan sesi?"
-        subtitle={archive?.title}
-        onClose={() => setArchive(null)}
-      >
-        <p className="muted">Bisa dipulihkan dalam 30 hari. Simpanan pribadi tetap ada.</p>
-        <div className="dialog-actions">
-          <button className="button secondary" onClick={() => setArchive(null)}>
-            Batal
-          </button>
-          <button className="button danger" onClick={archiveLesson}>
-            Arsipkan
-          </button>
-        </div>
-      </Modal>
     </>
   );
 }
