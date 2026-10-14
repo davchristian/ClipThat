@@ -5,7 +5,6 @@
 .course-summary-panel,
 .course-agenda-panel,
 .course-session-card,
-.drafts-panel,
 .calendar-panel,
 .transcript-panel,
 .concept-canvas,
@@ -61,11 +60,8 @@
   .home-course-cta {
     display: none;
   }
-  .course-tile {
-    padding: 22px;
-  }
-  .course-tile h3 {
-    font-size: 14px;
+  .course-tile-info {
+    padding: 20px;
   }
 }
 @media (max-width: 850px) {
@@ -115,7 +111,7 @@
     padding: 20px 8px;
   }
   .transcript-segment p {
-    font-size: 14px;
+    font-size: var(--font-body);
   }
 }
 @media (max-width: 620px) {
@@ -188,20 +184,18 @@
   }
   h1,
   .session-heading h1 {
-    font-size: 25px;
+    font-size: var(--font-page-mobile);
   }
   .page-heading > .button {
     min-height: 38px;
     padding: 9px 11px;
-    font-size: 12px;
+    font-size: var(--font-caption);
   }
   .course-tile {
-    padding: 21px;
-    min-height: 108px;
-    gap: 13px;
+    min-height: 250px;
   }
   .course-tile h3 {
-    font-size: 15px;
+    font-size: var(--font-card);
   }
   .panel {
     padding: 20px;
@@ -218,10 +212,10 @@
   .session-row h3,
   .saved-row h3,
   .agenda-item h3 {
-    font-size: 13px;
+    font-size: var(--font-card);
   }
   .row-main p {
-    font-size: 11px;
+    font-size: var(--font-caption);
     line-height: 1.7;
   }
   .saved-row > .icon-button {
@@ -234,7 +228,7 @@
     gap: 21px;
   }
   .tabs button {
-    font-size: 12px;
+    font-size: var(--font-caption);
   }
   .transcript-toolbar {
     padding: 16px;
@@ -252,17 +246,17 @@
     width: 29px;
   }
   .transcript-segment time {
-    font-size: 10px;
+    font-size: var(--font-caption);
   }
   .transcript-segment p {
-    font-size: 14px;
+    font-size: var(--font-body);
   }
   .capture-bar {
     padding: 14px 12px;
     gap: 8px;
   }
   .capture-bar .button {
-    font-size: 12px;
+    font-size: var(--font-caption);
     padding: 10px 11px;
   }
   .capture-bar .button.primary {
@@ -283,26 +277,20 @@
     padding: 22px 16px;
     gap: 13px;
   }
-  .drafts-panel {
-    padding: 19px;
-  }
-  .draft-row {
-    gap: 12px;
-  }
   .calendar-toolbar {
     padding: 18px 15px 10px;
     gap: 8px;
   }
   .calendar-toolbar h2 {
-    font-size: 19px;
+    font-size: var(--font-section);
   }
   .calendar-toolbar .eyebrow {
-    font-size: 10px;
+    font-size: var(--font-caption);
   }
   .calendar-controls .button {
     min-height: 32px;
     padding: 6px 8px;
-    font-size: 11px;
+    font-size: var(--font-caption);
   }
   .calendar-controls .icon-button {
     width: 29px;
@@ -310,12 +298,12 @@
   }
   .calendar-legend {
     padding: 5px 15px 14px;
-    font-size: 11px;
+    font-size: var(--font-caption);
   }
   .calendar-grid th {
     padding: 8px 3px;
     text-align: center;
-    font-size: 10px;
+    font-size: var(--font-caption);
   }
   .calendar-grid th:first-child,
   .calendar-grid td:first-child {
@@ -338,7 +326,7 @@
   .calendar-day-number {
     width: 23px;
     height: 23px;
-    font-size: 12px;
+    font-size: var(--font-caption);
   }
   .calendar-events {
     display: none;
@@ -351,7 +339,7 @@
     height: 5px;
   }
   .selected-agenda-heading h2 {
-    font-size: 16px;
+    font-size: var(--font-card);
   }
   .agenda-kind {
     display: none;
@@ -370,13 +358,13 @@
   .aggregate-row {
     grid-template-columns: 120px 1fr 30px;
     gap: 8px;
-    font-size: 11px;
+    font-size: var(--font-caption);
   }
   .integration-row {
     gap: 10px;
   }
   .integration-row .button {
-    font-size: 11px;
+    font-size: var(--font-caption);
     padding: 8px;
   }
   .integration-logo {
@@ -385,118 +373,6 @@
   }
 }
 @media (min-width: 851px) {
-  h2,
-  .course-panel-heading h2,
-  .calendar-toolbar h2,
-  .modal-top h2 {
-    font-size: 22px;
-  }
-  h3,
-  .section-title h2,
-  .course-session-top .row-main h3 {
-    font-size: 18px;
-  }
-  .nav-item,
-  .button,
-  .tabs button,
-  .form-stack label,
-  .settings-calendars > summary {
-    font-size: 16px;
-  }
-  .page-intro,
-  .course-summary-lead,
-  .session-intro,
-  .notes-lead,
-  .transcript-segment p,
-  .reading-note p,
-  .question-body > p,
-  .capture-excerpt {
-    font-size: 16px;
-  }
-  .button.small,
-  .text-button,
-  .back-link,
-  .session-meta,
-  .transcript-toolbar,
-  .related-lesson,
-  .question-intro p,
-  .answer,
-  .concept-detail p,
-  .calendar-legend,
-  .calendar-grid th,
-  .selected-agenda-heading > span,
-  .draft-row p,
-  .row-main p,
-  .home-course-row small,
-  .course-personal-note small,
-  .concept-preview p,
-  .personal-results > p:not(.eyebrow),
-  .integration-row .row-main p,
-  .modal-top p,
-  .menu-items button,
-  .menu-items a,
-  .source-quote {
-    font-size: 14px;
-  }
-  .eyebrow,
-  .badge,
-  .chip,
-  .profile strong,
-  .role-trigger,
-  .role-options button,
-  .field-hint,
-  .field-error,
-  .search-results small,
-  .course-tile p,
-  .session-number,
-  .vote-button,
-  .question-body > small,
-  .answer strong,
-  .material-row small,
-  .saved-preview small,
-  .concept-edge,
-  .calendar-event,
-  .calendar-more,
-  .agenda-kind,
-  .transcript-photo small,
-  .toast,
-  .demo-note {
-    font-size: 13px;
-  }
-  .home-course-row strong,
-  .course-personal-note strong,
-  .draft-row h3,
-  .question-intro strong,
-  .search-results strong,
-  .saved-row .row-main h3,
-  .material-row strong,
-  .saved-preview strong,
-  .integration-row .row-main h3,
-  .concept-preview strong {
-    font-size: 16px;
-  }
-  .archived-personal > p,
-  .saved-preview,
-  .concept-node,
-  .aggregate-row,
-  .empty p,
-  .notes-panel .detail-section,
-  .transcript-photo span,
-  .settings-line select,
-  .form-stack input[type="file"] {
-    font-size: 14px;
-  }
-  .transcript-segment time,
-  .calendar-day-number {
-    font-size: 14px;
-  }
-  .drafts-panel > h2,
-  .course-tile h3 {
-    font-size: 16px;
-  }
-  .selected-agenda-heading h2 {
-    font-size: 18px;
-  }
   .calendar-grid td {
     height: 90px;
   }

@@ -7,8 +7,9 @@
 @import "../app/classes/course.css";
 @import "../app/session/classroom.css";
 @import "../components/saved-detail.css";
-@import "../app/agenda/agenda.css";
 @import "../app/settings/settings.css";
 @import "../app/home.css";
 @import "../app/components/notifications.css";
 @import "./responsive.css";
+@import "../app/agenda/agenda.css";
+@import "../app/session/questions.css";

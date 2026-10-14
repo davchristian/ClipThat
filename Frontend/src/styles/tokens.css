@@ -2,8 +2,17 @@
   --bg: #faf9f6;
   --paper: #ffffff;
   --ink: #2b3730;
-  --muted: #6b7466;
+  --muted: #626e63;
   --green: #2e5145;
+  --text-warm: #865b38;
+  --text-blue: #4c6b80;
+  --text-danger: #963e30;
+  --font-caption: 12px;
+  --font-body: 14px;
+  --font-card: 16px;
+  --font-section: 18px;
+  --font-page: 28px;
+  --font-page-mobile: 24px;
   --line: #e5e7df;
   --sage: #edf1e7;
   --peach: #f6eade;

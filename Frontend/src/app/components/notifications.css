@@ -24,10 +24,10 @@
   color: var(--green);
 }
 .notification-card-agenda .notification-card-icon {
-  color: #a25c34;
+  color: var(--text-warm);
 }
 .notification-card-review .notification-card-icon {
-  color: #58758a;
+  color: var(--text-blue);
 }
 .notification-card-copy {
   display: block;
@@ -37,8 +37,8 @@
 .notification-card-label {
   display: block;
   margin-bottom: 4px;
-  color: #846b50;
-  font-size: 12px;
+  color: var(--text-warm);
+  font-size: var(--font-caption);
   font-weight: 600;
 }
 .notification-card strong,
@@ -47,16 +47,16 @@
   line-height: 1.4;
 }
 .notification-card strong {
-  font-size: 15px;
+  font-size: var(--font-card);
 }
 .notification-card small {
   margin-top: 3px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: var(--font-body);
 }
 .notification-card-arrow {
   flex-shrink: 0;
-  color: #71886a;
+  color: var(--muted);
 }
 .notification-status {
   position: absolute;
@@ -68,8 +68,8 @@
   padding: 2px 0;
   border: 0;
   background: transparent;
-  color: #946b45;
-  font-size: 12px;
+  color: var(--text-warm);
+  font-size: var(--font-caption);
   font-weight: 600;
 }
 .notification-status.handled {
@@ -95,7 +95,7 @@
 }
 .notifications-modal .modal-top p {
   margin-top: 3px;
-  font-size: 13px;
+  font-size: var(--font-body);
 }
 .notifications-list {
   max-height: min(55vh, 480px);

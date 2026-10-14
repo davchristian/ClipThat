@@ -8,19 +8,19 @@
   flex-shrink: 0;
 }
 .saved-row .row-main h3 {
-  font-size: 14px;
+  font-size: var(--font-card);
 }
 .saved-row.reviewed {
   opacity: 0.7;
 }
 .saved-row.reviewed .icon-button[aria-pressed="true"] {
   background: var(--sage);
-  color: #557941;
+  color: var(--green);
 }
 .capture-excerpt {
-  font-size: 14px;
+  font-size: var(--font-body);
   line-height: 1.9;
-  color: #60764e;
+  color: var(--ink);
   margin-bottom: 20px;
 }
 .photo-preview {

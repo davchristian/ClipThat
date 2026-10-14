@@ -17,7 +17,7 @@ export function getNotifications(data: DemoState): AppNotification[] {
     const lessons = data.lessons.filter((lesson) => lesson.courseId === "aljabar");
     const live = lessons.find((lesson) => lesson.status === "live");
     const latestCourseLesson = [...lessons].reverse().find((lesson) => lesson.status === "done");
-    const unanswered = data.questions.filter((item) => !item.answer && !item.oral);
+    const unanswered = data.questions.filter((item) => !item.oral);
     const notifications: AppNotification[] = [];
 
     if (unanswered.length && lessons.length)
@@ -42,17 +42,19 @@ export function getNotifications(data: DemoState): AppNotification[] {
   }
 
   const notifications: AppNotification[] = [];
-  const pendingAgenda = data.agenda.filter((item) => !item.confirmed);
+  const classAgenda = data.agenda.filter(
+    (item) => item.confirmed && item.sourceSessionId && !item.done,
+  );
   const savedToReview = data.saved.filter((item) => !item.reviewed);
 
-  if (pendingAgenda.length)
+  if (classAgenda.length)
     notifications.push({
-      id: `student:agenda:${pendingAgenda.map((item) => item.id).join(",")}`,
-      title: `${pendingAgenda.length} agenda perlu konfirmasi`,
-      detail: "Tinjau tanggal dari pengumuman kelas sebelum disimpan.",
+      id: `student:agenda:${classAgenda.map((item) => item.id).join(",")}`,
+      title: `${classAgenda.length} agenda dari kelas sudah tersimpan`,
+      detail: "Lihat jadwal tugas dan kuis yang dibahas di kelas.",
       href: "/agenda",
       kind: "agenda",
-      label: "Perlu dikonfirmasi",
+      label: "Agenda kelas",
     });
   if (savedToReview.length) {
     const lesson = data.lessons.find((item) => item.id === savedToReview[0].sessionId);

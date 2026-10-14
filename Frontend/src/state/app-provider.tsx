@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { initialState } from "@/data";
 import { readStoredState, writeStoredState } from "@/data/client-storage";
 import type { DemoState } from "@/lib/types";
+import { confirmClassAgenda } from "@/lib/agenda";
 type Context = {
   data: DemoState;
   ready: boolean;
@@ -13,14 +14,14 @@ type Context = {
 };
 const AppContext = createContext<Context | null>(null);
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [data, setData] = useState<DemoState>(initialState);
+  const [data, setData] = useState<DemoState>(() => confirmClassAgenda(initialState));
   const [ready, setReady] = useState(false);
   const [toast, setToast] = useState<{ text: string; id: number } | null>(null);
   const notify = useCallback((text: string) => setToast({ text, id: Date.now() }), []);
   useEffect(() => {
     try {
       const saved = readStoredState();
-      if (saved) setData(saved);
+      if (saved) setData(confirmClassAgenda(saved));
     } catch {
       notify("Data contoh tidak bisa dibaca. Ruang belajarmu dimuat ulang.");
     }
@@ -40,7 +41,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return () => clearTimeout(timer);
     }
   }, [toast]);
-  const update = useCallback((fn: (state: DemoState) => DemoState) => setData(fn), []);
+  const update = useCallback(
+    (fn: (state: DemoState) => DemoState) => setData((state) => confirmClassAgenda(fn(state))),
+    [],
+  );
   return (
     <AppContext.Provider
       value={{
@@ -49,7 +53,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         update,
         notify,
         reset: () => {
-          setData(structuredClone(initialState));
+          setData(confirmClassAgenda(structuredClone(initialState)));
           notify("Ruang demo direset.");
         },
       }}

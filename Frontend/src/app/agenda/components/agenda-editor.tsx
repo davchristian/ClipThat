@@ -34,16 +34,11 @@ export function AgendaEditor({
       reminder: true,
     },
   );
-  const draft = item && !item.confirmed;
   function field<K extends keyof Agenda>(key: K, value: Agenda[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
   return (
-    <Modal
-      open
-      title={draft ? "Konfirmasi agenda" : item ? "Edit agenda" : "Tambah agenda"}
-      onClose={onClose}
-    >
+    <Modal open title={item ? "Edit agenda" : "Tambah agenda"} onClose={onClose}>
       <form
         className="form-stack"
         onSubmit={(e) => {
@@ -56,12 +51,12 @@ export function AgendaEditor({
               ? d.agenda.map((a) => (a.id === item.id ? result : a))
               : [...d.agenda, result],
           }));
-          notify(draft ? "Agenda dikonfirmasi." : "Agenda tersimpan.");
+          notify("Agenda tersimpan.");
           onSaved(result);
           onClose();
         }}
       >
-        {draft && item.source && <p className="source-quote">{item.source}</p>}
+        {item?.source && <p className="source-quote">{item.source}</p>}
         <label>
           Judul agenda
           <input
@@ -144,7 +139,7 @@ export function AgendaEditor({
             Batal
           </button>
           <button className="button primary" disabled={!form.title.trim()}>
-            {draft ? "Konfirmasi agenda" : "Simpan agenda"}
+            Simpan agenda
           </button>
         </div>
       </form>

@@ -1,9 +1,24 @@
 import type { ReactNode } from "react";
 
-export function PageHeading({ title, action }: { title: string; action?: ReactNode }) {
+export function PageHeading({
+  title,
+  action,
+  leading,
+}: {
+  title: string;
+  action?: ReactNode;
+  leading?: ReactNode;
+}) {
   return (
     <div className="page-heading">
-      <h1>{title}</h1>
+      {leading ? (
+        <div className="page-heading-title">
+          {leading}
+          <h1>{title}</h1>
+        </div>
+      ) : (
+        <h1>{title}</h1>
+      )}
       {action}
     </div>
   );

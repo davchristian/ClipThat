@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Archive, ArrowRight, Bookmark, ChevronRight, RotateCcw } from "lucide-react";
+import { Archive, ArrowRight, Bookmark, Clock3, RotateCcw, UserRound } from "lucide-react";
 import { courses, demoNow } from "@/data";
 import type { Lesson } from "@/lib/types";
 import { useApp } from "@/state/app-provider";
-import { CourseIcon, Empty, Modal, PageHeading, SectionTitle } from "@/components/ui";
+import { Breadcrumbs, CourseIcon, Empty, Modal, PageHeading, SectionTitle } from "@/components/ui";
 import { SavedDetail } from "@/components/saved-detail";
 import { SessionEntry } from "./session-entry";
 import { CourseSessionCard } from "./course-session-card";
@@ -61,25 +61,44 @@ export function CoursesView({ courseId }: { courseId?: string }) {
   }
   return (
     <>
+      <Breadcrumbs
+        items={
+          course
+            ? [{ label: "Course", href: "/classes" }, { label: course.name }]
+            : [{ label: "Course" }]
+        }
+      />
       <PageHeading
         title={course?.name || "Course"}
         action={lecturer ? <SessionEntry /> : undefined}
       />
       {!course && (
-        <p className="page-intro">
-          Pilih course untuk melihat materi, rangkuman, dan kelas yang sedang berlangsung.
-        </p>
-      )}
-      {!course && (
         <div className="course-grid">
           {visible.map((c) => (
-            <Link className="course-tile" key={c.id} href={`/classes/${c.id}`}>
-              <CourseIcon course={c} />
-              <div>
-                <h3>{c.name}</h3>
-                <p>Materi dan rangkuman pertemuan</p>
+            <Link
+              className={`course-tile course-tile-${c.color}`}
+              key={c.id}
+              href={`/classes/${c.id}`}
+            >
+              <div className="course-tile-banner" aria-hidden="true">
+                <span>{c.glyph}</span>
+                <span>{c.glyph}</span>
+                <span>{c.glyph}</span>
               </div>
-              <ChevronRight size={17} />
+              <div className="course-tile-info">
+                <h3>{c.name}</h3>
+                <div className="course-tile-meta" aria-label="Informasi mata kuliah">
+                  <span className="course-tile-code">
+                    <CourseIcon course={c} small /> {c.code}
+                  </span>
+                  <span>
+                    <UserRound size={15} aria-hidden="true" /> {c.teacher}
+                  </span>
+                  <span className="course-tile-schedule">
+                    <Clock3 size={15} aria-hidden="true" /> {c.days} · {c.scheduleTime}
+                  </span>
+                </div>
+              </div>
             </Link>
           ))}
         </div>

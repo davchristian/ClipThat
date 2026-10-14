@@ -5,16 +5,26 @@
   width: var(--sidebar-width);
   background: #f1f2eb;
   border-right: 1px solid var(--line);
+  box-shadow: 4px 0 14px #254a3512;
   padding: 32px 16px 20px;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   overscroll-behavior: none;
   z-index: 30;
-  box-shadow: 3px 0 18px #254a3508;
 }
 .sidebar > * {
   flex-shrink: 0;
+}
+.sidebar-header {
+  display: flex;
+  flex-direction: column;
+}
+.sidebar-header .brand-link {
+  margin-bottom: 32px;
+}
+.sidebar-profile-avatar {
+  display: none;
 }
 .brand-link {
   display: block;
@@ -49,13 +59,13 @@
   border: 1px solid #dfe3d7;
   border-radius: 8px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--font-caption);
   margin-bottom: 28px;
   text-align: left;
 }
 .sidebar-search kbd {
   font: inherit;
-  font-size: 9px;
+  font-size: var(--font-caption);
   margin-left: auto;
   white-space: nowrap;
 }
@@ -66,7 +76,7 @@
   height: 46px;
   padding: 0 12px;
   border-radius: 8px;
-  color: #687363;
+  color: var(--muted);
   margin-bottom: 6px;
 }
 .nav-item:hover {
@@ -112,12 +122,12 @@
   display: block;
 }
 .sidebar-clock time span {
-  font-size: 12px;
+  font-size: var(--font-caption);
 }
 .sidebar-clock time strong {
   margin-top: 2px;
   color: var(--green);
-  font-size: 14px;
+  font-size: var(--font-body);
   font-weight: 600;
 }
 .avatar {
@@ -125,14 +135,14 @@
   width: 33px;
   border-radius: 50%;
   background: #e7dcca;
-  color: #7b664c;
+  color: var(--text-warm);
   display: grid;
   place-items: center;
-  font-size: 11px;
+  font-size: var(--font-caption);
   flex-shrink: 0;
 }
 .profile strong {
-  font-size: 12px;
+  font-size: var(--font-body);
   font-weight: 600;
   display: block;
   white-space: nowrap;
@@ -147,7 +157,7 @@
   gap: 4px;
   border: none;
   background: transparent;
-  font-size: 11px;
+  font-size: var(--font-caption);
   color: var(--muted);
   line-height: 1.4;
   min-height: 24px;
@@ -179,7 +189,7 @@
   width: 100%;
   padding: 9px 10px;
   border-radius: 5px;
-  font-size: 12px;
+  font-size: var(--font-caption);
   text-align: left;
 }
 .role-options button:hover,
@@ -188,11 +198,54 @@
   color: var(--green);
 }
 .demo-badge {
-  font-size: 9px;
+  font-size: var(--font-caption);
   padding: 2px 4px;
   border-radius: 4px;
-  color: #6c7764;
+  color: var(--muted);
   border: 1px solid #d7dfce;
   margin-left: auto;
   flex-shrink: 0;
+}
+@media (min-width: 621px) {
+  .app-layout {
+    --sidebar-width: 76px;
+  }
+  .sidebar {
+    width: 76px;
+    padding-left: 12px;
+    padding-right: 12px;
+    overflow-x: hidden;
+    transition: width 0.18s;
+  }
+  .sidebar:hover,
+  .sidebar:has(:focus-visible) {
+    width: 216px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .sidebar:not(:hover):not(:has(:focus-visible)) .brand-link {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .sidebar:not(:hover):not(:has(:focus-visible)) .brand-name,
+  .sidebar:not(:hover):not(:has(:focus-visible)) .nav-item > span,
+  .sidebar:not(:hover):not(:has(:focus-visible)) .sidebar-clock,
+  .sidebar:not(:hover):not(:has(:focus-visible)) .profile {
+    display: none;
+  }
+  .sidebar:not(:hover):not(:has(:focus-visible)) .brand-symbol {
+    margin-right: 0;
+  }
+  .sidebar:not(:hover):not(:has(:focus-visible)) .nav-item {
+    justify-content: center;
+    padding: 0;
+    gap: 0;
+  }
+  .sidebar:not(:hover):not(:has(:focus-visible)) .sidebar-profile-avatar {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
 }

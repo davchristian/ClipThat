@@ -20,6 +20,12 @@ export const transcript: Segment[] = [
     topic: "Sifat transformasi linear",
   },
   {
+    id: "t-kernel",
+    time: 1035,
+    text: "Ada yang tanya bedanya kernel dengan vektor nol. Vektor nol itu satu vektor, sedangkan kernel adalah himpunan semua vektor yang dipetakan menjadi vektor nol oleh transformasi.",
+    topic: "Kernel dan vektor nol",
+  },
+  {
     id: "t4",
     time: 1065,
     text: "Untuk mencari matriks transformasi, cukup lihat ke mana setiap vektor basis dipetakan. Hasilnya menjadi kolom-kolom matriks kita.",

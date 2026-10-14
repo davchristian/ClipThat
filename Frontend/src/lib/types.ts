@@ -32,7 +32,6 @@ export type Question = {
   text: string;
   votes: number;
   supported: boolean;
-  answer?: string;
   oral?: boolean;
   time: string;
 };
@@ -63,6 +62,7 @@ export type Agenda = {
   done: boolean;
   reminder: boolean;
   source?: string;
+  sourceSessionId?: string;
 };
 
 export type DemoState = {

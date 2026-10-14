@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CalendarDays, Clock3, Network, UserRound } from "lucide-react";
+import { ArrowRight, CalendarDays, Network } from "lucide-react";
 import { demoToday, notesForLesson } from "@/data";
-import { CourseIcon } from "@/components/ui";
 import { dateLabel } from "@/lib/format";
 import type { Agenda, Course, Lesson } from "@/lib/types";
 
@@ -30,19 +29,6 @@ export function CourseOverview({
 
   return (
     <>
-      <div className="course-meta" aria-label="Informasi mata kuliah">
-        <CourseIcon course={course} />
-        <span>{course.code}</span>
-        <span className="course-meta-divider" aria-hidden="true" />
-        <span>
-          <UserRound size={15} /> {course.teacher}
-        </span>
-        <span className="course-meta-divider" aria-hidden="true" />
-        <span>
-          <Clock3 size={15} /> {course.days} · {course.scheduleTime}
-        </span>
-      </div>
-
       <div className="course-overview-grid">
         <section className="course-summary-panel">
           <div className="course-panel-heading">

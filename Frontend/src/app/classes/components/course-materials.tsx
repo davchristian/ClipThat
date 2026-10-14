@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { courses, notesForLesson } from "@/data";
-import { Empty, PageHeading, SectionTitle } from "@/components/ui";
+import { Breadcrumbs, Empty, PageHeading, SectionTitle } from "@/components/ui";
 import { dateLabel } from "@/lib/format";
 import { useApp } from "@/state/app-provider";
 
@@ -31,9 +31,13 @@ export function CourseMaterials({ courseId }: { courseId: string }) {
 
   return (
     <div className="course-materials-page">
-      <Link className="back-link" href={`/classes/${course.id}`}>
-        <ArrowLeft size={15} /> {course.name}
-      </Link>
+      <Breadcrumbs
+        items={[
+          { label: "Course", href: "/classes" },
+          { label: course.name, href: `/classes/${course.id}` },
+          { label: "Materi" },
+        ]}
+      />
       <PageHeading title={`Materi ${course.name}`} />
       {completed.length ? (
         <>

@@ -18,7 +18,7 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-sans);
-  font-size: 16px;
+  font-size: var(--font-body);
   font-weight: 400;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
@@ -64,18 +64,18 @@ p {
   margin: 0;
 }
 h1 {
-  font-size: clamp(28px, 3vw, 32px);
-  font-weight: 650;
-  letter-spacing: -1px;
+  font-size: var(--font-page);
+  font-weight: 600;
+  letter-spacing: -0.6px;
   line-height: 1.3;
 }
 h2 {
-  font-size: 20px;
-  font-weight: 650;
+  font-size: var(--font-section);
+  font-weight: 600;
   letter-spacing: -0.3px;
 }
 h3 {
-  font-size: 16px;
+  font-size: var(--font-card);
   font-weight: 600;
   line-height: 1.5;
 }
@@ -87,19 +87,19 @@ strong {
 }
 .sage {
   background: var(--sage);
-  color: #52724c;
+  color: var(--green);
 }
 .peach {
   background: var(--peach);
-  color: #926743;
+  color: var(--text-warm);
 }
 .blue {
   background: var(--blue);
-  color: #58758a;
+  color: var(--text-blue);
 }
 .sand {
   background: var(--sand);
-  color: #837347;
+  color: var(--text-warm);
 }
 .skip-link {
   position: fixed;

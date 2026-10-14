@@ -27,16 +27,25 @@
 .page-heading:has(+ .page-intro) {
   margin-bottom: 8px;
 }
+.page-heading-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.course-back-button {
+  flex-shrink: 0;
+}
 .page-intro {
   max-width: 680px;
   margin-bottom: 32px;
   color: var(--muted);
-  font-size: 15px;
+  font-size: var(--font-body);
   line-height: 1.7;
 }
 .eyebrow {
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--font-caption);
   font-weight: 600;
   letter-spacing: 0.035em;
 }
@@ -54,13 +63,75 @@
   margin-bottom: 18px;
 }
 .section-title h2 {
-  font-size: 18px;
+  font-size: var(--font-section);
 }
 .back-link {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--font-caption);
   margin-bottom: 24px;
+}
+.breadcrumbs {
+  margin-bottom: 16px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: var(--font-body);
+}
+.breadcrumbs ol {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.breadcrumbs li,
+.breadcrumbs a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.breadcrumbs li {
+  flex: 0 1 auto;
+  max-width: 320px;
+}
+.breadcrumbs li:first-child,
+.breadcrumbs li:nth-child(2) {
+  flex-shrink: 0;
+}
+.breadcrumbs svg {
+  flex-shrink: 0;
+}
+.breadcrumbs a > span,
+.breadcrumb-current {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.breadcrumb-current {
+  color: var(--green);
+  font-weight: 500;
+}
+.breadcrumb-home {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.breadcrumbs a:hover {
+  color: var(--green);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (max-width: 620px) {
+  .breadcrumbs {
+    font-size: var(--font-caption);
+  }
+  .breadcrumbs ol,
+  .breadcrumbs li,
+  .breadcrumbs a {
+    gap: 6px;
+  }
 }

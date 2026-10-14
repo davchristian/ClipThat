@@ -21,8 +21,7 @@ export const initialState: DemoState = {
       votes: 4,
       supported: false,
       time: "16:20",
-      answer:
-        "Vektor nol adalah satu vektor. Kernel adalah himpunan semua vektor yang dipetakan menjadi vektor nol oleh transformasi.",
+      oral: true,
     },
     {
       id: "q3",
@@ -105,6 +104,7 @@ export const initialState: DemoState = {
       courseId: "aljabar",
       kind: "Tugas",
       confirmed: false,
+      sourceSessionId: "linear-05",
       done: false,
       reminder: true,
       source: "Pengumuman kelas · 18:20: “Latihan matriks dikumpulkan Jumat sebelum tengah malam.”",

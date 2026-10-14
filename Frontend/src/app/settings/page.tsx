@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ExternalLink, RotateCcw } from "lucide-react";
 import { useApp } from "@/state/app-provider";
-import { Modal, PageHeading } from "@/components/ui";
+import { Breadcrumbs, Modal, PageHeading } from "@/components/ui";
 import type { Role } from "@/lib/types";
 
 const integrations = [
@@ -29,6 +29,7 @@ export default function SettingsPage() {
   }, []);
   return (
     <>
+      <Breadcrumbs items={[{ label: "Pengaturan" }]} />
       <PageHeading title="Pengaturan" />
       <div className="settings-layout">
         <section className="panel">

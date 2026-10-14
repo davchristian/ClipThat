@@ -13,10 +13,10 @@
 }
 .settings-line select {
   width: 150px;
-  font-size: 13px;
+  font-size: var(--font-body);
 }
 .settings-calendars > summary {
-  font-size: 15px;
+  font-size: var(--font-body);
 }
 .integration-row {
   display: flex;
@@ -35,27 +35,27 @@
   display: grid;
   place-items: center;
   background: #f2f5ec;
-  color: #63785d;
+  color: var(--muted);
   font-size: 17px;
   font-weight: 600;
   border-radius: 8px;
   flex-shrink: 0;
 }
 .integration-row .row-main h3 {
-  font-size: 13px;
+  font-size: var(--font-card);
 }
 .integration-row .row-main p {
-  font-size: 11px;
+  font-size: var(--font-caption);
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
 .reset-button {
   padding: 12px 0;
-  color: #887454;
+  color: var(--text-warm);
 }
 .demo-note {
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--font-caption);
   line-height: 1.8;
   margin-top: 22px;
 }

@@ -45,9 +45,11 @@ export function Sidebar({ mobile }: { mobile: boolean }) {
 
   return (
     <aside id="main-sidebar" className={`sidebar ${mobile ? "is-open" : ""}`}>
-      <Link href="/" aria-label="ClipThat beranda" className="brand-link">
-        <Logo />
-      </Link>
+      <div className="sidebar-header">
+        <Link href="/" aria-label="ClipThat beranda" className="brand-link">
+          <Logo />
+        </Link>
+      </div>
       <nav aria-label="Navigasi utama">
         {navigation
           .filter((item) => !lecturer || item.href !== "/agenda")
@@ -64,6 +66,8 @@ export function Sidebar({ mobile }: { mobile: boolean }) {
                 key={item.href}
                 className={`nav-item ${active ? "active" : ""}`}
                 aria-current={active ? "page" : undefined}
+                aria-label={item.label}
+                title={item.label}
               >
                 <item.icon size={20} strokeWidth={1.7} />
                 <span>{item.label}</span>
@@ -72,11 +76,19 @@ export function Sidebar({ mobile }: { mobile: boolean }) {
           })}
       </nav>
       <div className="sidebar-bottom">
-        <Link className={`nav-item ${pathname === "/settings" ? "active" : ""}`} href="/settings">
+        <Link
+          className={`nav-item ${pathname === "/settings" ? "active" : ""}`}
+          href="/settings"
+          aria-label="Pengaturan"
+          title="Pengaturan"
+        >
           <Settings2 size={19} strokeWidth={1.7} />
-          Pengaturan
+          <span>Pengaturan</span>
         </Link>
         <SidebarClock />
+        <div className="sidebar-profile-avatar" aria-hidden="true">
+          <span className="avatar">{lecturer ? "NP" : "DF"}</span>
+        </div>
         <div className="profile">
           <span className="avatar">{lecturer ? "NP" : "DF"}</span>
           <div className="profile-info">

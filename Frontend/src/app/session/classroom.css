@@ -11,7 +11,7 @@
   gap: 12px;
   align-items: center;
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--font-caption);
   margin-top: 11px;
 }
 .class-tabs {
@@ -32,8 +32,8 @@
 .tabs button {
   padding: 0 0 18px;
   border-bottom: 2px solid transparent;
-  font-size: 13px;
-  color: #7a8770;
+  font-size: var(--font-body);
+  color: var(--muted);
 }
 .tabs button.active {
   border-color: var(--green);
@@ -52,7 +52,7 @@
   justify-content: space-between;
   padding: 18px 24px;
   border-bottom: 1px solid var(--line);
-  font-size: 12px;
+  font-size: var(--font-caption);
   color: var(--muted);
 }
 .transcript-content {
@@ -75,20 +75,20 @@
   background: #f6f0df;
 }
 .transcript-segment time {
-  color: #77866b;
-  font-size: 11px;
+  color: var(--muted);
+  font-size: var(--font-caption);
   padding-top: 5px;
   font-variant-numeric: tabular-nums;
 }
 .transcript-segment p {
   max-width: 88ch;
-  font-size: 15px;
+  font-size: var(--font-body);
   line-height: 1.85;
-  color: #53664c;
+  color: var(--ink);
 }
 .bookmark-button {
   margin-top: -3px;
-  color: #9aab8d;
+  color: var(--muted);
 }
 .transcript-marker {
   display: grid;
@@ -96,10 +96,10 @@
   width: 34px;
   height: 34px;
   flex-shrink: 0;
-  color: #a28a48;
+  color: var(--muted);
 }
 .bookmark-button.selected {
-  color: #a58443;
+  color: var(--muted);
 }
 .capture-bar {
   display: flex;
@@ -130,12 +130,12 @@
   animation: spin 1.5s linear infinite;
 }
 .reading-note > summary {
-  font-size: 16px;
-  color: #4c6741;
+  font-size: var(--font-card);
+  color: var(--ink);
 }
 .reading-note p {
-  color: #617354;
-  font-size: 14px;
+  color: var(--ink);
+  font-size: var(--font-body);
   line-height: 1.9;
   margin-top: 17px;
 }
@@ -146,20 +146,20 @@
   margin-top: 17px;
   text-align: center;
   font-family: Georgia, serif;
-  font-size: 21px;
-  color: #5b7649;
+  font-size: var(--font-section);
+  color: var(--green);
 }
 .notes-panel .detail-section {
   margin-top: 10px;
-  font-size: 13px;
+  font-size: var(--font-body);
 }
 .related-lesson {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 15px 0;
-  font-size: 12px;
-  color: #647f52;
+  font-size: var(--font-caption);
+  color: var(--green);
 }
 .personal-note textarea {
   background: #fffdf5;
@@ -172,18 +172,18 @@
   border-bottom: 1px solid var(--line);
   text-align: left;
   width: 100%;
-  font-size: 13px;
+  font-size: var(--font-body);
 }
 .saved-preview:last-child {
   border-bottom: 0;
 }
 .saved-preview strong {
-  font-size: 13px;
+  font-size: var(--font-card);
   font-weight: 600;
   flex: 1;
 }
 .saved-preview small {
-  font-size: 11px;
+  font-size: var(--font-caption);
   color: var(--muted);
 }
 .aggregate-row {
@@ -192,7 +192,7 @@
   gap: 14px;
   align-items: center;
   margin-top: 20px;
-  font-size: 12px;
+  font-size: var(--font-caption);
   color: var(--muted);
 }
 .aggregate-row > div {
@@ -232,19 +232,19 @@
   height: 54px;
   border: 1px solid #e0e6d7;
   border-radius: 8px;
-  color: #7f9570;
+  color: var(--muted);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4px;
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: var(--font-caption);
 }
 .vote-button.supported {
   background: #e7efdd;
   border-color: #b8cea4;
-  color: #4f7538;
+  color: var(--green);
 }
 .question-vote-history {
   display: flex;
@@ -256,11 +256,11 @@
   color: var(--muted);
 }
 .question-vote-history strong {
-  font-size: 16px;
+  font-size: var(--font-card);
   color: var(--ink);
 }
 .question-vote-history small {
-  font-size: 11px;
+  font-size: var(--font-caption);
 }
 .question-body {
   flex: 1;
@@ -268,13 +268,13 @@
   overflow-wrap: anywhere;
 }
 .question-body > p {
-  font-size: 14px;
+  font-size: var(--font-body);
   line-height: 1.8;
-  color: #4e6741;
+  color: var(--ink);
 }
 .question-body > small {
   display: block;
-  font-size: 11px;
+  font-size: var(--font-caption);
   color: var(--muted);
   margin-top: 8px;
 }
@@ -283,14 +283,14 @@
   border-radius: 8px;
   background: #f1f5e8;
   margin-top: 17px;
-  color: #607d4d;
-  font-size: 13px;
+  color: var(--ink);
+  font-size: var(--font-body);
   line-height: 1.8;
 }
 .answer strong {
   display: block;
   margin-bottom: 6px;
-  font-size: 11px;
+  font-size: var(--font-caption);
   font-weight: 600;
 }
 .question-actions {
@@ -304,7 +304,7 @@
   gap: 15px;
   padding: 19px 0;
   border-bottom: 1px solid var(--line);
-  color: #7c8d6f;
+  color: var(--muted);
 }
 .material-row:last-child {
   border-bottom: 0;
@@ -315,14 +315,14 @@
 }
 .material-row strong {
   display: block;
-  font-size: 13px;
+  font-size: var(--font-card);
   color: var(--ink);
   font-weight: 600;
   overflow-wrap: anywhere;
 }
 .material-row small {
   display: block;
-  font-size: 11px;
+  font-size: var(--font-caption);
   color: var(--muted);
   margin-top: 5px;
 }
@@ -356,8 +356,8 @@
   background: white;
   border-radius: 9px;
   min-width: min(225px, 100%);
-  font-size: 13px;
-  color: #637c50;
+  font-size: var(--font-body);
+  color: var(--green);
 }
 .concept-node.active {
   background: #e8f0dc;
@@ -370,8 +370,8 @@
   justify-content: center;
   height: 66px;
   gap: 4px;
-  font-size: 10px;
-  color: #71895f;
+  font-size: var(--font-caption);
+  color: var(--green);
 }
 .concept-edge::before,
 .concept-edge::after {
@@ -384,7 +384,7 @@
   align-self: start;
 }
 .concept-detail p {
-  font-size: 13px;
+  font-size: var(--font-body);
   line-height: 1.85;
   color: var(--muted);
   margin: 15px 0 22px;
@@ -408,7 +408,7 @@
 
 .session-intro {
   color: var(--muted);
-  font-size: 14px;
+  font-size: var(--font-body);
   margin: -11px 0 24px;
 }
 .notes-panel > .eyebrow {
@@ -417,7 +417,7 @@
 }
 .notes-lead {
   color: var(--muted);
-  font-size: 14px;
+  font-size: var(--font-body);
   margin: -5px 0 19px;
 }
 .concept-preview {
@@ -435,11 +435,11 @@
   min-width: 0;
 }
 .concept-preview strong {
-  font-size: 14px;
+  font-size: var(--font-body);
 }
 .concept-preview p {
   color: var(--muted);
-  font-size: 13px;
+  font-size: var(--font-body);
   line-height: 1.5;
   margin-top: 4px;
 }
@@ -450,11 +450,11 @@
 }
 .personal-results h2 {
   margin: 5px 0;
-  font-size: 19px;
+  font-size: var(--font-section);
 }
 .personal-results > p:not(.eyebrow) {
   color: var(--muted);
-  font-size: 13px;
+  font-size: var(--font-body);
   margin-bottom: 14px;
 }
 .personal-results .saved-preview {
@@ -462,7 +462,7 @@
   text-align: left;
 }
 .personal-results .saved-preview > svg:first-child {
-  color: #a08654;
+  color: var(--muted);
 }
 .transcript-entry {
   min-width: 0;
@@ -490,8 +490,8 @@
 }
 .transcript-photo span {
   display: block;
-  color: #746442;
-  font-size: 12px;
+  color: var(--text-warm);
+  font-size: var(--font-caption);
   font-weight: 600;
 }
 .transcript-photo span svg {
@@ -502,7 +502,7 @@
 .transcript-photo small {
   display: block;
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--font-caption);
   font-weight: 400;
 }
 .question-intro {
@@ -511,10 +511,10 @@
 }
 .question-intro strong {
   display: block;
-  font-size: 15px;
+  font-size: var(--font-card);
 }
 .question-intro p {
   color: var(--muted);
-  font-size: 13px;
+  font-size: var(--font-body);
   margin-top: 4px;
 }

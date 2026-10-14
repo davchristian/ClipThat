@@ -3,17 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Bookmark,
-  FileText,
-  LoaderCircle,
-  Network,
-  Play,
-  Square,
-} from "lucide-react";
-import { ActionMenu, Empty, Modal } from "@/components/ui";
+import { ArrowRight, Bookmark, LoaderCircle, Play, Square } from "lucide-react";
+import { Breadcrumbs, Empty, Modal } from "@/components/ui";
 import { dateLabel, seconds } from "@/lib/format";
 import { SavedDetail } from "@/components/saved-detail";
 import { useSession } from "./use-session";
@@ -41,7 +32,7 @@ export function SessionView({ id }: { id: string }) {
   const [photo, setPhoto] = useState(false);
   const [end, setEnd] = useState(false);
   const currentTab =
-    query && allowedTabs.includes(query)
+    query && allowedTabs.includes(query) && (query !== "notes" || lesson?.status === "done")
       ? query
       : lesson?.status === "done"
         ? "notes"
@@ -71,10 +62,13 @@ export function SessionView({ id }: { id: string }) {
   const live = lesson.status === "live";
   return (
     <div className="classroom">
-      <Link className="back-link" href={`/classes/${course.id}`}>
-        <ArrowLeft size={15} />
-        {course.name}
-      </Link>
+      <Breadcrumbs
+        items={[
+          { label: "Course", href: "/classes" },
+          { label: course.name, href: `/classes/${course.id}` },
+          { label: lesson.title },
+        ]}
+      />
       <div className="page-heading session-heading">
         <div>
           <h1>{lesson.title}</h1>
@@ -112,36 +106,21 @@ export function SessionView({ id }: { id: string }) {
           )}
         </div>
       </div>
-      <p className="session-intro">
-        {upcoming
-          ? "Siapkan diri dengan materi dosen sebelum kelas dimulai."
-          : live
-            ? "Ikuti pembahasan, simpan bagian yang penting, dan ajukan pertanyaan kapan saja."
-            : "Ringkasan bersama dan bagian pribadimu tersusun dari pertemuan ini."}
-      </p>
       <div className="class-tabs">
         <div className="tabs" aria-label="Bagian kelas">
-          {primaryTabs.map((t) => (
-            <button
-              key={t.id}
-              className={currentTab === t.id ? "active" : ""}
-              aria-current={currentTab === t.id ? "page" : undefined}
-              onClick={() => changeTab(t.id)}
-            >
-              {t.label}
-            </button>
-          ))}
+          {primaryTabs
+            .filter((tab) => tab.id !== "notes" || lesson.status === "done")
+            .map((t) => (
+              <button
+                key={t.id}
+                className={currentTab === t.id ? "active" : ""}
+                aria-current={currentTab === t.id ? "page" : undefined}
+                onClick={() => changeTab(t.id)}
+              >
+                {t.label}
+              </button>
+            ))}
         </div>
-        <ActionMenu label="Lainnya di kelas">
-          <button onClick={() => changeTab("materials")}>
-            <FileText size={16} />
-            Materi
-          </button>
-          <button onClick={() => changeTab("graph")}>
-            <Network size={16} />
-            Peta konsep
-          </button>
-        </ActionMenu>
       </div>
       {lesson.status === "processing" ? (
         <div className="processing" role="status">
@@ -170,19 +149,16 @@ export function SessionView({ id }: { id: string }) {
                 onAsk={() => changeTab("questions")}
               />
             ))}
-          {currentTab === "notes" &&
-            (upcoming ? (
-              <Empty title="Catatan tersedia setelah kelas" />
-            ) : (
-              <NotesPanel
-                lesson={lesson}
-                saved={saved}
-                onSource={() => changeTab("transcript")}
-                onGraph={() => changeTab("graph")}
-                onSaved={setDetail}
-              />
-            ))}
-          {currentTab === "questions" && <QuestionsPanel sessionId={id} teacher={course.teacher} />}
+          {currentTab === "notes" && lesson.status === "done" && (
+            <NotesPanel
+              lesson={lesson}
+              saved={saved}
+              onSource={() => changeTab("transcript")}
+              onGraph={() => changeTab("graph")}
+              onSaved={setDetail}
+            />
+          )}
+          {currentTab === "questions" && <QuestionsPanel sessionId={id} />}
           {currentTab === "materials" && <MaterialsPanel lesson={lesson} />}
           {currentTab === "graph" && (
             <GraphPanel
@@ -238,7 +214,7 @@ export function SessionView({ id }: { id: string }) {
       <Modal
         open={end}
         title="Akhiri kelas?"
-        subtitle="Catatan dan pertanyaan tetap tersedia."
+        subtitle="Catatan dan pertanyaan tetap tersedia. Agenda dari kelas langsung tersimpan."
         onClose={() => setEnd(false)}
       >
         <div className="dialog-actions">

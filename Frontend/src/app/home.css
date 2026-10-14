@@ -1,7 +1,4 @@
 /* Home */
-.home-page .page-intro {
-  margin-bottom: 20px;
-}
 .home-reminders {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(310px, 430px);
@@ -34,7 +31,7 @@
 .home-reminders-heading .eyebrow {
   display: block;
   color: #cbdcc8;
-  font-size: 11px;
+  font-size: var(--font-caption);
 }
 .home-reminders-list {
   display: grid;
@@ -65,14 +62,14 @@
   padding: 2px 7px;
   border-radius: 4px;
   background: #f3e5cf;
-  color: #795438;
-  font-size: 11px;
-  font-weight: 700;
+  color: var(--text-warm);
+  font-size: var(--font-caption);
+  font-weight: 600;
   line-height: 1.2;
 }
 .home-latest-notification strong {
   display: block;
-  font-size: 15px;
+  font-size: var(--font-body);
   line-height: 1.4;
 }
 .home-latest-notification:hover strong {
@@ -91,7 +88,7 @@
   border: 0;
   background: transparent;
   color: #e2eddf;
-  font-size: 13px;
+  font-size: var(--font-body);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -100,7 +97,7 @@
 }
 .home-reminders-empty {
   color: #e0eadc;
-  font-size: 14px;
+  font-size: var(--font-body);
 }
 .home-columns {
   display: grid;
@@ -148,15 +145,15 @@
   align-items: flex-start;
   justify-content: space-between;
   width: 100%;
-  color: #82957a;
+  color: var(--muted);
 }
 .home-course-live {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   color: var(--green);
-  font-size: 12px;
-  font-weight: 700;
+  font-size: var(--font-caption);
+  font-weight: 600;
 }
 .home-course-live-dot {
   width: 8px;
@@ -188,13 +185,13 @@
   gap: 6px;
   margin-top: 12px;
   color: var(--green);
-  font-size: 13px;
+  font-size: var(--font-body);
   font-weight: 600;
 }
 .home-course-row strong,
 .course-personal-note strong {
   display: block;
-  font-size: 14px;
+  font-size: var(--font-card);
   font-weight: 600;
   line-height: 1.45;
 }
@@ -202,7 +199,7 @@
 .course-personal-note small {
   display: block;
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--font-caption);
   line-height: 1.5;
   margin-top: 4px;
 }
@@ -224,7 +221,7 @@
   gap: 12px;
 }
 .home-calendar-header h3 {
-  font-size: 18px;
+  font-size: var(--font-section);
   line-height: 1.35;
   text-transform: capitalize;
 }
@@ -245,7 +242,7 @@
 .home-calendar-weekdays {
   margin-top: 12px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--font-caption);
   font-weight: 600;
   text-align: center;
 }
@@ -263,7 +260,7 @@
   justify-content: center;
   gap: 1px;
   border-radius: 7px;
-  font-size: 13px;
+  font-size: var(--font-body);
   font-weight: 500;
   line-height: 1.25;
 }
@@ -273,7 +270,7 @@
 .home-calendar-day.selected {
   background: #e7f0e1;
   color: var(--green);
-  font-weight: 700;
+  font-weight: 600;
 }
 .home-calendar-day.today {
   box-shadow: inset 0 0 0 1px #a7bf9b;
@@ -310,11 +307,11 @@
   line-height: 1.4;
 }
 .home-calendar-selection strong {
-  font-size: 14px;
+  font-size: var(--font-body);
 }
 .home-calendar-selection small {
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--font-caption);
 }
 .home-calendar-study {
   display: inline-flex;
@@ -328,7 +325,7 @@
   border-radius: 8px;
   background: #f1f5ee;
   color: var(--green);
-  font-size: 13px;
+  font-size: var(--font-body);
   font-weight: 600;
 }
 .home-calendar-study:hover {

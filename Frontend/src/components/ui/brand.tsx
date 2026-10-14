@@ -7,7 +7,9 @@ export function Logo() {
       <span className="brand-symbol">
         <Paperclip size={21} />
       </span>
-      clipthat<span className="brand-period">.</span>
+      <span className="brand-name">
+        clipthat<span className="brand-period">.</span>
+      </span>
     </span>
   );
 }

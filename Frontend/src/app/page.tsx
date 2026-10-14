@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { courses, courseFor } from "@/data";
 import { getNotifications } from "./components/notification-model";
-import { PageHeading, SectionTitle } from "@/components/ui";
+import { Breadcrumbs, PageHeading, SectionTitle } from "@/components/ui";
 import { useApp } from "@/state/app-provider";
 import { HomeCalendar, type HomeCalendarEvent } from "./components/home-calendar";
 import { NotificationStrip } from "./components/notifications";
@@ -38,13 +38,11 @@ export default function Home() {
         }));
   return (
     <div className="home-page">
-      <PageHeading title={lecturer ? "Selamat datang, Bu Nadia" : "Selamat datang, Davin"} />
+      <Breadcrumbs items={[]} />
+      <PageHeading title={lecturer ? "Selamat datang, Bu Nadia!" : "Selamat datang, Davin!"} />
       <p className="page-intro">
-        {lecturer
-          ? "Lanjutkan kelas dan lihat bagian yang perlu dijelaskan kepada murid."
-          : "Kelas, rangkuman, dan hal yang perlu kamu ingat ada di sini."}
+        {lecturer ? "Siap lanjut mengajar hari ini?" : "Mau lanjut belajar apa hari ini?"}
       </p>
-
       <NotificationStrip
         notifications={notifications}
         handledIds={data.handledNotifications || []}

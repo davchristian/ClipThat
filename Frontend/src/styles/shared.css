@@ -7,7 +7,7 @@
   min-height: 42px;
   padding: 10px 15px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: var(--font-body);
   font-weight: 600;
   line-height: 1.4;
   white-space: nowrap;
@@ -23,7 +23,7 @@
 .button.secondary {
   background: var(--paper);
   border: 1px solid #dde3d5;
-  color: #52664b;
+  color: var(--green);
 }
 .button.secondary:hover {
   background: #f2f5ec;
@@ -37,12 +37,12 @@
 }
 .button.danger {
   background: #f8e8e1;
-  color: #9c4535;
+  color: var(--text-danger);
 }
 .button.small {
   min-height: 34px;
   padding: 7px 11px;
-  font-size: 12px;
+  font-size: var(--font-caption);
 }
 .icon-button {
   width: 36px;
@@ -51,7 +51,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 7px;
-  color: #74826a;
+  color: var(--muted);
   flex-shrink: 0;
 }
 .icon-button:hover {
@@ -62,9 +62,9 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-size: 13px;
+  font-size: var(--font-body);
   font-weight: 500;
-  color: #5d7751;
+  color: var(--green);
 }
 .text-button:hover {
   color: var(--green);
@@ -79,8 +79,8 @@
   border: 1px solid #dde4d5;
   padding: 8px 13px;
   border-radius: 20px;
-  color: #6c7c61;
-  font-size: 12px;
+  color: var(--muted);
+  font-size: var(--font-caption);
 }
 .chip.active {
   background: var(--green);
@@ -92,15 +92,15 @@
   gap: 6px;
   align-items: center;
   background: #eef1e6;
-  color: #667858;
+  color: var(--green);
   border-radius: 5px;
   padding: 4px 8px;
-  font-size: 11px;
+  font-size: var(--font-caption);
   white-space: nowrap;
 }
 .badge.live {
   background: #e9f1df;
-  color: #54753f;
+  color: var(--green);
 }
 .status-dot {
   width: 6px;
@@ -141,7 +141,7 @@
   width: 100%;
   padding: 11px 10px;
   text-align: left;
-  font-size: 12px;
+  font-size: var(--font-caption);
   border-radius: 6px;
 }
 .menu-items button:hover,
@@ -179,10 +179,10 @@
   margin-bottom: 25px;
 }
 .modal-top h2 {
-  font-size: 21px;
+  font-size: var(--font-section);
 }
 .modal-top p {
-  font-size: 12px;
+  font-size: var(--font-caption);
   color: var(--muted);
   margin-top: 8px;
   line-height: 1.6;
@@ -196,7 +196,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  font-size: 12px;
+  font-size: var(--font-body);
   font-weight: 500;
 }
 input,
@@ -212,7 +212,7 @@ textarea {
 }
 input::placeholder,
 textarea::placeholder {
-  color: #829078;
+  color: var(--muted);
 }
 textarea {
   min-height: 110px;
@@ -220,7 +220,7 @@ textarea {
   resize: vertical;
 }
 input[type="file"] {
-  font-size: 12px;
+  font-size: var(--font-caption);
 }
 input[type="file"]::file-selector-button {
   background: var(--sage);
@@ -238,14 +238,14 @@ input[type="file"]::file-selector-button {
   min-width: 0;
 }
 .field-hint {
-  font-size: 11px;
+  font-size: var(--font-caption);
   font-weight: 400;
   color: var(--muted);
   line-height: 1.7;
 }
 .field-error {
-  color: #9e4535;
-  font-size: 12px;
+  color: var(--text-danger);
+  font-size: var(--font-caption);
 }
 .checkbox-label {
   display: flex !important;
@@ -296,12 +296,12 @@ input[type="file"]::file-selector-button {
 }
 .search-results strong {
   display: block;
-  font-size: 13px;
-  font-weight: 550;
+  font-size: var(--font-body);
+  font-weight: 500;
 }
 .search-results small {
   display: block;
-  font-size: 11px;
+  font-size: var(--font-caption);
   color: var(--muted);
   margin-top: 4px;
 }
@@ -324,7 +324,7 @@ input[type="file"]::file-selector-button {
 .reading-note > summary::after,
 .settings-calendars > summary::after {
   content: "⌄";
-  color: #87977b;
+  color: var(--muted);
   margin-left: auto;
 }
 .detail-section[open] > summary::after,
@@ -361,7 +361,7 @@ input[type="file"]::file-selector-button {
   gap: 11px;
   background: #294d3f;
   color: #f4f2e6;
-  font-size: 12px;
+  font-size: var(--font-caption);
   padding: 13px 17px;
   border-radius: 10px;
   box-shadow: 0 6px 20px #1f3e2420;
@@ -369,7 +369,7 @@ input[type="file"]::file-selector-button {
   pointer-events: auto;
 }
 .toast button {
-  font-size: 18px;
+  font-size: var(--font-section);
   padding: 0 4px;
 }
 .toast-check {
