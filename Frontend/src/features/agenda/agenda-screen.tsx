@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Check, ChevronLeft, ChevronRight, Download, Pencil, Plus } from "lucide-react";
+import {
+  CalendarPlus,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Lock,
+  Pencil,
+  Plus,
+} from "lucide-react";
 import { useApp } from "@/state/app-provider";
 import { ActionMenu, Empty, Modal, PageHeading } from "@/components/ui";
 import { courseFor } from "@/lib/demo-data";
@@ -23,7 +32,9 @@ export function AgendaView() {
   if (data.role === "lecturer")
     return (
       <Empty
+        icon={Lock}
         title="Agenda pribadi mahasiswa"
+        text="Mahasiswa menyusun agenda dari kelas yang mereka ikuti. Isinya hanya terlihat oleh mereka."
         action={
           <Link className="button secondary" href="/">
             Buka kelas
@@ -52,7 +63,7 @@ export function AgendaView() {
               <button
                 onClick={() => {
                   if (!data.agenda.some((a) => a.confirmed && !a.done)) {
-                    notify("Belum ada agenda aktif.");
+                    notify("Belum ada agenda aktif untuk diunduh.", { kind: "info" });
                     return;
                   }
                   downloadText(
@@ -142,7 +153,7 @@ export function AgendaView() {
                       }))
                     }
                   >
-                    <Check size={14} />
+                    <Check size={16} />
                   </button>
                   <div className="row-main">
                     <h3>{a.title}</h3>
@@ -162,7 +173,19 @@ export function AgendaView() {
           </div>
         </section>
       ))}
-      {!entries.length && <Empty title="Belum ada agenda minggu ini" />}
+      {!entries.length && (
+        <Empty
+          icon={CalendarPlus}
+          title="Belum ada agenda minggu ini"
+          text="Tambahkan tugas atau jadwal belajar sendiri. Tenggat dari pengumuman kelas juga muncul di sini untuk dikonfirmasi."
+          action={
+            <button className="button secondary" onClick={() => setEditing("new")}>
+              <Plus size={16} />
+              Tambah agenda
+            </button>
+          }
+        />
+      )}
       {editing && (
         <AgendaEditor
           key={editing === "new" ? "new" : editing.id}

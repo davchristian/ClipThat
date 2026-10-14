@@ -1,18 +1,67 @@
 :root {
   --bg: #faf9f6;
   --paper: #ffffff;
-  --ink: #2b3730;
-  --muted: #6b7466;
-  --green: #2e5145;
-  --line: #e5e7df;
+  --surface: #f2f4ec;
   --sage: #edf1e7;
+  --sage-strong: #e0e8d8;
+
+  --ink: #2b3730;
+  --ink-2: #4e6344;
+  --muted: #5f6959;
+  --faint: #76836b;
+
+  --line: #e5e7df;
+  --line-strong: #d6ddcc;
+  --line-accent: #b5c8a5;
+
+  --green: #2e5145;
+  --green-hover: #3c6354;
+  --on-green: #f4f2e6;
+  --on-green-muted: #c9d6bd;
+  --leaf: #a3bb8c;
+
+  --clip: #bc946c;
+  --clip-ink: #7a5c3a;
+  --clip-wash: #f7f0e3;
+  --clip-line: #eae0ca;
+
+  --danger: #9c4535;
+  --danger-wash: #f8e8e1;
+  --toast-warning: #4a3c1b;
+  --toast-error: #5c2a22;
+  --toast-icon-success: #c7d9aa;
+  --toast-icon-info: #bcd3e3;
+  --toast-icon-warning: #f1d27f;
+  --toast-icon-error: #f5ad9b;
+
+  --sage-ink: #4c6a46;
   --peach: #f6eade;
+  --peach-ink: #7f5836;
   --blue: #eaf0f4;
+  --blue-ink: #4b6578;
   --sand: #f3efdf;
+  --sand-ink: #6c5e36;
+
+  --shadow-rgb: 31 62 36;
+  --scrim: rgb(26 48 42 / 0.27);
+
+  --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 13px;
+  --text-base: 14px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 28px;
+  --text-display: clamp(36px, 2.4vw + 14px, 44px);
+
   --sidebar-width: 216px;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --touch-target: 44px;
 
   --font-family-ui: "DM Sans Variable", "DM Sans", sans-serif;
-  --text-display: 44px;
   --text-page-title: 28px;
   --text-feature-title: 24px;
   --text-dialog-title: 20px;

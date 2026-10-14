@@ -58,7 +58,7 @@ export function AuthScreen({ mode }: { mode: "login" | "register" }) {
     if (register) update((data) => ({ ...data, role }));
     // Only demonstrate the frontend flow. Credentials are never stored or sent.
     setPassword("");
-    notify("Demo dibuka. Akun belum dibuat atau diverifikasi.");
+    notify("Demo dibuka. Akun belum dibuat atau diverifikasi.", { kind: "info" });
     router.push("/");
   }
 
@@ -158,14 +158,16 @@ export function AuthScreen({ mode }: { mode: "login" | "register" }) {
                 <legend>Aku seorang</legend>
                 <div>
                   {(["student", "lecturer"] as const).map((value) => (
-                    <button
-                      type="button"
-                      key={value}
-                      aria-pressed={role === value}
-                      onClick={() => setRole(value)}
-                    >
-                      {value === "student" ? "Mahasiswa" : "Dosen"}
-                    </button>
+                    <label className="auth-role-option" key={value}>
+                      <input
+                        type="radio"
+                        name="role"
+                        value={value}
+                        checked={role === value}
+                        onChange={() => setRole(value)}
+                      />
+                      <span>{value === "student" ? "Mahasiswa" : "Dosen"}</span>
+                    </label>
                   ))}
                 </div>
               </fieldset>

@@ -36,10 +36,10 @@ export function useSession(id: string) {
     return () => clearTimeout(timer);
   }, [lesson?.status, id, update, notify]);
   function bookmark(segment: Segment) {
-    const exists = saved.some((s) => s.type === "bookmark" && s.time === segment.time);
+    const existing = saved.find((s) => s.type === "bookmark" && s.time === segment.time);
     update((d) => ({
       ...d,
-      saved: exists
+      saved: existing
         ? d.saved.filter(
             (s) => !(s.sessionId === id && s.type === "bookmark" && s.time === segment.time),
           )
@@ -57,7 +57,15 @@ export function useSession(id: string) {
             },
           ],
     }));
-    notify(exists ? "Penanda dihapus." : "Bagian tersimpan.");
+    if (!existing) return notify("Bagian tersimpan.");
+    notify("Penanda dihapus.", {
+      action: { label: "Urungkan", run: () => restore(existing) },
+    });
+  }
+  function restore(item: SavedItem) {
+    update((d) =>
+      d.saved.some((s) => s.id === item.id) ? d : { ...d, saved: [...d.saved, item] },
+    );
   }
   function capture() {
     if (lecturer || pendingCapture) return;
@@ -99,7 +107,13 @@ export function useSession(id: string) {
     notify("Capture tersimpan.");
   }
   function discardCapture() {
+    const item = pendingCapture;
     setCaptureDraft(null);
+    if (!item) return;
+    notify("Capture dibuang.", {
+      kind: "info",
+      action: { label: "Urungkan", run: () => setCaptureDraft(item) },
+    });
   }
   function sendCaptureQuestion(text: string) {
     if (!pendingCapture || !text.trim()) return;

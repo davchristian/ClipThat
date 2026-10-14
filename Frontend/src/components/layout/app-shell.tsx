@@ -8,7 +8,6 @@ import {
   Bookmark,
   CalendarDays,
   GraduationCap,
-  LogIn,
   Menu,
   Search,
   Settings2,
@@ -80,7 +79,7 @@ function DemoShell({ children }: { children: ReactNode }) {
           aria-label="Cari kelas atau topik"
           onClick={() => setSearchOpen(true)}
         >
-          <Search size={17} />
+          <Search size={18} />
           <span>Cari kelas</span>
           <kbd>Ctrl K</kbd>
         </button>
@@ -101,7 +100,7 @@ function DemoShell({ children }: { children: ReactNode }) {
                   className={`nav-item ${active ? "active" : ""}`}
                   aria-current={active ? "page" : undefined}
                 >
-                  <n.icon size={20} strokeWidth={1.7} />
+                  <n.icon size={20} />
                   <span>{n.label}</span>
                 </Link>
               );
@@ -109,12 +108,8 @@ function DemoShell({ children }: { children: ReactNode }) {
         </nav>
         <div className="sidebar-bottom">
           <Link className={`nav-item ${pathname === "/settings" ? "active" : ""}`} href="/settings">
-            <Settings2 size={19} strokeWidth={1.7} />
+            <Settings2 size={20} />
             Pengaturan
-          </Link>
-          <Link className="nav-item" href="/login">
-            <LogIn size={19} strokeWidth={1.7} />
-            Masuk
           </Link>
           <div className="profile">
             <span className="avatar">{lecturer ? "NP" : "DF"}</span>
@@ -135,7 +130,7 @@ function DemoShell({ children }: { children: ReactNode }) {
             aria-controls="main-sidebar"
             onClick={() => setMobile((v) => !v)}
           >
-            <Menu size={22} />
+            <Menu size={20} />
           </button>
           <Link href="/" aria-label="ClipThat">
             <Logo />

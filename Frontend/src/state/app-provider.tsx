@@ -1,15 +1,15 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
-import { X } from "lucide-react";
 import { initialState } from "@/lib/demo-data";
+import { Toast, type ToastData, type ToastOptions } from "@/components/toast";
 import type { DemoState } from "@/lib/types";
 import { liveMode } from "@/lib/app-mode";
 type Context = {
   data: DemoState;
   ready: boolean;
   update: (fn: (data: DemoState) => DemoState) => void;
-  notify: (message: string) => void;
+  notify: (message: string, options?: ToastOptions) => void;
   reset: () => void;
 };
 const AppContext = createContext<Context | null>(null);
@@ -17,8 +17,13 @@ const storageKey = "clipthat-frontend-v1";
 export function AppProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<DemoState>(initialState);
   const [ready, setReady] = useState(false);
-  const [toast, setToast] = useState<{ text: string; id: number } | null>(null);
-  const notify = useCallback((text: string) => setToast({ text, id: Date.now() }), []);
+  const [toast, setToast] = useState<ToastData | null>(null);
+  const notify = useCallback(
+    (text: string, { kind = "success", action }: ToastOptions = {}) =>
+      setToast({ text, kind, action, id: Date.now() }),
+    [],
+  );
+  const clearToast = useCallback(() => setToast(null), []);
   useEffect(() => {
     if (liveMode) {
       setReady(true);
@@ -39,7 +44,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           setData(saved);
       }
     } catch {
-      notify("Data contoh tidak bisa dibaca. Ruang belajarmu dimuat ulang.");
+      notify("Data contoh tidak bisa dibaca. Ruang belajarmu dimuat ulang.", { kind: "warning" });
     }
     setReady(true);
   }, [notify]);
@@ -48,15 +53,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       localStorage.setItem(storageKey, JSON.stringify(data));
     } catch {
-      notify("Penyimpanan browser penuh. Perubahan tersedia sampai halaman ditutup.");
+      notify("Penyimpanan browser penuh. Perubahan tersedia sampai halaman ditutup.", {
+        kind: "warning",
+      });
     }
   }, [data, ready, notify]);
-  useEffect(() => {
-    if (toast) {
-      const timer = setTimeout(() => setToast(null), 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [toast]);
   const update = useCallback((fn: (state: DemoState) => DemoState) => setData(fn), []);
   return (
     <AppContext.Provider
@@ -73,19 +74,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     >
       {children}
       <div className="toast-region" aria-live="polite" aria-atomic="true">
-        {toast && (
-          <div className="toast">
-            <span className="toast-check">✓</span>
-            {toast.text}
-            <button
-              className="icon-button small"
-              aria-label="Tutup pemberitahuan"
-              onClick={() => setToast(null)}
-            >
-              <X size={16} aria-hidden="true" />
-            </button>
-          </div>
-        )}
+        {toast && <Toast key={toast.id} toast={toast} onDone={clearToast} />}
       </div>
     </AppContext.Provider>
   );

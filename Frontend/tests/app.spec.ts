@@ -419,7 +419,6 @@ test("lecturer answers, updates map, ends class, archives, restores and creates 
   await page.goto("/classes/aljabar");
   await page.getByLabel("Opsi Transformasi linear").click();
   await page.getByRole("button", { name: "Arsipkan Transformasi linear" }).click();
-  await page.getByRole("dialog").getByRole("button", { name: "Arsipkan", exact: true }).click();
   await expect(
     page.getByRole("link", { name: "Buka Transformasi linear", exact: true }),
   ).toHaveCount(0);
@@ -532,7 +531,10 @@ test("login and registration validate input and open only the frontend demo", as
   await page.getByRole("button", { name: "Masuk", exact: true }).click();
   await expect(page).toHaveURL("/");
   await expect(page.getByRole("heading", { name: "Kelas", exact: true })).toBeVisible();
-  await page.getByRole("link", { name: "Masuk", exact: true }).click();
+  await expect(page.locator(".sidebar").getByRole("link", { name: "Masuk" })).toHaveCount(0);
+  await page.getByRole("button", { name: "Pilih peran demo" }).click();
+  await page.getByRole("link", { name: "Keluar", exact: true }).click();
+  await expect(page).toHaveURL(/\/login$/);
   await page.getByRole("link", { name: "Daftar", exact: true }).click();
   await expect(page).toHaveURL(/\/register$/);
   await page.getByLabel("Nama lengkap", { exact: true }).fill("  ");
@@ -541,11 +543,9 @@ test("login and registration validate input and open only the frontend demo", as
   await page.getByRole("button", { name: "Buat akun", exact: true }).click();
   await expect(page.locator(".auth-form").getByRole("alert")).toContainText("minimal 2 karakter");
   await page.getByLabel("Nama lengkap", { exact: true }).fill("Dosen Contoh");
-  await page.getByRole("button", { name: "Dosen", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Dosen", exact: true })).toHaveAttribute(
-    "aria-pressed",
-    "true",
-  );
+  await page.getByRole("radio", { name: "Dosen", exact: true }).check();
+  await expect(page.getByRole("radio", { name: "Dosen", exact: true })).toBeChecked();
+  await expect(page.getByRole("radio", { name: "Mahasiswa", exact: true })).not.toBeChecked();
   await page.getByRole("button", { name: "Buat akun", exact: true }).click();
   await expect(page).toHaveURL("/");
   await expect(page.getByRole("button", { name: "Pilih peran demo" })).toHaveText("Dosen");
@@ -638,7 +638,10 @@ test("capture actions stay reachable on narrow phones and landscape screens", as
     await page.setViewportSize(viewport);
     await page.goto("/session/linear-05");
     await page.getByRole("button", { name: "Capture 90 detik" }).click();
-    const preview = page.getByRole("dialog", { name: "Preview capture" });
+    const sideBySide = viewport.width > 1200 && viewport.height > 700;
+    const preview = page.getByRole(sideBySide ? "complementary" : "dialog", {
+      name: "Preview capture",
+    });
     await expect(preview).toBeVisible();
     await preview.locator("summary").filter({ hasText: "Transkrip sumber" }).click();
     await preview.getByRole("button", { name: "Edit dan kirim" }).click();

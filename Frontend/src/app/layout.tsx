@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "@fontsource-variable/dm-sans";
+import "@fontsource/dm-mono/400.css";
+import "@fontsource/dm-mono/500.css";
 import "@/styles/globals.css";
 import { AppProvider } from "@/state/app-provider";
 import { Shell } from "@/components/layout/app-shell";

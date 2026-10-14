@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
-import { Check, ChevronUp } from "lucide-react";
+import { Check, ChevronUp, LogOut } from "lucide-react";
 import { useApp } from "@/state/app-provider";
 import type { Role } from "@/lib/types";
 
@@ -55,25 +56,31 @@ export function RoleSwitcher() {
         onClick={() => setOpen((value) => !value)}
       >
         {data.role === "lecturer" ? "Dosen" : "Mahasiswa"}
-        <ChevronUp size={12} aria-hidden="true" />
+        <ChevronUp size={16} aria-hidden="true" />
       </button>
       {open && (
-        <div id={id} className="role-options" role="group" aria-label="Pilihan peran demo">
-          {roles.map((role) => (
-            <button
-              key={role.value}
-              type="button"
-              aria-pressed={data.role === role.value}
-              onClick={() => {
-                update((state) => ({ ...state, role: role.value }));
-                setOpen(false);
-                trigger.current?.focus();
-              }}
-            >
-              {role.label}
-              {data.role === role.value && <Check size={14} aria-hidden="true" />}
-            </button>
-          ))}
+        <div id={id} className="role-options">
+          <div role="group" aria-label="Pilihan peran demo">
+            {roles.map((role) => (
+              <button
+                key={role.value}
+                type="button"
+                aria-pressed={data.role === role.value}
+                onClick={() => {
+                  update((state) => ({ ...state, role: role.value }));
+                  setOpen(false);
+                  trigger.current?.focus();
+                }}
+              >
+                {role.label}
+                {data.role === role.value && <Check size={16} aria-hidden="true" />}
+              </button>
+            ))}
+          </div>
+          <Link className="role-signout" href="/login" onClick={() => setOpen(false)}>
+            <LogOut size={16} aria-hidden="true" />
+            Keluar
+          </Link>
         </div>
       )}
     </div>

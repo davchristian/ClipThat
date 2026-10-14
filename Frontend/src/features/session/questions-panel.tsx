@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ChevronUp, Send } from "lucide-react";
+import { Check, ChevronUp, MessageCircle, Send } from "lucide-react";
 import { useApp } from "@/state/app-provider";
 import { Empty, Modal } from "@/components/ui";
 import { seconds } from "@/lib/format";
@@ -73,7 +73,7 @@ export function QuestionsPanel({ sessionId, teacher }: { sessionId: string; teac
                 }))
               }
             >
-              <ChevronUp size={17} />
+              <ChevronUp size={18} />
               {q.votes}
             </button>
             <div className="question-body">
@@ -89,7 +89,7 @@ export function QuestionsPanel({ sessionId, teacher }: { sessionId: string; teac
               )}
               {q.oral && !q.answer && (
                 <div className="answer">
-                  <Check size={14} />
+                  <Check size={16} />
                   Dijawab di kelas
                 </div>
               )}
@@ -126,7 +126,15 @@ export function QuestionsPanel({ sessionId, teacher }: { sessionId: string; teac
           </article>
         ))
       ) : (
-        <Empty title="Belum ada pertanyaan" />
+        <Empty
+          icon={MessageCircle}
+          title="Belum ada pertanyaan"
+          text={
+            lecturer
+              ? "Pertanyaan mahasiswa muncul di sini selama kelas. Pengirimnya tetap anonim."
+              : "Tulis bagian yang belum jelas di atas. Pertanyaanmu dikirim tanpa nama."
+          }
+        />
       )}
       <Modal open={!!answering} title="Jawab pertanyaan" onClose={() => setAnswering(null)}>
         <p className="capture-excerpt">{answering?.text}</p>

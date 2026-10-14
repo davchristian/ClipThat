@@ -32,7 +32,9 @@ export function MaterialsPanel({
       file.size > 1024 * 1024 ||
       !["application/pdf", "text/plain", "image/png", "image/jpeg"].includes(file.type)
     ) {
-      notify("PDF, TXT, JPG, PNG · maksimal 1 MB.");
+      notify("Berkas tidak didukung. Gunakan PDF, TXT, JPG, atau PNG maksimal 1 MB.", {
+        kind: "error",
+      });
       return;
     }
     try {
@@ -49,7 +51,7 @@ export function MaterialsPanel({
       }));
       notify("Materi ditambahkan.");
     } catch {
-      notify("Berkas tidak bisa dibaca.");
+      notify("Berkas tidak bisa dibaca. Coba unggah ulang.", { kind: "error" });
     }
   }
   return (
@@ -59,7 +61,7 @@ export function MaterialsPanel({
           action={
             data.role === "lecturer" && (
               <button className="button secondary small" onClick={() => input.current?.click()}>
-                <Upload size={15} />
+                <Upload size={16} />
                 Tambah materi
               </button>
             )
@@ -79,7 +81,7 @@ export function MaterialsPanel({
           }}
         />
         <div className="material-row">
-          <FileText size={22} />
+          <FileText size={20} />
           <span>
             <strong>{lesson.title}.txt</strong>
             <small>Materi contoh</small>
@@ -99,7 +101,7 @@ export function MaterialsPanel({
         </div>
         {(data.materials[lesson.id] || []).map((m) => (
           <div className="material-row" key={m.id}>
-            <FileText size={22} />
+            <FileText size={20} />
             <span>
               <strong>{m.name}</strong>
               <small>Berkas lokal</small>
@@ -183,16 +185,16 @@ export function GraphPanel({
         </p>
         <button className="text-button" onClick={onSource}>
           Buka pembahasan
-          <ArrowRight size={14} />
+          <ArrowRight size={16} />
         </button>
         <button className="text-button" onClick={onMaterial}>
           Materi terkait
-          <ArrowRight size={14} />
+          <ArrowRight size={16} />
         </button>
         {concept === 0 && lesson.id === "linear-05" && (
           <Link className="text-button" href="/session/basis-04">
             Pertemuan sebelumnya
-            <ArrowRight size={14} />
+            <ArrowRight size={16} />
           </Link>
         )}
         {data.role === "lecturer" && (

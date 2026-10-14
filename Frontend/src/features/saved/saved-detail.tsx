@@ -89,7 +89,7 @@ export function SavedDetail({ item, onClose }: { item: SavedItem | null; onClose
                     close();
                   }}
                 >
-                  <Send size={14} />
+                  <Send size={16} />
                   Kirim anonim
                 </button>
               </details>
@@ -102,7 +102,7 @@ export function SavedDetail({ item, onClose }: { item: SavedItem | null; onClose
                   onClick={close}
                 >
                   Buka kelas
-                  <ArrowRight size={14} />
+                  <ArrowRight size={16} />
                 </Link>
               )}
               <button
@@ -110,7 +110,7 @@ export function SavedDetail({ item, onClose }: { item: SavedItem | null; onClose
                 aria-label="Hapus bagian pribadi"
                 onClick={() => setDeleting(true)}
               >
-                <Trash2 size={17} />
+                <Trash2 size={18} />
               </button>
               <button
                 className="button primary small"
@@ -125,7 +125,7 @@ export function SavedDetail({ item, onClose }: { item: SavedItem | null; onClose
                   close();
                 }}
               >
-                <Check size={15} />
+                <Check size={16} />
                 {item.reviewed ? "Review lagi" : "Sudah paham"}
               </button>
             </div>

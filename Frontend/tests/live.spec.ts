@@ -62,6 +62,40 @@ test("live login uses auth API, capture waits for confirmation, responsive tabs 
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
     ).toBe(true);
   }
+  // The incoming mobile sheet must respect the backend save-in-progress guard.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("tab", { name: "Transkrip", exact: true }).click();
+  await page.getByRole("button", { name: "Capture 90 detik" }).click();
+  const mobilePreview = page.getByRole("dialog", { name: "Preview capture" });
+  let releaseSave = () => {};
+  const pendingSave = new Promise<void>((resolve) => {
+    releaseSave = resolve;
+  });
+  await page.route("**/api/v1/saved/capture", async (route) => {
+    await pendingSave;
+    await route.fulfill({
+      status: 503,
+      json: { error: { message: "Penyimpanan belum tersedia." } },
+    });
+  });
+  try {
+    const saving = page.waitForRequest(
+      (request) => request.url().endsWith("/api/v1/saved/capture") && request.method() === "POST",
+    );
+    await mobilePreview.getByRole("button", { name: "Simpan capture" }).click();
+    await saving;
+    await expect(mobilePreview.getByRole("button", { name: "Tutup dialog" })).toBeDisabled();
+    await page.keyboard.press("Escape");
+    await expect(mobilePreview).toBeVisible();
+    await expect(mobilePreview).toBeInViewport();
+  } finally {
+    releaseSave();
+  }
+  await expect(mobilePreview.getByRole("alert")).toContainText("Penyimpanan belum tersedia.");
+  await expect(mobilePreview.getByRole("button", { name: "Simpan capture" })).toBeEnabled();
+  await mobilePreview.getByRole("button", { name: "Buang capture", exact: true }).click();
+  await expect(mobilePreview).not.toBeVisible();
+  await expect(page.getByRole("button", { name: "Tersimpan (1)" })).toBeVisible();
   expect(errors).toEqual([]);
 });
 test("live lecturer can end class and student cannot access internal worker", async ({

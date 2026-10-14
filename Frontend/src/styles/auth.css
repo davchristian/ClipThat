@@ -1,7 +1,7 @@
 .auth-page {
   height: 100dvh;
   overflow-y: auto;
-  background: linear-gradient(115deg, #eef2e7, #f6f4ec 48%, #faf9f6);
+  background: linear-gradient(115deg, var(--sage), var(--surface) 48%, var(--bg));
 }
 .auth-layout {
   display: grid;
@@ -43,20 +43,20 @@
   position: absolute;
   width: 276px;
   height: 244px;
-  border: 1px solid #dde2d5;
+  border: 1px solid var(--line-strong);
   border-radius: 14px;
 }
 .auth-paper-back {
   left: 16px;
   top: 12px;
   transform: rotate(-7deg);
-  background: #e5ebdb;
+  background: var(--sage);
 }
 .auth-paper {
   padding: 24px;
   transform: rotate(3deg);
-  background: #fffef9;
-  box-shadow: 0 8px 24px #40503c08;
+  background: var(--paper);
+  box-shadow: 0 8px 24px rgb(var(--shadow-rgb) / 0.03);
 }
 .auth-paper-label {
   display: block;
@@ -67,7 +67,7 @@
   height: 5px;
   margin-top: 16px;
   border-radius: 8px;
-  background: #e7ebdf;
+  background: var(--sage);
 }
 .auth-paper-line.short {
   width: 66%;
@@ -104,10 +104,10 @@
   max-width: 440px;
   margin: auto;
   padding: 38px;
-  border: 1px solid #e7e8df;
+  border: 1px solid var(--line);
   border-radius: 18px;
-  background: #fffefb;
-  box-shadow: 0 12px 36px #40503c05;
+  background: var(--paper);
+  box-shadow: 0 12px 36px rgb(var(--shadow-rgb) / 0.02);
 }
 .auth-subtitle {
   margin: 12px 0 30px;
@@ -149,15 +149,40 @@
   gap: 8px;
   margin-top: 10px;
 }
-.auth-role button {
-  min-height: var(--control-height);
+.auth-role-option {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 44px;
   border: 1px solid var(--line);
-  border-radius: var(--control-radius);
+  border-radius: 7px;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition:
+    background-color 150ms var(--ease-out),
+    border-color 150ms var(--ease-out),
+    color 150ms var(--ease-out),
+    transform 160ms var(--ease-out);
 }
-.auth-role button[aria-pressed="true"] {
-  border-color: #b3c5aa;
-  background: #eef3e8;
+.auth-role-option input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.auth-role-option:has(input:checked) {
+  border-color: var(--line-accent);
+  background: var(--sage);
   color: var(--green);
+}
+.auth-role-option:has(input:focus-visible) {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
 }
 .auth-submit {
   width: 100%;

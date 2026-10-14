@@ -72,7 +72,7 @@ export function SettingsView() {
           </details>
         )}
         <button className="text-button reset-button" onClick={() => setResetting(true)}>
-          <RotateCcw size={15} />
+          <RotateCcw size={16} />
           Reset demo
         </button>
         <p className="demo-note">
@@ -93,9 +93,9 @@ export function SettingsView() {
             setPreferences(next);
             try {
               localStorage.setItem(preferenceKey, JSON.stringify(next));
-              notify("Tujuan tersimpan. Akun belum terhubung.");
+              notify("Tujuan tersimpan. Akun belum terhubung.", { kind: "info" });
             } catch {
-              notify("Penyimpanan browser penuh.");
+              notify("Penyimpanan browser penuh.", { kind: "warning" });
             }
             setConnection(null);
           }}
@@ -118,7 +118,7 @@ export function SettingsView() {
               rel="noreferrer"
             >
               Buka aplikasi
-              <ExternalLink size={13} />
+              <ExternalLink size={16} />
             </a>
             <button className="button primary" disabled={!target.trim()}>
               Simpan tujuan

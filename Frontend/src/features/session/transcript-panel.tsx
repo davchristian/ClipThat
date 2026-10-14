@@ -1,5 +1,6 @@
 "use client";
 
+import { useLayoutEffect, useRef } from "react";
 import { Bookmark, Camera, MessageCircle, ScanLine } from "lucide-react";
 import { seconds } from "@/lib/format";
 import type { SavedItem, Segment } from "@/lib/types";
@@ -27,18 +28,29 @@ export function TranscriptPanel({
   onAsk: () => void;
   captureBusy?: boolean;
 }) {
+  const content = useRef<HTMLDivElement>(null);
+  const captureId = pendingCapture?.id;
+  useLayoutEffect(() => {
+    const box = content.current;
+    const first = box?.querySelector<HTMLElement>(".in-capture");
+    if (!box || !first) return;
+    const view = box.getBoundingClientRect();
+    const offset = first.getBoundingClientRect().top - view.top;
+    if (offset >= 0 && offset <= view.height / 2) return;
+    box.scrollTop += offset - 12;
+  }, [captureId]);
   return (
     <section className="transcript-panel">
       <div className="transcript-toolbar">
         <span>Transkrip</span>
         {!lecturer && (
           <button className="text-button" onClick={onSaved}>
-            <Bookmark size={15} />
+            <Bookmark size={16} />
             Tersimpan ({saved.length})
           </button>
         )}
       </div>
-      <div className="transcript-content">
+      <div className="transcript-content" ref={content}>
         {segments.map((segment) => {
           const marked = saved.some((s) => s.type === "bookmark" && s.time === segment.time);
           const inCapture =

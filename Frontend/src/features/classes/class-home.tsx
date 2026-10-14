@@ -31,7 +31,7 @@ export function Dashboard() {
           </div>
           <Link href={`/session/${next.id}`} className={`button ${live ? "cream" : "primary"}`}>
             {lecturer ? "Buka kelas" : live ? "Masuk kelas" : "Lihat kelas"}
-            <ArrowRight size={17} />
+            <ArrowRight size={18} />
           </Link>
         </section>
       )}
@@ -49,7 +49,7 @@ export function Dashboard() {
                 <h3>{course.name}</h3>
                 <p>{session?.title || "Belum ada pertemuan"}</p>
               </div>
-              <ChevronRight size={17} />
+              <ChevronRight size={18} />
             </Link>
           );
         })}
