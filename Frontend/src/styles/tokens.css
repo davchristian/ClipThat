@@ -10,4 +10,45 @@
   --blue: #eaf0f4;
   --sand: #f3efdf;
   --sidebar-width: 216px;
+
+  --font-family-ui: "DM Sans Variable", "DM Sans", sans-serif;
+  --text-display: 44px;
+  --text-page-title: 28px;
+  --text-feature-title: 24px;
+  --text-dialog-title: 20px;
+  --text-section-title: 18px;
+  --text-card-title: 16px;
+  --text-reading: 16px;
+  --text-body: 14px;
+  --text-label: 13px;
+  --text-caption: 12px;
+  --text-micro: 11px;
+  --text-input: 14px;
+  --text-brand: 24px;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --leading-heading: 1.3;
+  --leading-body: 1.6;
+  --leading-reading: 1.85;
+  --leading-caption: 1.5;
+  --control-height: 44px;
+  --control-height-small: 36px;
+  --control-icon: 40px;
+  --control-icon-small: 32px;
+  --control-radius: 8px;
+}
+
+@media (max-width: 950px) {
+  :root {
+    --text-display: 36px;
+  }
+}
+@media (max-width: 620px) {
+  :root {
+    --text-page-title: 24px;
+    --text-feature-title: 22px;
+    --text-input: 16px;
+  }
 }

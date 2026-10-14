@@ -17,6 +17,8 @@ import { useApp } from "@/state/app-provider";
 import { CourseIcon, Logo, Modal } from "@/components/ui";
 import { courseFor } from "@/lib/demo-data";
 import { RoleSwitcher } from "./role-switcher";
+import { liveMode } from "@/lib/app-mode";
+import { LiveWorkspace } from "@/features/live/workspace";
 
 const navigation = [
   { href: "/", label: "Kelas", icon: GraduationCap },
@@ -24,6 +26,9 @@ const navigation = [
   { href: "/agenda", label: "Agenda", icon: CalendarDays },
 ];
 export function Shell({ children }: { children: ReactNode }) {
+  return liveMode ? <LiveWorkspace>{children}</LiveWorkspace> : <DemoShell>{children}</DemoShell>;
+}
+function DemoShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const authPage = pathname === "/login" || pathname === "/register";
   const { data } = useApp();

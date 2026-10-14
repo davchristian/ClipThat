@@ -1,0 +1,126 @@
+.live-loading {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+}
+.live-course {
+  margin-bottom: 32px;
+}
+.live-muted {
+  color: var(--muted);
+  font-size: var(--text-caption);
+  margin: 8px 0;
+}
+.live-session-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+  gap: 16px;
+  margin: 18px 0;
+}
+.live-session-card {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 12px;
+}
+.live-session-card:hover {
+  border-color: var(--green);
+}
+.live-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.live-row > .row-main {
+  flex: 1;
+  min-width: 140px;
+}
+.live-row > span:first-child {
+  flex: 1;
+}
+.live-saved-open {
+  text-align: left;
+  width: 100%;
+  overflow-wrap: anywhere;
+}
+.live-note {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+}
+.live-note p {
+  margin: 12px 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.live-source-link {
+  display: inline-flex;
+  margin: 6px 12px 6px 0;
+}
+.live-graph-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.live-graph-node {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  text-align: left;
+}
+.live-graph-node[aria-pressed="true"] {
+  background: #e7eddf;
+  border-color: var(--green);
+}
+.live-mic {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 14px 20px;
+  border-top: 1px solid var(--line);
+}
+.live-mic p {
+  width: 100%;
+  color: var(--muted);
+  font-size: var(--text-caption);
+}
+.live-transcript-empty {
+  padding: 80px 24px;
+  text-align: center;
+  color: var(--muted);
+}
+.live-error {
+  color: var(--danger);
+  margin: 12px 0;
+}
+.live-upload input {
+  max-width: 100%;
+}
+.live-question-form {
+  display: flex;
+  gap: 12px;
+  margin: 18px 0;
+  flex-wrap: wrap;
+}
+.live-question-form textarea {
+  flex: 1;
+  min-width: min(100%, 240px);
+}
+.live-main-empty {
+  margin: 32px 0;
+}
+@media (max-width: 600px) {
+  .live-row {
+    gap: 8px;
+  }
+  .live-question-form > .button {
+    width: 100%;
+  }
+}

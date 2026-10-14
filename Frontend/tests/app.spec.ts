@@ -271,6 +271,89 @@ test("small-screen capture preview confirms saving and closing never saves a dra
   ).toBe(true);
 });
 
+test("transcript and capture stay equal in height and aligned through page and panel scrolling", async ({
+  page,
+}) => {
+  for (const viewport of [
+    { width: 1366, height: 768 },
+    { width: 1440, height: 1000 },
+    { width: 1920, height: 900 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto("/session/linear-05");
+    const originalHeight = await page
+      .locator(".transcript-panel")
+      .evaluate((element) => element.getBoundingClientRect().height);
+    await page.getByRole("button", { name: "Capture 90 detik" }).click();
+    const preview = page.getByRole("complementary", { name: "Preview capture" });
+    const transcript = page.locator(".transcript-panel");
+    const main = page.locator(".main-wrapper");
+    const aligned = async () => {
+      const left = (await transcript.boundingBox())!;
+      const right = (await preview.boundingBox())!;
+      expect(Math.abs(left.y - right.y), `top at ${viewport.width}px`).toBeLessThan(1);
+      expect(Math.abs(left.height - right.height), `height at ${viewport.width}px`).toBeLessThan(1);
+    };
+    await aligned();
+    expect((await transcript.boundingBox())!.height).toBeGreaterThanOrEqual(originalHeight);
+    await preview.locator("summary").filter({ hasText: "Transkrip sumber" }).click();
+    await preview.getByRole("button", { name: "Edit dan kirim" }).click();
+    await preview
+      .getByLabel("Draf pertanyaan capture")
+      .fill("Bagaimana cara menentukan matriksnya? ".repeat(20));
+    await aligned();
+    // Editing focuses the textarea and may scroll an ancestor into view.
+    await main.evaluate((element) => element.scrollTo({ top: 0, behavior: "instant" }));
+    const initialY = (await transcript.boundingBox())!.y;
+    await page.mouse.move(viewport.width - 12, 100);
+    await expect
+      .poll(async () => {
+        await page.mouse.wheel(0, 160);
+        return main.evaluate((element) => element.scrollTop);
+      })
+      .toBeGreaterThan(0);
+    await expect.poll(async () => (await transcript.boundingBox())!.y).toBeLessThan(initialY);
+    await aligned();
+    const mainScroll = await main.evaluate((element) => {
+      element.scrollTop = Math.floor(element.scrollTop / 2);
+      return element.scrollTop;
+    });
+    const transcriptBody = page.locator(".transcript-content");
+    const transcriptBounds = (await transcriptBody.boundingBox())!;
+    await page.mouse.move(transcriptBounds.x + 40, Math.max(150, transcriptBounds.y + 40));
+    await page.mouse.wheel(0, 2000);
+    await expect
+      .poll(() => transcriptBody.evaluate((element) => element.scrollTop))
+      .toBeGreaterThan(0);
+    await page.mouse.wheel(0, 1000);
+    const previewBody = preview.locator(".capture-preview-body");
+    const previewBounds = (await previewBody.boundingBox())!;
+    await page.mouse.move(previewBounds.x + 40, Math.max(150, previewBounds.y + 40));
+    await page.mouse.wheel(0, 2000);
+    await expect
+      .poll(() => previewBody.evaluate((element) => element.scrollTop))
+      .toBeGreaterThan(0);
+    await page.mouse.wheel(0, 1000);
+    expect(await main.evaluate((element) => element.scrollTop)).toBe(mainScroll);
+    await aligned();
+    await main.evaluate((element) =>
+      element.scrollTo({ top: element.scrollHeight, behavior: "instant" }),
+    );
+    await aligned();
+    await expect(preview.getByRole("button", { name: "Simpan capture" })).toBeInViewport({
+      ratio: 1,
+    });
+    if (viewport.width === 1440) {
+      await page.screenshot({
+        path: "docs/screenshots/capture-preview-aligned.png",
+        animations: "disabled",
+      });
+    }
+    await preview.getByRole("button", { name: "Buang capture" }).click();
+    await expect(page.locator(".transcript-panel")).toBeVisible();
+  }
+});
+
 test("agenda supports confirmation, quick creation, edit, completion, export and delete", async ({
   page,
 }) => {
@@ -353,7 +436,9 @@ test("lecturer answers, updates map, ends class, archives, restores and creates 
   await expect(page.getByText("Live", { exact: true })).toBeVisible();
 });
 
-test("main views work without browser errors or horizontal overflow", async ({ page }) => {
+test("main views keep consistent typography and controls without browser errors or horizontal overflow", async ({
+  page,
+}) => {
   test.setTimeout(60000);
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
@@ -374,6 +459,34 @@ test("main views work without browser errors or horizontal overflow", async ({ p
       await page.goto(path);
       await expect(page.locator("h1").first()).toBeVisible();
       await expect(page.locator(".processing")).toHaveCount(0);
+      const headingStyle = await page
+        .locator("h1")
+        .first()
+        .evaluate((element) => {
+          const style = getComputedStyle(element);
+          return { size: style.fontSize, weight: style.fontWeight, family: style.fontFamily };
+        });
+      expect(headingStyle.size, `${path} heading at ${width}px`).toBe(
+        width <= 620 ? "24px" : "28px",
+      );
+      expect(headingStyle.weight).toBe("600");
+      expect(headingStyle.family).toContain("DM Sans Variable");
+      const buttons = await page.locator(".button").evaluateAll((elements) =>
+        elements
+          .filter((element) => element.getClientRects().length)
+          .map((element) => {
+            const style = getComputedStyle(element);
+            return {
+              small: element.classList.contains("small"),
+              height: element.getBoundingClientRect().height,
+              font: style.fontSize,
+            };
+          }),
+      );
+      for (const button of buttons) {
+        expect(button.height, `${path} button at ${width}px`).toBe(button.small ? 36 : 44);
+        expect(button.font).toBe(button.small ? "13px" : "14px");
+      }
       expect(
         await page.evaluate(() => {
           const content = document.querySelector(".main-wrapper, .auth-page")!;

@@ -9,16 +9,33 @@
     "typecheck": "tsc --noEmit",
     "test:e2e": "playwright test",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test:backend": "tsx --test tests/backend/*.test.ts",
+    "test:live": "playwright test --config playwright.live.config.ts",
+    "jobs:run": "tsx scripts/run-jobs.ts",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "cf:deploy:jobs": "wrangler deploy --config wrangler.jobs.jsonc"
+  },
+  "overrides": {
+    "@node-minify/core": {
+      "glob": "^10.5.0"
+    }
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.2.8",
+    "@opennextjs/cloudflare": "^1.20.10",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.3",
     "lucide-react": "^0.468.0",
     "next": "16.3.8",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "@playwright/test": "^1.58.0",
     "@tailwindcss/postcss": "^4.1.0",
     "@types/node": "^24.0.0",
@@ -26,6 +43,8 @@
     "@types/react-dom": "^19.2.0",
     "prettier": "^3.9.9",
     "tailwindcss": "^4.1.0",
-    "typescript": "^5.9.0"
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.0",
+    "wrangler": "^4.149.0"
   }
 }

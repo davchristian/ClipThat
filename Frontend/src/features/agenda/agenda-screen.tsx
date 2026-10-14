@@ -100,14 +100,14 @@ export function AgendaView() {
             Minggu ini
           </button>
           <button
-            className="icon-button"
+            className="icon-button small"
             aria-label="Minggu sebelumnya"
             onClick={() => setWeek((w) => w - 1)}
           >
             <ChevronLeft size={18} />
           </button>
           <button
-            className="icon-button"
+            className="icon-button small"
             aria-label="Minggu berikutnya"
             onClick={() => setWeek((w) => w + 1)}
           >

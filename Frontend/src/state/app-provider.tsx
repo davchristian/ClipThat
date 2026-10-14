@@ -1,8 +1,10 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { X } from "lucide-react";
 import { initialState } from "@/lib/demo-data";
 import type { DemoState } from "@/lib/types";
+import { liveMode } from "@/lib/app-mode";
 type Context = {
   data: DemoState;
   ready: boolean;
@@ -18,6 +20,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [toast, setToast] = useState<{ text: string; id: number } | null>(null);
   const notify = useCallback((text: string) => setToast({ text, id: Date.now() }), []);
   useEffect(() => {
+    if (liveMode) {
+      setReady(true);
+      return;
+    }
     try {
       const value = localStorage.getItem(storageKey);
       if (value) {
@@ -38,7 +44,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setReady(true);
   }, [notify]);
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || liveMode) return;
     try {
       localStorage.setItem(storageKey, JSON.stringify(data));
     } catch {
@@ -71,8 +77,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
           <div className="toast">
             <span className="toast-check">✓</span>
             {toast.text}
-            <button aria-label="Tutup pemberitahuan" onClick={() => setToast(null)}>
-              ×
+            <button
+              className="icon-button small"
+              aria-label="Tutup pemberitahuan"
+              onClick={() => setToast(null)}
+            >
+              <X size={16} aria-hidden="true" />
             </button>
           </div>
         )}

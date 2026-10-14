@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "clipthat",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-10",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": { "binding": "ASSETS", "directory": ".open-next/assets" },
+  "vars": {
+    "NEXT_PUBLIC_APP_MODE": "live",
+    "APP_URL": "https://replace-with-your-clipthat-domain.example",
+    "NEXT_PUBLIC_SUPABASE_URL": "",
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "",
+    "GEMINI_MODEL": "gemini-2.5-flash",
+  },
+}

@@ -1,0 +1,209 @@
+/* Semantic text styles shared by every screen. Sizes live in tokens.css. */
+body {
+  font-family: var(--font-family-ui);
+  font-size: var(--text-body);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-body);
+}
+h1 {
+  font-size: var(--text-page-title);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-heading);
+  letter-spacing: -0.7px;
+}
+h2 {
+  font-size: var(--text-section-title);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-heading);
+  letter-spacing: -0.3px;
+}
+h3,
+.reading-note > summary,
+.material-row strong {
+  font-size: var(--text-card-title);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-caption);
+}
+.auth-intro h2 {
+  font-size: var(--text-display);
+  line-height: 1.15;
+  letter-spacing: -1.6px;
+}
+.active-class h2 {
+  font-size: var(--text-feature-title);
+  line-height: var(--leading-heading);
+  letter-spacing: -0.5px;
+}
+.modal-top h2 {
+  font-size: var(--text-dialog-title);
+}
+.brand {
+  font-size: var(--text-brand);
+  font-weight: var(--weight-bold);
+  line-height: 1.2;
+  letter-spacing: -1px;
+}
+.nav-item.active,
+.tabs button.active,
+.auth-switch a,
+.integration-logo {
+  font-weight: var(--weight-semibold);
+}
+.button {
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  line-height: 20px;
+}
+.button.small,
+.text-button,
+.chip,
+.sidebar-search,
+.role-options button,
+.menu-items button,
+.menu-items a,
+.back-link,
+.tabs button,
+.transcript-toolbar,
+.form-stack label,
+.auth-field label,
+.auth-role legend,
+.capture-summary h3,
+.capture-question h3,
+.capture-source > summary,
+.auth-demo a,
+.saved-preview strong,
+.drafts-panel > h2,
+.agenda-group > h2,
+.settings-calendars > summary {
+  font-size: var(--text-label);
+  line-height: var(--leading-caption);
+}
+.button.small {
+  line-height: 18px;
+}
+.text-button,
+.tabs button,
+.form-stack label,
+.auth-field label,
+.auth-role legend,
+.detail-section > summary,
+.reading-note > summary,
+.settings-calendars > summary,
+.saved-preview strong {
+  font-weight: var(--weight-medium);
+}
+.capture-summary h3,
+.capture-question h3,
+.drafts-panel > h2,
+.agenda-group > h2 {
+  font-weight: var(--weight-semibold);
+}
+.active-class p,
+.empty p,
+.capture-question > p,
+.answer,
+.concept-detail p,
+.source-quote,
+.auth-subtitle,
+.auth-switch {
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+}
+.transcript-segment p,
+.capture-summary p,
+.capture-source > p,
+.reading-note p,
+.question-body > p,
+.capture-excerpt,
+.auth-intro p {
+  font-size: var(--text-reading);
+  line-height: var(--leading-reading);
+}
+.session-meta,
+.live-label,
+.course-tile p,
+.row-main p,
+.search-results small,
+.field-hint,
+.field-error,
+.toast,
+.capture-preview-heading p,
+.capture-action small,
+.capture-unsaved,
+.capture-question-sent,
+.saved-preview small,
+.aggregate-row,
+.question-body > small,
+.answer strong,
+.material-row small,
+.materials-map-hint,
+.draft-row p,
+.demo-note,
+.auth-demo,
+.auth-saved-note {
+  font-size: var(--text-caption);
+  line-height: var(--leading-caption);
+}
+.answer strong {
+  font-weight: var(--weight-semibold);
+}
+.sidebar-search kbd,
+.avatar,
+.role-trigger,
+.demo-badge,
+.badge,
+.transcript-segment time,
+.concept-edge,
+.auth-paper-label,
+.auth-paper-highlight {
+  font-size: var(--text-micro);
+  line-height: var(--leading-caption);
+}
+.profile strong {
+  font-size: var(--text-label);
+  font-weight: var(--weight-medium);
+}
+.search-results strong {
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+}
+.session-number,
+.saved-preview,
+.vote-button,
+.related-lesson,
+.concept-node {
+  font-size: var(--text-label);
+  line-height: var(--leading-caption);
+}
+.week-header h2 {
+  font-size: var(--text-card-title);
+}
+input,
+select,
+textarea {
+  font-size: var(--text-input);
+  line-height: var(--leading-body);
+}
+input[type="file"] {
+  font-size: var(--text-caption);
+}
+.auth-role button {
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+}
+.formula {
+  font-size: var(--text-dialog-title);
+  line-height: var(--leading-reading);
+}
+.course-icon {
+  font-size: var(--text-feature-title);
+}
+.course-icon.small {
+  font-size: var(--text-dialog-title);
+}
+.integration-logo {
+  font-size: var(--text-section-title);
+}
+.auth-paper strong {
+  font-size: var(--text-card-title);
+}

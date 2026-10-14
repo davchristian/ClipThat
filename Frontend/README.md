@@ -1,5 +1,7 @@
 # ClipThat · Frontend
 
+Aplikasi ini sekarang juga memuat backend Next.js. Mode default tetap **demo**. Untuk memakai akun Supabase dan data asli, ikuti [setup backend](docs/backend-setup.md); tersedia [daftar API](docs/backend-api.md). Semua dependency frontend/backend dikelola pada folder ini.
+
 Alur utama: **Kelas → Capture → Preview → Simpan atau Buang → Tersimpan**. Navigasi mahasiswa hanya Kelas, Tersimpan, dan Agenda. Materi, peta konsep, dan detail tambahan dibuka saat dibutuhkan.
 
 ## Jalankan
@@ -40,12 +42,16 @@ docs/screenshots/  Preview frontend terbaru
 
 Eksperimen Figma lama dipisah ke [archive](../archive/README.md). Aplikasi tidak membutuhkan plugin Figma.
 
+Standar ukuran teks, tombol, dan perilaku scroll panel dijelaskan di [panduan UI](docs/ui-guidelines.md). Token bersama memastikan jenis teks dan kontrol yang sama tetap konsisten di setiap halaman.
+
 ## Periksa dan rapikan
 
 ```powershell
 npm.cmd run typecheck
 npm.cmd run build
 npm.cmd run test:e2e
+npm.cmd run test:backend
+npm.cmd run test:live
 npm.cmd run format:check
 npm.cmd run format
 ```
@@ -58,4 +64,4 @@ Pengujian responsif mencakup lebar 320, 390, 768, 1024, 1366, dan 1440 px, terma
 
 Data kelas dan tanggal menggunakan contoh 5 Oktober 2026. Perubahan disimpan di browser dengan key lama `clipthat-frontend-v1`, sehingga perubahan tampilan tidak menghapus simpanan.
 
-Transkrip, ringkasan, pertanyaan rekomendasi, dan rekap adalah contoh. Mikrofon, Whisper/Gemini, Supabase, autentikasi, dan sinkronisasi Google Calendar/Notion/Outlook belum terhubung. Konfigurasi kalender hanya menyimpan tujuan. Ekspor `.ics` menghasilkan berkas kalender yang dapat diimpor manual. Foto/materi maksimal 1 MB per berkas. Latihan personal tetap untuk pengembangan berikutnya.
+Dalam **mode demo**, transkrip, ringkasan, pertanyaan rekomendasi, dan rekap adalah contoh. Mikrofon, AI, dan akun Supabase tidak dipanggil. Konfigurasi kalender hanya menyimpan tujuan. Ekspor `.ics` menghasilkan berkas kalender yang dapat diimpor manual. Foto/materi demo maksimal 1 MB per berkas. Mode **live** memakai API dan Supabase; batas/fitur yang tersedia dijelaskan di panduan backend. Sinkronisasi Google Calendar/Notion/Outlook dan latihan personal tetap untuk pengembangan berikutnya.

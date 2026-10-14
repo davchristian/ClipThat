@@ -14,6 +14,7 @@ export function TranscriptPanel({
   onPhoto,
   onSaved,
   onAsk,
+  captureBusy = false,
 }: {
   segments: Segment[];
   saved: SavedItem[];
@@ -24,6 +25,7 @@ export function TranscriptPanel({
   onPhoto: () => void;
   onSaved: () => void;
   onAsk: () => void;
+  captureBusy?: boolean;
 }) {
   return (
     <section className="transcript-panel">
@@ -46,13 +48,14 @@ export function TranscriptPanel({
           return (
             <article
               key={segment.id}
+              id={`source-${segment.id}`}
               className={`transcript-segment ${!lecturer && marked ? "marked" : ""} ${inCapture ? "in-capture" : ""}`}
             >
               <time>{seconds(segment.time)}</time>
               <p>{segment.text}</p>
               {!lecturer && (
                 <button
-                  className={`icon-button bookmark-button ${marked ? "selected" : ""}`}
+                  className={`icon-button small bookmark-button ${marked ? "selected" : ""}`}
                   aria-label={`${marked ? "Hapus penanda" : "Simpan bagian"} ${seconds(segment.time)}`}
                   title={marked ? "Hapus penanda" : "Simpan untuk review"}
                   aria-pressed={marked}
@@ -72,12 +75,12 @@ export function TranscriptPanel({
               id="capture-trigger"
               className="button primary"
               onClick={capture}
-              disabled={!!pendingCapture}
+              disabled={!!pendingCapture || captureBusy}
               aria-expanded={!!pendingCapture}
               aria-controls={pendingCapture ? "capture-preview" : undefined}
             >
               <ScanLine size={17} />
-              Capture 90 detik
+              {captureBusy ? "Memproses…" : "Capture 90 detik"}
             </button>
             <small>Lihat preview sebelum menyimpan</small>
           </div>

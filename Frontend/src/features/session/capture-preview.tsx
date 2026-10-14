@@ -13,14 +13,19 @@ export function CapturePreview({
   onAsk,
 }: {
   item: SavedItem;
-  onSave: (draft: string) => void;
+  onSave: (draft: string) => void | Promise<void>;
   onDiscard: () => void;
-  onAsk: (text: string) => void;
+  onAsk: (text: string) => void | Promise<void>;
 }) {
   const [compact, setCompact] = useState(false);
   const [draft, setDraft] = useState(item.draft || "");
   const [editing, setEditing] = useState(false);
   const [sent, setSent] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const discard = () => {
+    if (!busy) onDiscard();
+  };
   const heading = useRef<HTMLHeadingElement>(null);
   const range = `${seconds(item.time)}–${seconds(item.end ?? item.time)}`;
 
@@ -60,11 +65,19 @@ export function CapturePreview({
           {editing && !sent ? (
             <form
               className="capture-question-form"
-              onSubmit={(event) => {
+              onSubmit={async (event) => {
                 event.preventDefault();
                 if (!draft.trim()) return;
-                onAsk(draft);
-                setSent(true);
+                setBusy(true);
+                setError("");
+                try {
+                  await onAsk(draft);
+                  setSent(true);
+                } catch (e) {
+                  setError(e instanceof Error ? e.message : "Pertanyaan belum terkirim.");
+                } finally {
+                  setBusy(false);
+                }
               }}
             >
               <textarea
@@ -75,7 +88,7 @@ export function CapturePreview({
                 autoFocus
                 required
               />
-              <button className="button secondary small" disabled={!draft.trim()}>
+              <button className="button secondary small" disabled={!draft.trim() || busy}>
                 <Send size={14} aria-hidden="true" />
                 Kirim anonim
               </button>
@@ -96,17 +109,37 @@ export function CapturePreview({
             </>
           )}
         </section>
+        {error && (
+          <p className="field-error" role="alert">
+            {error}
+          </p>
+        )}
       </div>
       <div className="capture-preview-actions">
         <button
-          className="icon-button capture-discard"
+          className="icon-button large capture-discard"
           aria-label="Buang capture"
           title="Buang capture"
-          onClick={onDiscard}
+          onClick={discard}
+          disabled={busy}
         >
           <Trash2 size={19} aria-hidden="true" />
         </button>
-        <button className="button primary" onClick={() => onSave(draft)}>
+        <button
+          className="button primary"
+          disabled={busy}
+          onClick={async () => {
+            setBusy(true);
+            setError("");
+            try {
+              await onSave(draft);
+            } catch (e) {
+              setError(e instanceof Error ? e.message : "Capture belum disimpan.");
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
           <Bookmark size={15} aria-hidden="true" />
           Simpan capture
         </button>
@@ -121,7 +154,7 @@ export function CapturePreview({
         wide
         title="Preview capture"
         subtitle={`${range} · 90 detik terakhir`}
-        onClose={onDiscard}
+        onClose={discard}
       >
         <div id="capture-preview" className="capture-preview-compact">
           {content}
@@ -137,7 +170,7 @@ export function CapturePreview({
       onKeyDown={(event) => {
         if (event.key === "Escape") {
           event.stopPropagation();
-          onDiscard();
+          discard();
         }
       }}
     >
@@ -151,7 +184,12 @@ export function CapturePreview({
           </h2>
           <p>{range} · 90 detik terakhir</p>
         </div>
-        <button className="icon-button" aria-label="Buang dan tutup preview" onClick={onDiscard}>
+        <button
+          className="icon-button"
+          aria-label="Buang dan tutup preview"
+          onClick={discard}
+          disabled={busy}
+        >
           <X size={18} />
         </button>
       </div>

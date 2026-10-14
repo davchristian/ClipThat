@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowLeft, ArrowRight, Bookmark, Link2, LoaderCircle, Play, Square } from "lucide-react";
@@ -32,6 +32,7 @@ export function SessionView({ id }: { id: string }) {
   const [photo, setPhoto] = useState(false);
   const [end, setEnd] = useState(false);
   const tabs = useRef<HTMLDivElement>(null);
+  const workspace = useRef<HTMLDivElement>(null);
   const currentTab =
     query === "graph"
       ? "materials"
@@ -40,6 +41,21 @@ export function SessionView({ id }: { id: string }) {
         : lesson?.status === "done"
           ? "notes"
           : "transcript";
+  useEffect(() => {
+    if (!ready || !session.pendingCapture || currentTab !== "transcript") return;
+    const container = workspace.current;
+    const transcript = container?.querySelector<HTMLElement>(".transcript-panel");
+    if (!container || !transcript) return;
+    const resize = () =>
+      container.style.setProperty("--transcript-panel-height", `${transcript.offsetHeight}px`);
+    resize();
+    const observer = new ResizeObserver(resize);
+    observer.observe(transcript);
+    return () => {
+      observer.disconnect();
+      container.style.removeProperty("--transcript-panel-height");
+    };
+  }, [ready, currentTab, session.pendingCapture?.id]);
   function changeTab(tab: string) {
     window.history.replaceState(null, "", `?tab=${tab}`);
     requestAnimationFrame(() => tabs.current?.scrollIntoView({ block: "start" }));
@@ -149,7 +165,10 @@ export function SessionView({ id }: { id: string }) {
           <h2>Menyiapkan catatan…</h2>
         </div>
       ) : (
-        <div className={`session-workspace ${captureVisible ? "has-preview" : ""}`}>
+        <div
+          ref={workspace}
+          className={`session-workspace ${captureVisible ? "has-preview" : ""} ${currentTab === "transcript" && !upcoming ? "with-transcript" : ""}`}
+        >
           <div className="session-content">
             {currentTab === "transcript" &&
               (upcoming ? (

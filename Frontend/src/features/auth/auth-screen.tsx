@@ -7,6 +7,8 @@ import { ArrowRight, Bookmark, Check, Eye, EyeOff } from "lucide-react";
 import { Logo } from "@/components/ui";
 import { useApp } from "@/state/app-provider";
 import type { Role } from "@/lib/types";
+import { liveMode } from "@/lib/app-mode";
+import { api } from "@/lib/api";
 
 export function AuthScreen({ mode }: { mode: "login" | "register" }) {
   const register = mode === "register";
@@ -18,8 +20,10 @@ export function AuthScreen({ mode }: { mode: "login" | "register" }) {
   const [visible, setVisible] = useState(false);
   const [role, setRole] = useState<Role>("student");
   const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [confirmation, setConfirmation] = useState(false);
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (register && name.trim().length < 2) {
       setError("Tulis nama dengan minimal 2 karakter.");
@@ -27,6 +31,28 @@ export function AuthScreen({ mode }: { mode: "login" | "register" }) {
     }
     if (password.length < 8) {
       setError("Kata sandi minimal 8 karakter.");
+      return;
+    }
+    if (liveMode) {
+      setBusy(true);
+      try {
+        const result = await api<{ needs_confirmation?: boolean }>(
+          `auth/${mode}`,
+          "POST",
+          register ? { name, email, password, role } : { email, password },
+        );
+        setPassword("");
+        if (result.needs_confirmation) {
+          setConfirmation(true);
+          return;
+        }
+        router.push("/");
+        router.refresh();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Belum bisa masuk.");
+      } finally {
+        setBusy(false);
+      }
       return;
     }
     if (register) update((data) => ({ ...data, role }));
@@ -73,6 +99,7 @@ export function AuthScreen({ mode }: { mode: "login" | "register" }) {
             {register ? "Mulai dari satu kelas." : "Lanjutkan dari yang terakhir kamu pelajari."}
           </p>
           <form className="auth-form" onSubmit={submit} onChange={() => setError("")}>
+            {confirmation && <p role="status">Cek emailmu untuk mengonfirmasi akun, lalu masuk.</p>}
             {register && (
               <div className="auth-field">
                 <label htmlFor="auth-name">Nama lengkap</label>
@@ -148,8 +175,8 @@ export function AuthScreen({ mode }: { mode: "login" | "register" }) {
                 {error}
               </p>
             )}
-            <button className="button primary auth-submit" type="submit">
-              {register ? "Buat akun" : "Masuk"}
+            <button className="button primary auth-submit" type="submit" disabled={busy}>
+              {busy ? "Memproses…" : register ? "Buat akun" : "Masuk"}
               <ArrowRight size={17} />
             </button>
           </form>
@@ -157,13 +184,15 @@ export function AuthScreen({ mode }: { mode: "login" | "register" }) {
             {register ? "Sudah punya akun?" : "Belum punya akun?"}{" "}
             <Link href={register ? "/login" : "/register"}>{register ? "Masuk" : "Daftar"}</Link>
           </p>
-          <div className="auth-demo">
-            <span>Mode demo · gunakan data contoh.</span>
-            <span>Akun belum dibuat atau diverifikasi.</span>
-            <Link href="/">
-              Coba tanpa akun <ArrowRight size={13} />
-            </Link>
-          </div>
+          {!liveMode && (
+            <div className="auth-demo">
+              <span>Mode demo · gunakan data contoh.</span>
+              <span>Akun belum dibuat atau diverifikasi.</span>
+              <Link href="/" className="text-button">
+                Coba tanpa akun <ArrowRight size={13} />
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>

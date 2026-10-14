@@ -6,3 +6,7 @@ out/
 *.tsbuildinfo
 playwright-report/
 test-results/
+.open-next/
+.wrangler/
+.dev.vars*
+.next-live/
