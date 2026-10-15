@@ -43,7 +43,7 @@ Panduan resmi: [Google Sign-In dengan Supabase](https://supabase.com/docs/guides
 
 ## 4. Gemini dan environment lokal
 
-Buat key di https://aistudio.google.com/apikey. Pilih model yang tersedia pada proyekmu. Default kode tetap `gemini-2.5-flash` sesuai arsitektur yang diminta. Jika proyek baru tidak memiliki akses 2.5, pilih model yang tersedia di AI Studio melalui `GEMINI_MODEL`. Ketersediaan dan kuota mengikuti akun Google.
+Buat key di https://aistudio.google.com/apikey. Pilih model yang tersedia pada proyekmu. Default kode tetap `gemini-2.5-flash` sesuai arsitektur yang diminta; akses model 2.5 saat ini dibatasi untuk pengguna lama. Untuk proyek baru, pilih model seperti `gemini-3.5-flash-lite` melalui `GEMINI_MODEL`. Ketersediaan dan kuota mengikuti akun Google. Daftar model atau sukses membaca metadata model belum membuktikan request transkripsi dapat dijalankan. [Jadwal dan akses model](https://ai.google.dev/gemini-api/docs/deprecations).
 
 Salin template tanpa menimpa file yang sudah berisi secret:
 
@@ -60,7 +60,9 @@ NEXT_PUBLIC_SUPABASE_URL=https://PROJECT.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_ISI_MILIKMU
 SUPABASE_SECRET_KEY=sb_secret_ISI_MILIKMU
 GEMINI_API_KEY=ISI_MILIKMU
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3.5-flash-lite
+GEMINI_TRANSCRIPTION_MODEL=gemini-3.5-transcribe
+TRANSCRIPTION_PROVIDER=gemini
 CAPTURE_SIGNING_SECRET=SECRET_ACAK_PERTAMA
 JOB_RUNNER_SECRET=SECRET_ACAK_KEDUA
 INTEGRATION_ENCRYPTION_KEY=SECRET_HEX_ACAK_KETIGA
@@ -78,7 +80,29 @@ Restart server setelah mengubah environment. Buka **APP_URL persis**; jangan men
 
 Gemini menghasilkan struktur catatan, nodes/edges graph, draf agenda, dan review pribadi. Layout graph digambar oleh Cytoscape.js di frontend. Hasil kelas disimpan dan digunakan bersama agar membuka graph tidak mengulang request AI. AI memakai sumber transkrip dan referensi pertemuan sebelumnya, bukan sumber web yang dikarang.
 
-Opsional: isi `OPENAI_API_KEY` jika ingin mengaktifkan adapter transkripsi mikrofon dosen. Tanpa konfigurasi transkripsi, aplikasi tetap bisa digunakan dengan transkrip yang dikirim lewat API. Audio dikirim sebagai potongan lengkap, dan retry tidak menduplikasi segmen.
+Mikrofon dosen sekarang bisa memakai Gemini: set `TRANSCRIPTION_PROVIDER=gemini` dengan `GEMINI_API_KEY` dan `GEMINI_MODEL` di atas. `OPENAI_API_KEY` tidak diperlukan. Untuk tetap memakai Whisper, pilih `TRANSCRIPTION_PROVIDER=whisper` dan isi `OPENAI_API_KEY`. Jika provider tidak diisi, aplikasi memilih Gemini ketika key Gemini tersedia, atau Whisper untuk konfigurasi lama yang hanya memiliki key OpenAI. Kegagalan Gemini tidak otomatis dialihkan ke Whisper.
+
+Gunakan `GEMINI_TRANSCRIPTION_MODEL=gemini-3.5-transcribe` untuk model khusus speech-to-text. Adapter mengirim audio melalui **Interactions API** tanpa prompt ringkasan atau JSON schema. `GEMINI_MODEL` tetap model umum untuk ringkasan, graph, dan review; jangan mengisinya dengan model Transcribe. Jika `GEMINI_TRANSCRIPTION_MODEL` dikosongkan, transkripsi memakai model umum pada `GEMINI_MODEL` dengan keluaran JSON. Model Transcribe menyimpan satu segmen per potongan dengan rentang waktu rekaman yang diukur browser; timestamp kata per kata belum digunakan. [API transkripsi khusus](https://ai.google.dev/gemini-api/docs/transcribe).
+
+### Tes transkripsi dengan suara sendiri
+
+1. Pada `.env` atau `.env.local` yang digunakan, set `NEXT_PUBLIC_APP_MODE=live` dan `TRANSCRIPTION_PROVIDER=gemini`. Pastikan key Gemini dan konfigurasi Supabase sudah diisi. `.env.local` memiliki prioritas lebih tinggi daripada `.env`.
+2. Restart `npm.cmd run dev`. Buka origin yang sama persis dengan `APP_URL`, misalnya `http://localhost:3000`.
+3. Login/register sebagai **dosen**. Pilihan peran demo tidak membuat akun dosen live. Buat sesi, buka sesi, lalu klik **Mulai kelas**.
+4. Pada kelas yang berlangsung, klik **Rekam suara dosen**, izinkan mikrofon, lalu bicara selama sekitar 15–20 detik. Audio baru dikirim setelah satu potongan 15 detik lengkap; waktu respons Gemini menambah jeda.
+5. Klik **Hentikan rekaman** untuk mengirim potongan terakhir. Tunggu antrean selesai. Buka **Transkrip** untuk memeriksa hasil; reload halaman untuk memastikan hasil tersimpan di Supabase.
+
+`GET /api/v1/health` menampilkan `transcription_configured: true` ketika key provider tersedia. Status tersebut hanya memeriksa konfigurasi, bukan membuktikan key valid atau kuota tersedia. Kesalahan/kuota ditampilkan di panel mikrofon; potongan gagal menunggu **Coba kirim ulang**. Hindari menutup halaman sebelum semua potongan terkirim karena antrean audio masih berada dalam memori browser.
+
+Dalam mode `demo`, transkrip tetap contoh dan mikrofon cloud tidak aktif. Audio dikirim ke Gemini dari server; key tidak dikirim ke browser. Hasil transkrip tersimpan, sedangkan potongan audio tidak diunggah ke storage aplikasi. Timestamp Gemini adalah perkiraan model dan perlu diperiksa. Ini transkripsi per potongan, bukan streaming kata demi kata. Dokumentasi: [audio Gemini](https://ai.google.dev/gemini-api/docs/generate-content/audio).
+
+Jika Gemini menolak request:
+
+- **Model tidak tersedia / HTTP 404:** pilih model yang didukung proyek melalui `GEMINI_MODEL`, kemudian restart server.
+- **Kredit prabayar / HTTP 402:** cocokkan proyek pada halaman **API Keys** dengan proyek pada **Usage & Billing**. Key dari proyek dengan kredit prabayar habis tidak dapat dipakai hanya dengan memilih proyek Free tier lain di tampilan AI Studio. Untuk pengujian gratis, buat/pilih proyek Free tier dan gunakan API key milik proyek tersebut; jangan aktifkan billing jika ingin tetap gratis. Dukungan Free tier berbeda menurut model dan akun.
+- **Kuota / HTTP 429:** periksa batas pemakaian proyek dan tunggu sebelum mencoba ulang. Jangan menekan retry berulang kali.
+
+Status konfigurasi `/api/v1/health` tidak memeriksa saldo atau kuota. Perubahan API key/model membutuhkan restart server. [Billing Gemini](https://ai.google.dev/gemini-api/docs/billing), [harga dan Free tier](https://ai.google.dev/gemini-api/docs/pricing).
 
 ## 5. Kalender: ClipThat ke layanan tujuan
 

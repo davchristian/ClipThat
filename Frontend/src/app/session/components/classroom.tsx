@@ -35,20 +35,6 @@ export function SessionView({ id }: { id: string }) {
   const [detail, setDetail] = useState<string | null>(savedQuery);
   const [photo, setPhoto] = useState(false);
   const [end, setEnd] = useState(false);
-  const [recordingBusy, setRecordingBusy] = useState(false);
-  const [questionDraft, setQuestionDraft] = useState("");
-  const sourceQuery = searchParams.get("source");
-  useEffect(() => {
-    const source = sourceQuery || window.location.hash.replace(/^#segment-/, "");
-    if (!source || !ready || query !== "transcript") return;
-    const frame = requestAnimationFrame(() => {
-      const element = [
-        ...document.querySelectorAll<HTMLElement>(`#${CSS.escape(`segment-${source}`)}`),
-      ].find((node) => node.getClientRects().length > 0);
-      element?.scrollIntoView({ block: "center", behavior: "smooth" });
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [sourceQuery, ready, query, session.segments.length]);
   const classroomRef = useRef<HTMLDivElement>(null);
   const [focused, setFocused] = useState(false);
 
@@ -128,7 +114,7 @@ export function SessionView({ id }: { id: string }) {
             )}
           </p>
         </div>
-        <div className="page-heading-actions session-actions">
+        <div className="session-actions">
           {lecturer && lesson.status === "failed" && (
             <button
               className="button secondary"
@@ -252,6 +238,7 @@ export function SessionView({ id }: { id: string }) {
                   captureBusy={session.previewLoading || !!session.preview || session.pending}
                   captureLoading={session.previewLoading}
                   onPhoto={() => setPhoto(true)}
+                  onSaved={() => setSavedOpen(true)}
                   onOpenSaved={setDetail}
                   onAsk={() => changeTab("questions")}
                 />

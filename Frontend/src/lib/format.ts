@@ -1,10 +1,11 @@
 export function seconds(value: number) {
+  const whole = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
   return (
-    Math.floor(value / 60)
+    Math.floor(whole / 60)
       .toString()
       .padStart(2, "0") +
     ":" +
-    (value % 60).toString().padStart(2, "0")
+    (whole % 60).toString().padStart(2, "0")
   );
 }
 

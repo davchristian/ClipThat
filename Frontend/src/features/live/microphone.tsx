@@ -158,33 +158,34 @@ export function Microphone({
     }
   }
   return (
-    <section className="panel live-mic">
-      <button
-        className="button secondary"
-        disabled={!configured || starting || (!recording && count > 0)}
-        onClick={recording ? stop : start}
-      >
-        {recording ? <Square size={16} /> : <Mic size={16} />}{" "}
-        {starting ? "Menyiapkan…" : recording ? "Hentikan rekaman" : "Rekam suara dosen"}
-      </button>
-      {count > 0 && <span>{count} potongan menunggu</span>}
+    <section className="live-mic" aria-label="Rekaman kelas">
+      <div className="mic-control-row">
+        <button
+          className="button secondary"
+          disabled={!configured || starting || (!recording && count > 0)}
+          onClick={recording ? stop : start}
+        >
+          {recording ? <Square size={16} /> : <Mic size={16} />}{" "}
+          {starting ? "Menyiapkan…" : recording ? "Hentikan rekaman" : "Rekam suara dosen"}
+        </button>
+        <span className="mic-status" role="status">
+          {!configured
+            ? "Transkripsi belum aktif"
+            : count
+              ? `Memproses ${count} potongan…`
+              : recording
+                ? "Merekam · diperbarui tiap 15 detik"
+                : "Siap merekam"}
+        </span>
+      </div>
       {error && (
-        <>
+        <div className="mic-error">
           <p role="alert">{error}</p>
           <button className="button secondary small" onClick={drain}>
             Coba kirim ulang
           </button>
-        </>
+        </div>
       )}
-      <p>
-        {!configured
-          ? "Transkripsi belum diaktifkan oleh pengelola aplikasi."
-          : recording
-            ? "Mikrofon aktif. Transkrip diperbarui per potongan audio."
-            : count
-              ? "Tunggu semua potongan terkirim sebelum mengakhiri atau meninggalkan kelas."
-              : "Suara diambil dari perangkat dosen. Hentikan rekaman sebelum mengakhiri kelas."}
-      </p>
     </section>
   );
 }

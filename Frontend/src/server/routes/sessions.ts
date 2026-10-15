@@ -9,7 +9,8 @@ import {
   secondsSchema,
 } from "../schemas";
 import { body, boundedBody, json, ApiError } from "../http";
-import { captureWindow, summarizeCapture, whisper } from "../ai";
+import { captureWindow, summarizeCapture } from "../ai";
+import { transcribeAudio, validateAudio } from "../transcription";
 import { signCapture } from "../capture-token";
 import { required } from "../config";
 import { readTranscript } from "../transcript";
@@ -122,19 +123,7 @@ export async function sessionRoute(request: Request, path: string[], db: Db, use
       .max(90)
       .parse(Number(form.get("duration")));
     const file = form.get("file");
-    if (
-      !(file instanceof File) ||
-      !file.size ||
-      file.size > 5_000_000 ||
-      !["audio/webm", "audio/mp4", "audio/ogg", "audio/wav", "audio/mpeg"].includes(
-        file.type.split(";")[0],
-      )
-    )
-      throw new ApiError(
-        422,
-        "invalid_audio",
-        "Gunakan audio webm/mp4/ogg/wav/mp3 maksimal 5 MB per potongan.",
-      );
+    validateAudio(file);
     const existing = checked(
       await db
         .from("transcript_segments")
@@ -144,7 +133,7 @@ export async function sessionRoute(request: Request, path: string[], db: Db, use
         .limit(1),
     );
     if (existing?.length) return json({ saved: true, duplicate: true });
-    const segments = await whisper(file, offset, duration);
+    const segments = await transcribeAudio(file, offset, duration);
     if (segments.length)
       checked(await db.rpc("append_transcript", { sid: id, chunk: chunkId, segments }));
     return json({ saved: true, segments: segments.length });

@@ -10,7 +10,13 @@ import type { Role } from "@/lib/types";
 import { liveMode } from "@/lib/app-mode";
 import { api } from "@/lib/api";
 
-export function AuthScreen({ mode }: { mode: "login" | "register" }) {
+export function AuthScreen({
+  mode,
+  setupError = "",
+}: {
+  mode: "login" | "register";
+  setupError?: string;
+}) {
   const register = mode === "register";
   const router = useRouter();
   const { update, notify } = useApp();
@@ -23,6 +29,7 @@ export function AuthScreen({ mode }: { mode: "login" | "register" }) {
   const [busy, setBusy] = useState(false);
   const [confirmation, setConfirmation] = useState(false);
   async function google() {
+    if (setupError) return;
     if (!liveMode) {
       setError("Google Sign-In tersedia setelah mode live dan provider Google diaktifkan.");
       return;
@@ -40,6 +47,7 @@ export function AuthScreen({ mode }: { mode: "login" | "register" }) {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (setupError) return;
     if (register && name.trim().length < 2) {
       setError("Tulis nama dengan minimal 2 karakter.");
       return;
@@ -113,10 +121,15 @@ export function AuthScreen({ mode }: { mode: "login" | "register" }) {
           <p className="auth-subtitle">
             {register ? "Mulai dari satu kelas." : "Lanjutkan dari yang terakhir kamu pelajari."}
           </p>
+          {setupError && (
+            <p className="field-error" role="alert">
+              {setupError}
+            </p>
+          )}
           <button
             type="button"
             className="button secondary auth-google"
-            disabled={busy}
+            disabled={busy || !!setupError}
             onClick={() => void google()}
           >
             <span aria-hidden="true">G</span> Lanjutkan dengan Google
@@ -203,7 +216,11 @@ export function AuthScreen({ mode }: { mode: "login" | "register" }) {
                 {error}
               </p>
             )}
-            <button className="button primary auth-submit" type="submit" disabled={busy}>
+            <button
+              className="button primary auth-submit"
+              type="submit"
+              disabled={busy || !!setupError}
+            >
               {busy ? "Memproses…" : register ? "Buat akun" : "Masuk"}
               <ArrowRight size={17} />
             </button>

@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
-import { publicConfig, required, setting } from "./config";
+import { publicConfig, required, setting, supabaseUrl } from "./config";
 import { ApiError } from "./http";
 
 export async function sessionDb() {
@@ -24,7 +24,7 @@ export async function authenticated() {
 }
 export function adminDb() {
   return createClient(
-    required("NEXT_PUBLIC_SUPABASE_URL"),
+    supabaseUrl(),
     setting("SUPABASE_SECRET_KEY") || required("SUPABASE_SERVICE_ROLE_KEY"),
     {
       auth: { persistSession: false, autoRefreshToken: false },

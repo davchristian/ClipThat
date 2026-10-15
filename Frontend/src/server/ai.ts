@@ -9,13 +9,51 @@ export type SourceSegment = {
   end_seconds: number;
   text: string;
 };
+export function checkGeminiResponse(response: Response, model: string) {
+  if (!response.ok) {
+    if (response.status === 402)
+      throw new ApiError(
+        503,
+        "ai_billing_required",
+        "Kredit prabayar proyek Gemini tidak tersedia. Periksa proyek pemilik API key di AI Studio → Usage & Billing, atau gunakan key dari proyek Free tier.",
+      );
+    if (response.status === 404)
+      throw new ApiError(
+        503,
+        "ai_model_unavailable",
+        `Model ${model} tidak tersedia untuk permintaan ini. Pilih model yang dapat digunakan proyekmu melalui GEMINI_MODEL, lalu restart server.`,
+      );
+    if (response.status === 401 || response.status === 403)
+      throw new ApiError(
+        503,
+        "ai_access_denied",
+        "Akses Gemini ditolak. Periksa API key, pembatasan key, dan izin proyek di AI Studio.",
+      );
+    if (response.status === 429)
+      throw new ApiError(
+        429,
+        "ai_rate_limited",
+        "Kuota Gemini sedang penuh. Periksa batas proyek di AI Studio dan tunggu sebelum mencoba lagi.",
+      );
+    throw new ApiError(
+      502,
+      "ai_unavailable",
+      response.status === 400
+        ? "Gemini menolak format permintaan. Periksa dukungan audio dan keluaran JSON pada model yang dipilih."
+        : "Layanan Gemini belum bisa memproses. Coba lagi nanti.",
+    );
+  }
+}
+
 export async function gemini<T>(
   schema: ZodType<T>,
   task: string,
   input: unknown,
   fetcher: typeof fetch = fetch,
+  audio?: { mimeType: string; data: string },
+  modelOverride?: string,
 ): Promise<T> {
-  const model = setting("GEMINI_MODEL") || "gemini-2.5-flash";
+  const model = modelOverride || setting("GEMINI_MODEL") || "gemini-2.5-flash";
   if (!/^gemini-[a-zA-Z0-9.-]{1,80}$/.test(model))
     throw new ApiError(503, "invalid_model", "Periksa nama model Gemini pada konfigurasi server.");
   const response = await fetcher(
@@ -34,7 +72,12 @@ export async function gemini<T>(
             },
           ],
         },
-        contents: [{ role: "user", parts: [{ text: JSON.stringify(input) }] }],
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: JSON.stringify(input) }, ...(audio ? [{ inlineData: audio }] : [])],
+          },
+        ],
         generationConfig: {
           temperature: 0.2,
           maxOutputTokens: 32768,
@@ -46,14 +89,7 @@ export async function gemini<T>(
   ).catch(() => {
     throw new ApiError(502, "ai_unavailable", "AI belum bisa memproses. Coba lagi nanti.");
   });
-  if (!response.ok)
-    throw new ApiError(
-      response.status === 429 ? 429 : 502,
-      "ai_unavailable",
-      response.status === 429
-        ? "Kuota AI sedang penuh. Tunggu sebentar lalu coba lagi."
-        : "AI belum bisa memproses. Periksa akses model dan konfigurasi server.",
-    );
+  checkGeminiResponse(response, model);
   const value = await response.json();
   const content = value.candidates?.[0]?.content?.parts
     ?.filter((p: { thought?: boolean }) => !p.thought)

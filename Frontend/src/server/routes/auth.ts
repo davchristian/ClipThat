@@ -3,6 +3,7 @@ import { sessionDb, authenticated, checked } from "../db";
 import { authInput } from "../schemas";
 import { body, json, ApiError } from "../http";
 import { required } from "../config";
+import { signupError } from "../signup-error";
 
 export async function authRoute(request: Request, action: string) {
   if (action === "me" && request.method === "GET") {
@@ -68,12 +69,7 @@ export async function authRoute(request: Request, action: string) {
         emailRedirectTo: `${origin}/auth/callback`,
       },
     });
-    if (error)
-      throw new ApiError(
-        400,
-        "signup_failed",
-        "Akun belum dapat dibuat. Periksa email dan kata sandi.",
-      );
+    if (error) throw signupError(error);
     return json({ needs_confirmation: !data.session }, 201);
   }
   const { error } = await db.auth.signInWithPassword({

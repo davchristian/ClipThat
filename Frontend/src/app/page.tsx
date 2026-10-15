@@ -9,7 +9,6 @@ import { Breadcrumbs, PageHeading, SectionTitle } from "@/components/ui";
 import { useApp } from "@/state/app-provider";
 import { HomeCalendar, type HomeCalendarEvent } from "./components/home-calendar";
 import { NotificationStrip } from "./components/notifications";
-import { SessionEntry } from "./classes/components/session-entry";
 import { CourseCard } from "./components/course-card";
 
 export default function Home() {
@@ -47,7 +46,6 @@ export default function Home() {
     <div className="home-page">
       <Breadcrumbs items={[]} />
       <PageHeading
-        action={lecturer ? <SessionEntry /> : undefined}
         title={
           data.profile
             ? `Selamat datang, ${data.profile.name.split(" ")[0]}!`
@@ -56,6 +54,9 @@ export default function Home() {
               : "Selamat datang, Davin!"
         }
       />
+      <p className="page-intro">
+        {lecturer ? "Siap lanjut mengajar hari ini?" : "Mau lanjut belajar apa hari ini?"}
+      </p>
       <NotificationStrip
         notifications={notifications}
         handledIds={data.handledNotifications || []}

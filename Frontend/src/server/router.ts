@@ -9,6 +9,8 @@ import { questionRoute } from "./routes/questions";
 import { filesRoute } from "./routes/files";
 import { z } from "zod";
 import { integrationsRoute } from "./routes/integrations";
+import { transcriptionConfigured } from "./transcription";
+import { supabaseConfigError } from "../lib/supabase-config";
 
 export async function dispatch(request: Request, path: string[]) {
   try {
@@ -16,11 +18,12 @@ export async function dispatch(request: Request, path: string[]) {
     if (path.length === 1 && path[0] === "health" && request.method === "GET")
       return json({
         status: "ok",
-        database_configured:
-          !!setting("NEXT_PUBLIC_SUPABASE_URL") &&
-          !!setting("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"),
+        database_configured: !supabaseConfigError(
+          setting("NEXT_PUBLIC_SUPABASE_URL"),
+          setting("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"),
+        ),
         ai_configured: !!setting("GEMINI_API_KEY"),
-        transcription_configured: !!setting("OPENAI_API_KEY"),
+        transcription_configured: transcriptionConfigured(),
       });
     if (path[0] === "auth" && path.length === 2) return await authRoute(request, path[1]);
     const { db, user } = await authenticated();

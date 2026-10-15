@@ -10,7 +10,6 @@ import type { Lesson } from "@/lib/types";
 import { useApp } from "@/state/app-provider";
 import { Breadcrumbs, CourseIcon, Empty, Modal, PageHeading, SectionTitle } from "@/components/ui";
 import { SavedDetail } from "@/components/saved-detail";
-import { SessionEntry } from "./session-entry";
 import { CourseSessionCard } from "./course-session-card";
 import { CourseOverview } from "./course-overview";
 
@@ -75,7 +74,6 @@ export function CoursesView({ courseId }: { courseId?: string }) {
       />
       <PageHeading
         title={course?.name || "Course"}
-        action={lecturer ? <SessionEntry courseId={course?.id} /> : undefined}
       />
       {!course && (
         <div className="course-grid">

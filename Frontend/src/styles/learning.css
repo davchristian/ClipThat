@@ -49,6 +49,75 @@
   padding: 32px 16px;
   color: var(--muted);
 }
+.lecture-recording {
+  margin: -9px 0 20px;
+  flex-shrink: 0;
+}
+.live-mic {
+  min-width: 0;
+}
+.mic-control-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+}
+.mic-status {
+  color: var(--muted);
+  font-size: var(--font-caption);
+}
+.mic-error {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 10px;
+}
+.mic-error p {
+  color: var(--text-danger);
+  font-size: var(--font-body);
+  overflow-wrap: anywhere;
+}
+.lecturer-workspace {
+  --study-panel-height: max(420px, calc(100dvh - 320px));
+}
+.session-workspace.lecturer-workspace .transcript-panel {
+  min-height: 420px;
+  box-shadow: none;
+}
+/* Timestamps must never expand across the transcript text. */
+.transcript-segment {
+  grid-template-columns: minmax(5ch, max-content) minmax(0, 1fr) 36px;
+}
+.transcript-segment time {
+  white-space: nowrap;
+}
+.transcript-entry p {
+  overflow-wrap: anywhere;
+}
+.lecturer-transcript .transcript-segment {
+  grid-template-columns: minmax(5ch, max-content) minmax(0, 1fr);
+  max-width: 960px;
+  margin-inline: auto;
+  padding-block: 18px;
+  gap: 24px;
+}
+.lecturer-transcript .transcript-segment p {
+  font-size: var(--font-card);
+  line-height: 1.8;
+}
+@media (max-width: 640px) {
+  .session-workspace.lecturer-workspace .transcript-panel {
+    height: max(420px, calc(100dvh - 360px));
+    min-height: 420px;
+  }
+  .transcript-segment {
+    grid-template-columns: minmax(5ch, max-content) minmax(0, 1fr) 29px;
+  }
+  .lecturer-transcript .transcript-segment {
+    gap: 14px;
+  }
+}
 .capture-preview {
   height: var(--study-panel-height);
   min-width: 0;

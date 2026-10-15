@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { liveMode } from "./lib/app-mode";
+import { supabaseConfigError } from "./lib/supabase-config";
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -10,10 +11,10 @@ export async function proxy(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/auth/")
   )
     return response;
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim();
   const authPage = ["/login", "/register"].includes(request.nextUrl.pathname);
-  if (!url || !key)
+  if (!url || !key || supabaseConfigError(url, key))
     return authPage ? response : NextResponse.redirect(new URL("/login", request.url));
   const db = createServerClient(url, key, {
     cookies: {

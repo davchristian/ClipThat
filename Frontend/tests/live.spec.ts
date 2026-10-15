@@ -179,3 +179,69 @@ test("generated class graph links to its transcript and agenda confirmation surv
   );
   await expect(page.locator(".graph-relations")).toContainText("penerapan");
 });
+
+for (const width of [1440, 390]) {
+  test(`lecturer recording stays compact and fractional transcript timestamps do not overlap at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.context().grantPermissions(["microphone"]);
+    await page.route("**/api/v1/health", (route) =>
+      route.fulfill({ json: { data: { transcription_configured: true } } }),
+    );
+    await page.route(`**/api/v1/sessions/${sid}`, async (route) => {
+      const response = await route.fetch();
+      const body = await response.json();
+      body.data.transcript = body.data.transcript.map(
+        (segment: Record<string, unknown>, i: number) => ({
+          ...segment,
+          start_seconds: 1214.906499 + i * 27.0815,
+          end_seconds: 1229.906499 + i * 27.0815,
+        }),
+      );
+      await route.fulfill({ response, json: body });
+    });
+    let uploads = 0;
+    await page.route(`**/api/v1/sessions/${sid}/transcribe`, (route) => {
+      uploads++;
+      return route.fulfill({ json: { data: { saved: true, segments: 1 } } });
+    });
+    await login(page, true);
+    await page.goto(`/session/${sid}?tab=transcript`);
+    await expect(page.locator(".session-heading .live-mic")).toHaveCount(0);
+    await expect(page.locator(".panel.live-mic")).toHaveCount(0);
+    const mic = page.getByRole("region", { name: "Rekaman kelas" });
+    await expect(mic).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Rekam suara dosen", exact: true }),
+    ).toBeEnabled();
+    expect((await mic.boundingBox())!.height).toBeLessThan(100);
+    const segments = page.locator(".transcript-segment");
+    await expect(segments.first().locator("time")).toHaveText("20:14");
+    await expect(segments.nth(1).locator("time")).toHaveText("20:41");
+    for (const segment of await segments.all()) {
+      const time = (await segment.locator("time").boundingBox())!;
+      const text = (await segment.locator(".transcript-entry").boundingBox())!;
+      expect(time.x + time.width + 8).toBeLessThanOrEqual(text.x);
+    }
+    await expect(segments.first().locator("p")).toHaveCSS("font-size", "16px");
+    expect(
+      await page.locator(".main-wrapper").evaluate((element) => element.scrollWidth),
+    ).toBeLessThanOrEqual(width);
+    await page.screenshot({
+      path: `test-results/lecturer-transcript-${width}.png`,
+      fullPage: true,
+    });
+    await page.getByRole("button", { name: "Rekam suara dosen", exact: true }).click();
+    const stop = page.getByRole("button", { name: "Hentikan rekaman", exact: true });
+    await expect(stop).toBeVisible();
+    await expect(page.getByRole("button", { name: "Akhiri", exact: true })).toBeDisabled();
+    await page.getByRole("button", { name: "Pertanyaan", exact: true }).click();
+    await expect(stop).toBeVisible();
+    await stop.click();
+    await expect.poll(() => uploads).toBeGreaterThan(0);
+    await expect(page.getByRole("button", { name: "Akhiri", exact: true })).toBeEnabled();
+    await page.getByRole("button", { name: "Transkrip", exact: true }).click();
+    await expect(segments.first().locator("time")).toHaveText("20:14");
+  });
+}

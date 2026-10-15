@@ -39,7 +39,7 @@ export function TranscriptPanel({
       segments[0],
     )?.id;
   return (
-    <section className="transcript-panel">
+    <section className={`transcript-panel${lecturer ? " lecturer-transcript" : ""}`}>
       <div className="transcript-toolbar">
         <span>Transkrip</span>
       </div>

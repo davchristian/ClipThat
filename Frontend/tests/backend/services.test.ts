@@ -5,8 +5,16 @@ import { captureSchema } from "../../src/server/schemas";
 import { signCapture, verifyCapture } from "../../src/server/capture-token";
 import { sameOrigin, body } from "../../src/server/http";
 import { z } from "zod";
+import { seconds } from "../../src/lib/format";
 
 const user = "00000000-0000-4000-8000-000000000001";
+test("transcript timestamps display whole seconds without floating-point overflow", () => {
+  assert.equal(seconds(1214.906499), "20:14");
+  assert.equal(seconds(1241.988), "20:41");
+  assert.equal(seconds(59.999), "00:59");
+  assert.equal(seconds(60), "01:00");
+  assert.equal(seconds(3600.5), "60:00");
+});
 test("90 seconds are seconds; clamp early class and include overlapping speech", () => {
   const s = [
     { id: user, start_seconds: 950, end_seconds: 1025, text: "Satu" },
