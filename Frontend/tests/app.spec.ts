@@ -1,4 +1,19 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function openSavedItem(page: Page, sessionId: string, title: string) {
+  const id = await page.evaluate(
+    ({ sessionId, title }) => {
+      const data = JSON.parse(localStorage.getItem("clipthat-frontend-v1")!);
+      return data.saved.find(
+        (item: { id: string; sessionId: string; title: string }) =>
+          item.sessionId === sessionId && item.title.includes(title),
+      )?.id;
+    },
+    { sessionId, title },
+  );
+  expect(id).toBeTruthy();
+  await page.goto(`/session/${sessionId}?tab=transcript&saved=${encodeURIComponent(id)}`);
+}
 
 test("course shows schedule, overall summary, nearest agenda and past class sources", async ({
   page,
@@ -73,11 +88,8 @@ test("completed classes preserve their history without student or lecturer editi
   await expect(page.getByRole("button", { name: "Capture 90 detik" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Tambahkan foto" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: /^(Simpan bagian|Hapus penanda)/ })).toHaveCount(0);
-  await page.getByRole("button", { name: "Tersimpan (1)" }).click();
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: /Menentukan basis sebuah ruang/ })
-    .click();
+  await expect(page.locator(".transcript-toolbar button")).toHaveCount(0);
+  await openSavedItem(page, "basis-04", "Menentukan basis sebuah ruang");
   await expect(page.getByRole("dialog")).toContainText("Basis adalah himpunan vektor");
   await expect(page.getByRole("button", { name: "Hapus bagian pribadi" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Sudah paham", exact: true })).toHaveCount(0);
@@ -243,11 +255,7 @@ test("simple navigation, one-tap capture, bookmarks and personal review", async 
   );
   await page.getByRole("button", { name: "Capture 90 detik" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await page.getByRole("button", { name: "Tersimpan (2)" }).click();
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: /Capture · 17:00/ })
-    .click();
+  await openSavedItem(page, "linear-05", "Capture · 17:00");
   await expect(page.getByRole("dialog")).toContainText("17:00 – 18:30");
   await page
     .getByRole("dialog")
@@ -279,14 +287,10 @@ test("simple navigation, one-tap capture, bookmarks and personal review", async 
   await expect(page.getByRole("button", { name: "Ringkasan", exact: true })).toHaveCount(0);
   await expect(page.locator(".notes-panel")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Capture 90 detik" })).toBeVisible();
-  await page.getByRole("button", { name: "Tersimpan (2)" }).click();
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: /Capture · 17:00/ })
-    .click();
+  await openSavedItem(page, "linear-05", "Capture · 17:00");
   await page.getByRole("dialog").getByRole("button", { name: "Sudah paham", exact: true }).click();
-  await page.getByRole("button", { name: "Tersimpan (2)" }).click();
-  await expect(page.getByRole("button", { name: /Capture · 17:00/ })).toBeVisible();
+  await openSavedItem(page, "linear-05", "Capture · 17:00");
+  await expect(page.getByRole("dialog")).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -684,11 +688,7 @@ test("photo upload validates timestamp and persists in the saved collection", as
   await page.getByRole("button", { name: "Simpan foto" }).click();
   await page.reload();
   await expect(page.getByRole("button", { name: /Foto kamu · 17:20/ })).toBeVisible();
-  await page.getByRole("button", { name: "Tersimpan (1)" }).click();
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: /Foto papan · 17:20/ })
-    .click();
+  await page.getByRole("button", { name: /Foto kamu · 17:20/ }).click();
   await expect(
     page.getByRole("dialog").getByRole("img", { name: "Foto papan · 17:20", exact: true }),
   ).toBeVisible();

@@ -12,7 +12,6 @@ export function TranscriptPanel({
   bookmark,
   capture,
   onPhoto,
-  onSaved,
   onOpenSaved,
   onAsk,
 }: {
@@ -23,7 +22,6 @@ export function TranscriptPanel({
   bookmark: (segment: Segment) => void;
   capture: () => void;
   onPhoto: () => void;
-  onSaved: () => void;
   onOpenSaved: (id: string) => void;
   onAsk: () => void;
 }) {
@@ -38,12 +36,6 @@ export function TranscriptPanel({
     <section className="transcript-panel">
       <div className="transcript-toolbar">
         <span>Transkrip</span>
-        {!lecturer && (
-          <button className="text-button" onClick={onSaved}>
-            <Bookmark size={15} />
-            Tersimpan ({saved.length})
-          </button>
-        )}
       </div>
       <div className="transcript-content">
         {segments.map((segment) => {

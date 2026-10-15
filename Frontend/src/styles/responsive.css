@@ -236,7 +236,6 @@
   }
   .transcript-content {
     padding: 6px 10px;
-    max-height: 480px;
   }
   .transcript-segment {
     grid-template-columns: 35px minmax(0, 1fr) 29px;
@@ -353,8 +352,7 @@
     padding: 23px;
   }
   .toast-region {
-    left: 0;
-    bottom: 16px;
+    top: max(16px, env(safe-area-inset-top));
   }
   .aggregate-row {
     grid-template-columns: 120px 1fr 30px;
