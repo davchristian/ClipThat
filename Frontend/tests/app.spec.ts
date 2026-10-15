@@ -325,9 +325,7 @@ test("compact questions support anonymous posting, voting and reload on mobile",
   });
 });
 
-test("class agenda stays a draft after class ends until the student confirms it", async ({
-  page,
-}) => {
+test("unconfirmed class agenda stays off the calendar after class ends", async ({ page }) => {
   await page.goto("/session/linear-05");
   await page.locator("#main-sidebar").hover();
   await page.getByRole("button", { name: "Pilih peran demo" }).click();
@@ -340,10 +338,11 @@ test("class agenda stays a draft after class ends until the student confirms it"
   await page.getByRole("button", { name: "Mahasiswa", exact: true }).click();
   await page.goto("/agenda");
   await page.reload();
-  const draft = page
-    .locator(".agenda-draft:visible")
-    .filter({ hasText: "Latihan matriks transformasi" });
-  await expect(draft).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Usulan dari kelas" })).toHaveCount(0);
+  await expect(page.locator(".agenda-drafts")).toHaveCount(0);
+  await expect(
+    page.locator(".calendar-event").filter({ hasText: "Latihan matriks transformasi" }),
+  ).toHaveCount(0);
   expect(
     await page.evaluate(
       () =>
@@ -352,19 +351,6 @@ test("class agenda stays a draft after class ends until the student confirms it"
         ).confirmed,
     ),
   ).toBe(false);
-  await draft.getByRole("button", { name: "Tinjau", exact: true }).click();
-  await page.getByRole("button", { name: "Konfirmasi agenda", exact: true }).click();
-  await expect(draft).toHaveCount(0);
-  await page.keyboard.press("Escape");
-  await page.reload();
-  expect(
-    await page.evaluate(
-      () =>
-        JSON.parse(localStorage.getItem("clipthat-frontend-v1")!).agenda.find(
-          (a: { id: string }) => a.id === "a4",
-        ).confirmed,
-    ),
-  ).toBe(true);
 });
 
 test("agenda supports date selection, quick creation, edit, completion, export and delete", async ({

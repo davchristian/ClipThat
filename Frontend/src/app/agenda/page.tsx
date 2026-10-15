@@ -13,7 +13,6 @@ import { downloadText } from "@/lib/files";
 import type { Agenda } from "@/lib/types";
 import { demoCalendarMonth } from "@/data";
 import { AgendaEditor } from "./components/agenda-editor";
-import { dateLabel } from "@/lib/format";
 
 function isoDay(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -120,26 +119,6 @@ export default function AgendaPage() {
           </div>
         }
       />
-      {data.agenda.some((a) => !a.confirmed) && (
-        <section className="panel agenda-drafts">
-          <h2>Usulan dari kelas</h2>
-          {data.agenda
-            .filter((a) => !a.confirmed)
-            .map((a) => (
-              <article className="agenda-draft" key={a.id}>
-                <div>
-                  <strong>{a.title}</strong>
-                  <small>
-                    {a.date ? `${dateLabel(a.date)} · ${a.time}` : "Tanggal perlu dipastikan"}
-                  </small>
-                </div>
-                <button className="button secondary small" onClick={() => openEditor(a)}>
-                  Tinjau
-                </button>
-              </article>
-            ))}
-        </section>
-      )}
       <div className="agenda-workspace">
         <section className="calendar-panel" aria-label="Kalender agenda">
           <div className="calendar-toolbar">
