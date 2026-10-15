@@ -75,7 +75,7 @@ export function CoursesView({ courseId }: { courseId?: string }) {
       />
       <PageHeading
         title={course?.name || "Course"}
-        action={<SessionEntry courseId={course?.id} />}
+        action={lecturer ? <SessionEntry courseId={course?.id} /> : undefined}
       />
       {!course && (
         <div className="course-grid">

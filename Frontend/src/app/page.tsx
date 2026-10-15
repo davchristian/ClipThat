@@ -47,7 +47,7 @@ export default function Home() {
     <div className="home-page">
       <Breadcrumbs items={[]} />
       <PageHeading
-        action={<SessionEntry />}
+        action={lecturer ? <SessionEntry /> : undefined}
         title={
           data.profile
             ? `Selamat datang, ${data.profile.name.split(" ")[0]}!`
