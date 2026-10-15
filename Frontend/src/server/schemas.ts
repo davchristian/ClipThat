@@ -38,6 +38,7 @@ export const graphSchema = z
           id: z.string().max(60),
           title: shortText,
           description: z.string().max(3000),
+          topics: z.array(z.string().trim().min(1).max(60)).max(4).optional(),
           source_ids: z.array(uuid).max(50),
         }),
       )

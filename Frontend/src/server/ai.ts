@@ -88,7 +88,7 @@ export async function createLessonResult(session: unknown, segments: SourceSegme
   if (!segments.length) return { notes: [], graph: { nodes: [], edges: [] }, agenda: [] };
   const result = await gemini(
     lessonResultSchema,
-    "Buat notes seluruh materi (buang obrolan di luar materi), graph subbab dengan nodes/edges, dan agenda pengumuman kelas sebagai DRAF. Semua uraian wajib memakai source_ids. due_at hanya tanggal ISO dengan offset jika disebut jelas dan tidak ambigu, selain itu null. quote harus kutipan persis dari segmen source_id. Jangan mengubah draf menjadi agenda tersimpan.",
+    "Buat notes seluruh materi (buang obrolan di luar materi), graph subbab dengan nodes/edges, dan agenda pengumuman kelas sebagai DRAF. Untuk setiap node graph, isi topics dengan 1–4 nama konsep atau metode yang disebut dalam sumber node, bukan kalimat penjelasan. Kosongkan topics jika tidak ada materi spesifik yang jelas; jangan menambahkan materi baru. description tetap berisi penjelasan untuk panel detail. Semua uraian wajib memakai source_ids. due_at hanya tanggal ISO dengan offset jika disebut jelas dan tidak ambigu, selain itu null. quote harus kutipan persis dari segmen source_id. Jangan mengubah draf menjadi agenda tersimpan.",
     { session, segments },
   );
   const allowed = new Set(segments.map((s) => s.id));

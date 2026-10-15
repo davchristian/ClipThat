@@ -135,6 +135,9 @@ test("generated class graph links to its transcript and agenda confirmation surv
   await request.get("http://127.0.0.1:54339/reset?processed=1");
   await login(page);
   await page.goto(`/session/${sid}?tab=materials&view=graph`);
+  await expect(
+    page.locator(".graph-topic-card").filter({ hasText: "Matriks" }).locator("span"),
+  ).toHaveText("Kolom matriks");
   await page.getByLabel("Pilih subbab").selectOption("matrix");
   await expect(page.locator(".graph-node-detail")).toContainText(
     "Kolom dari hasil pemetaan basis.",
@@ -156,4 +159,23 @@ test("generated class graph links to its transcript and agenda confirmation surv
   expect(body.data).toHaveLength(1);
   expect(body.data[0].confirmed).toBe(true);
   expect(body.data[0].source.draft_key).toBe(`${sid}:0`);
+  await page.request.post("/api/v1/auth/logout", {
+    headers: { Origin: "http://127.0.0.1:3188" },
+    data: {},
+  });
+  await login(page, true);
+  await page.goto(`/session/${sid}?tab=materials&view=graph`);
+  await page.getByRole("button", { name: "Koreksi hubungan" }).click();
+  await page.getByLabel("Jenis hubungan").selectOption("penerapan");
+  await page.getByRole("button", { name: "Simpan hubungan" }).click();
+  await expect(page.locator(".toast")).toContainText("Hubungan diperbarui");
+  await page.reload();
+  await expect(
+    page.locator(".graph-topic-card").filter({ hasText: "Matriks" }).locator("span"),
+  ).toHaveText("Kolom matriks");
+  await page.getByLabel("Pilih subbab").selectOption("matrix");
+  await expect(page.locator(".graph-node-detail")).toContainText(
+    "Kolom dari hasil pemetaan basis.",
+  );
+  await expect(page.locator(".graph-relations")).toContainText("penerapan");
 });

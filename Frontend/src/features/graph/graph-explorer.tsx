@@ -1,8 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import cytoscape, { type Core } from "cytoscape";
-import { ArrowUpRight, Focus, Maximize2, Minus, Network, Plus, Search, X } from "lucide-react";
+import { ArrowUpRight, Network, X } from "lucide-react";
 import type { ConceptGraph } from "@/lib/types";
+
+const CARD_WIDTH = 272;
+const CARD_HEIGHT = 156;
 
 export function GraphExplorer({
   graph,
@@ -14,27 +17,25 @@ export function GraphExplorer({
   onEdit?: () => void;
 }) {
   const canvas = useRef<HTMLDivElement>(null);
-  const wrapper = useRef<HTMLElement>(null);
+  const surface = useRef<HTMLDivElement>(null);
+  const detail = useRef<HTMLElement>(null);
   const cy = useRef<Core | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
-  const [query, setQuery] = useState("");
   const [failed, setFailed] = useState(false);
+  const [positions, setPositions] = useState<Record<string, { x: number; y: number }>>({});
   const signature = JSON.stringify(graph);
   useEffect(() => {
-    if (!canvas.current || !graph.nodes.length) return;
+    if (!canvas.current || !surface.current || !graph.nodes.length) return;
     try {
+      surface.current.style.width = "100%";
+      canvas.current.style.height = "640px";
       const value = JSON.parse(signature) as ConceptGraph;
-      const groups = [...new Set(value.nodes.map((n) => n.group || ""))];
-      const colors = ["#4f7562", "#b28159", "#78939c", "#97946b"];
+      const theme = getComputedStyle(canvas.current);
       const network = cytoscape({
         container: canvas.current,
         elements: [
           ...value.nodes.map((n) => ({
-            data: {
-              id: n.id,
-              title: n.title,
-              color: colors[groups.indexOf(n.group || "") % colors.length],
-            },
+            data: { id: n.id, title: n.title },
           })),
           ...value.edges.map((e, i) => ({
             data: { id: `edge:${i}`, source: e.from, target: e.to, relation: e.relation },
@@ -44,76 +45,69 @@ export function GraphExplorer({
           {
             selector: "node",
             style: {
-              "background-color": "data(color)",
-              width: 18,
-              height: 18,
-              label: "data(title)",
-              "font-family": "Plus Jakarta Sans Variable, sans-serif",
-              "font-size": 12,
-              color: "#4e5d51",
-              "text-valign": "bottom",
-              "text-margin-y": 11,
-              "text-wrap": "wrap",
-              "text-max-width": "125px",
-              "border-width": 5,
-              "border-color": "#ffffff",
-              "border-opacity": 0.8,
+              shape: "round-rectangle",
+              width: CARD_WIDTH,
+              height: CARD_HEIGHT,
+              "background-opacity": 0,
+              "border-width": 0,
               "overlay-opacity": 0,
             },
           },
           {
             selector: "edge",
-            style: { width: 1.2, "line-color": "#cad5c8", "curve-style": "bezier", opacity: 0.75 },
-          },
-          { selector: ".dimmed", style: { opacity: 0.13 } },
-          {
-            selector: "node.focused",
             style: {
-              width: 26,
-              height: 26,
-              "border-color": "#dbe7d8",
-              "border-width": 8,
-              "font-weight": "bold",
-              color: "#2e5145",
-              "font-size": 13,
+              width: 2,
+              "line-color": theme.getPropertyValue("--muted").trim(),
+              "line-style": "dashed",
+              "line-dash-pattern": [6, 5],
+              "curve-style": "taxi",
+              "taxi-direction": "downward",
+              "taxi-turn": "50%",
+              "source-endpoint": "0% 50%",
+              "target-endpoint": "0% -50%",
+              opacity: 0.35,
             },
           },
-          { selector: "edge.related", style: { width: 2, "line-color": "#789782", opacity: 1 } },
-          { selector: "node.matched", style: { "border-color": "#e8d4bb", "border-width": 8 } },
+          { selector: "edge.dimmed", style: { opacity: 0.12 } },
+          {
+            selector: "edge.related",
+            style: {
+              "line-color": theme.getPropertyValue("--green").trim(),
+              opacity: 0.85,
+            },
+          },
         ],
         layout: {
-          name: "cose",
+          name: "breadthfirst",
+          directed: true,
           animate: false,
-          padding: 70,
-          nodeRepulsion: () => 14000,
-          idealEdgeLength: () => 130,
-          componentSpacing: 100,
+          fit: false,
+          padding: 32,
+          spacingFactor: 1.2,
+          transform: (_node, position) => ({ x: position.x, y: position.y * 0.7 }),
         },
-        minZoom: 0.3,
-        maxZoom: 3,
+        minZoom: 1,
+        maxZoom: 1,
+        zoomingEnabled: false,
+        panningEnabled: false,
+        userZoomingEnabled: false,
+        userPanningEnabled: false,
         boxSelectionEnabled: false,
-        autoungrabify: false,
+        autoungrabify: true,
       });
       cy.current = network;
-      if (network.zoom() > 1.2) {
-        network.zoom(1.2);
-        network.center();
-      }
+      // Size the fixed diagram to its content; larger maps use ordinary scrolling.
+      const bounds = network.elements().boundingBox();
+      network.nodes().positions((n) => ({
+        x: n.position("x") - bounds.x1 + 32,
+        y: n.position("y") - bounds.y1 + 32,
+      }));
+      surface.current.style.width = `${Math.ceil(bounds.w + 64)}px`;
+      canvas.current.style.height = `${Math.max(320, Math.ceil(bounds.h + 64))}px`;
+      network.resize();
+      setPositions(Object.fromEntries(network.nodes().map((n) => [n.id(), n.position()])));
       setFailed(false);
-      network.on("tap", "node", (e) => setSelected(e.target.id()));
-      network.on("mouseover", "node", () => {
-        if (canvas.current) canvas.current.style.cursor = "pointer";
-      });
-      network.on("mouseout", "node", () => {
-        if (canvas.current) canvas.current.style.cursor = "grab";
-      });
-      network.on("tap", (e) => {
-        if (e.target === network) setSelected(null);
-      });
-      const observer = new ResizeObserver(() => network.resize());
-      observer.observe(canvas.current);
       return () => {
-        observer.disconnect();
         network.destroy();
         cy.current = null;
       };
@@ -124,84 +118,27 @@ export function GraphExplorer({
   useEffect(() => {
     const network = cy.current;
     if (!network) return;
-    network.elements().removeClass("dimmed focused related matched");
+    network.elements().removeClass("dimmed related");
     if (selected && network.$id(selected).length) {
       const node = network.$id(selected);
       network.elements().difference(node.closedNeighborhood()).addClass("dimmed");
-      node.addClass("focused");
       node.connectedEdges().addClass("related");
-      requestAnimationFrame(() => {
-        if (!network.destroyed()) {
-          network.resize();
-          network.center(node);
-        }
-      });
     }
-    if (query.trim()) {
-      const matches = network
-        .nodes()
-        .filter((n) =>
-          String(n.data("title"))
-            .toLocaleLowerCase("id-ID")
-            .includes(query.trim().toLocaleLowerCase("id-ID")),
-        );
-      network.elements().addClass("dimmed");
-      matches.closedNeighborhood().removeClass("dimmed");
-      matches.addClass("matched");
-    }
-  }, [selected, query, signature]);
+  }, [selected, signature]);
+  useEffect(() => {
+    if (selected && window.matchMedia("(max-width: 1100px)").matches)
+      detail.current?.scrollIntoView({ block: "nearest" });
+  }, [selected]);
   const node = graph.nodes.find((n) => n.id === selected);
   const related = graph.edges.filter((e) => e.from === selected || e.to === selected);
-  const zoom = (factor: number) => {
-    const network = cy.current;
-    if (network)
-      network.zoom({
-        level: network.zoom() * factor,
-        renderedPosition: { x: network.width() / 2, y: network.height() / 2 },
-      });
-  };
+  const visible = node ? new Set([node.id]) : null;
+  if (visible && node)
+    for (const edge of graph.edges) {
+      if (edge.from === node.id) visible.add(edge.to);
+      if (edge.to === node.id) visible.add(edge.from);
+    }
   return (
-    <section className="knowledge-graph" ref={wrapper} aria-label="Peta konsep interaktif">
-      <div className="graph-toolbar">
-        <div className="graph-search">
-          <Search size={16} />
-          <input
-            aria-label="Cari subbab"
-            placeholder="Cari subbab…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </div>
-        <div className="graph-tools">
-          <button className="icon-button" aria-label="Perkecil peta" onClick={() => zoom(0.8)}>
-            <Minus size={17} />
-          </button>
-          <button className="icon-button" aria-label="Perbesar peta" onClick={() => zoom(1.25)}>
-            <Plus size={17} />
-          </button>
-          <button
-            className="icon-button"
-            aria-label="Tampilkan seluruh peta"
-            onClick={() => {
-              cy.current?.fit(undefined, 70);
-              setSelected(null);
-              setQuery("");
-            }}
-          >
-            <Focus size={17} />
-          </button>
-          <button
-            className="icon-button"
-            aria-label="Peta layar penuh"
-            onClick={() => {
-              if (document.fullscreenElement) void document.exitFullscreen();
-              else void wrapper.current?.requestFullscreen?.();
-            }}
-          >
-            <Maximize2 size={17} />
-          </button>
-        </div>
-      </div>
+    <section className="knowledge-graph" aria-label="Peta konsep interaktif">
       {!graph.nodes.length ? (
         <div className="graph-empty">
           <Network size={30} />
@@ -210,9 +147,35 @@ export function GraphExplorer({
         </div>
       ) : (
         <div className={`graph-stage ${node ? "has-detail" : ""}`}>
-          <div className="graph-canvas" ref={canvas} aria-hidden="true" />
+          <div className="graph-viewport">
+            <div className="graph-surface" ref={surface}>
+              <div className="graph-canvas" ref={canvas} aria-hidden="true" />
+              <div className="graph-cards">
+                {graph.nodes.map((topic) => (
+                  <button
+                    key={topic.id}
+                    type="button"
+                    className={`graph-topic-card${selected === topic.id ? " selected" : ""}${visible && !visible.has(topic.id) ? " dimmed" : ""}`}
+                    aria-label={topic.title}
+                    aria-pressed={selected === topic.id}
+                    hidden={!positions[topic.id]}
+                    style={{
+                      left: positions[topic.id]?.x,
+                      top: positions[topic.id]?.y,
+                      width: CARD_WIDTH,
+                      height: CARD_HEIGHT,
+                    }}
+                    onClick={() => setSelected(topic.id)}
+                  >
+                    <strong>{topic.title}</strong>
+                    {!!topic.topics?.length && <span>{topic.topics.join(", ")}</span>}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
           {node && (
-            <aside className="graph-node-detail">
+            <aside className="graph-node-detail" ref={detail}>
               <button
                 className="icon-button graph-detail-close"
                 aria-label="Tutup detail subbab"

@@ -9,6 +9,7 @@ export function graphForLesson(
     id: `${lesson.id}-${i}`,
     title: n.title,
     description: n.body,
+    topics: n.topics || [],
     source_ids: n.source_ids || [],
     sessionId: lesson.id,
     group: String(lesson.number),

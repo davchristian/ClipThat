@@ -99,11 +99,18 @@ export type DemoState = {
   graphBySession?: Record<string, { from: number; to: number; relation: string }[]>;
 };
 
-export type StudyNote = { title: string; body: string; formula?: string; source_ids?: string[] };
+export type StudyNote = {
+  title: string;
+  body: string;
+  formula?: string;
+  source_ids?: string[];
+  topics?: string[];
+};
 export type ConceptNode = {
   id: string;
   title: string;
   description: string;
+  topics?: string[];
   source_ids: string[];
   sessionId?: string;
   group?: string;

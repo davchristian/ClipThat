@@ -318,10 +318,11 @@ export async function persistChanges(before: DemoState, after: DemoState) {
   for (const [id, graph] of Object.entries(after.conceptGraphs || {}))
     if (changed(graph, before.conceptGraphs?.[id]))
       await api(`sessions/${id}/graph`, "PUT", {
-        nodes: graph.nodes.map(({ id, title, description, source_ids }) => ({
+        nodes: graph.nodes.map(({ id, title, description, topics, source_ids }) => ({
           id,
           title,
           description,
+          topics,
           source_ids,
         })),
         edges: graph.edges,

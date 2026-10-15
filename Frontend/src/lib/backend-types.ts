@@ -65,7 +65,13 @@ export type BackendAgenda = {
   session_id: string | null;
 };
 export type BackendGraph = {
-  nodes: { id: string; title: string; description: string; source_ids: string[] }[];
+  nodes: {
+    id: string;
+    title: string;
+    description: string;
+    topics?: string[];
+    source_ids: string[];
+  }[];
   edges: { from: string; to: string; relation: string }[];
 };
 export type BackendNote = { title: string; body: string; source_ids: string[] };

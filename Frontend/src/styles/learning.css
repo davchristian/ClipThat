@@ -179,7 +179,7 @@
   background: #eef1e8;
   width: fit-content;
   border-radius: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 .resource-switch button {
   display: flex;
@@ -197,65 +197,101 @@
   box-shadow: 0 1px 4px #2b373010;
 }
 .knowledge-graph {
-  background: #fbfcf8;
+  background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 14px;
   overflow: hidden;
   min-width: 0;
 }
-.graph-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--line);
-  background: #ffffffb5;
-}
-.graph-search {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  max-width: 260px;
-  color: var(--muted);
-  min-width: 0;
-}
-.graph-search input {
-  background: transparent;
-  border: 0;
-  padding: 5px;
-  min-width: 0;
-  width: 100%;
-  font-size: var(--font-body);
-  box-shadow: none;
-}
-.graph-tools {
-  display: flex;
-  gap: 4px;
-}
 .graph-stage {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  min-height: 580px;
+  min-height: 320px;
   position: relative;
 }
 .graph-stage.has-detail {
   grid-template-columns: minmax(0, 1fr) 280px;
 }
-.graph-canvas {
-  height: 580px;
+.graph-viewport {
+  position: relative;
   min-width: 0;
-  background-image: radial-gradient(#dce3d5 0.75px, transparent 0.75px);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  background-image: radial-gradient(var(--line) 1px, transparent 1px);
   background-size: 23px 23px;
+}
+.graph-surface {
+  position: relative;
+  margin-inline: auto;
+}
+.graph-canvas {
+  height: 640px;
+  min-width: 0;
+  pointer-events: none;
+}
+.graph-cards {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.graph-topic-card {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  color: var(--ink);
+  text-align: center;
+  box-shadow: var(--shadow-surface);
+  pointer-events: auto;
+}
+.graph-topic-card:hover {
+  border-color: var(--green);
+}
+.graph-topic-card[hidden] {
+  display: none;
+}
+.graph-topic-card strong,
+.graph-topic-card > span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.graph-topic-card strong {
+  font-size: var(--font-card);
+  line-height: 1.4;
+  -webkit-line-clamp: 2;
+}
+.graph-topic-card > span {
+  color: var(--muted);
+  font-size: var(--font-body);
+  line-height: 1.5;
+  -webkit-line-clamp: 3;
+}
+.graph-topic-card.selected {
+  background: var(--sage);
+  border-color: var(--green);
+}
+.graph-topic-card.selected strong {
+  color: var(--green);
+}
+.graph-topic-card.dimmed {
+  opacity: 0.45;
 }
 .graph-node-detail {
   min-width: 0;
   padding: 28px 22px;
   border-left: 1px solid var(--line);
-  background: #fffffff0;
+  background: var(--paper);
   position: relative;
   overflow-y: auto;
-  max-height: 580px;
+  max-height: 640px;
 }
 .graph-detail-close {
   position: absolute;
@@ -263,7 +299,7 @@
   top: 12px;
 }
 .graph-node-detail .eyebrow {
-  font-size: 10px;
+  font-size: var(--font-caption);
   margin-top: 12px;
   display: block;
 }
@@ -327,21 +363,6 @@
 .graph-empty h3 {
   color: var(--ink);
   font-size: var(--font-card);
-}
-.knowledge-graph:fullscreen {
-  border-radius: 0;
-  display: flex;
-  flex-direction: column;
-}
-.knowledge-graph:fullscreen .graph-stage {
-  flex: 1;
-  min-height: 0;
-}
-.knowledge-graph:fullscreen .graph-canvas {
-  height: 100%;
-}
-.knowledge-graph:fullscreen .graph-node-detail {
-  max-height: none;
 }
 .workspace-status {
   min-height: 100dvh;
@@ -438,7 +459,7 @@
   flex-wrap: wrap;
 }
 .agenda-drafts {
-  margin-top: 24px;
+  margin-block: 24px;
 }
 .agenda-draft {
   display: flex;
@@ -479,14 +500,6 @@
     border-top: 1px solid var(--line);
     max-height: 340px;
   }
-  .graph-stage,
-  .graph-canvas {
-    min-height: 440px;
-    height: 440px;
-  }
-  .graph-stage.has-detail {
-    height: auto;
-  }
 }
 @media (max-width: 640px) {
   .session-workspace .transcript-panel {
@@ -526,22 +539,6 @@
   }
   .capture-bar .button {
     padding-inline: 12px;
-  }
-  .graph-toolbar {
-    padding: 12px;
-    gap: 6px;
-  }
-  .graph-tools {
-    gap: 0;
-  }
-  .graph-tools .icon-button {
-    width: 32px;
-    min-width: 32px;
-  }
-  .graph-canvas,
-  .graph-stage {
-    height: 380px;
-    min-height: 380px;
   }
   .graph-footer {
     padding: 12px;

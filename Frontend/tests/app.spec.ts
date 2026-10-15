@@ -704,26 +704,67 @@ test("login and registration remain readable on phone, tablet and desktop", asyn
   );
 });
 
-test("graph can be explored with keyboard controls on desktop and phone", async ({ page }) => {
+test("graph stays static while topic details work on desktop and phone", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/session/linear-05?tab=materials&view=graph");
     await expect(page.getByLabel("Peta konsep interaktif")).toBeVisible();
-    await page.getByLabel("Pilih subbab").selectOption({ index: 1 });
-    await expect(page.locator(".graph-node-detail")).toContainText("Apa itu transformasi linear?");
-    await page.screenshot({
+    const graph = page.getByLabel("Peta konsep interaktif");
+    await expect(graph.getByRole("textbox", { name: "Cari subbab" })).toHaveCount(0);
+    const cards = graph.locator(".graph-topic-card");
+    await expect(cards).toHaveCount(3);
+    await expect(cards.first()).toBeVisible();
+    await expect(cards.first().locator("span")).toHaveText(
+      "Ruang vektor, Penjumlahan, Perkalian skalar",
+    );
+    await expect(cards.first()).not.toContainText("Pemetaan dari satu ruang vektor");
+    await expect(
+      graph.getByRole("button", {
+        name: /Perbesar peta|Perkecil peta|Tampilkan seluruh peta|Peta layar penuh/,
+      }),
+    ).toHaveCount(0);
+    const boxes = await cards.evaluateAll((nodes) => nodes.map((n) => n.getBoundingClientRect().y));
+    expect(boxes[0]).toBeLessThan(boxes[1]);
+    expect(boxes[1]).toBeLessThan(boxes[2]);
+    await graph.screenshot({
       path: `docs/screenshots/graph-${width === 390 ? "mobile" : "desktop"}.png`,
       animations: "disabled",
       caret: "initial",
     });
-    await page.getByLabel("Cari subbab").fill("matriks");
-    await page.getByRole("button", { name: "Perbesar peta" }).click();
-    await page.getByRole("button", { name: "Tampilkan seluruh peta" }).click();
+    await cards.first().click();
+    await expect(page.locator(".graph-node-detail")).toContainText("Apa itu transformasi linear?");
+    await expect(page.locator(".graph-node-detail")).toContainText(
+      "Pemetaan dari satu ruang vektor",
+    );
+    await expect(cards.first()).toHaveAttribute("aria-pressed", "true");
+    if (width === 390) await expect(page.locator(".graph-node-detail")).toBeInViewport();
+    await page.getByLabel("Tutup detail subbab").click();
+    await cards.nth(1).focus();
+    await page.keyboard.press("Enter");
+    await expect(page.locator(".graph-node-detail")).toContainText("Dari vektor ke matriks");
+    await page.getByLabel("Pilih subbab").selectOption({ index: 1 });
+    await expect(page.locator(".graph-node-detail")).toContainText("Apa itu transformasi linear?");
+    const initialWidth = (await cards.nth(1).boundingBox())!.width;
+    const viewport = graph.locator(".graph-viewport");
+    await viewport.scrollIntoViewIfNeeded();
+    const box = (await viewport.boundingBox())!;
+    const initialX = (await cards.nth(1).boundingBox())!.x;
+    await page.mouse.move(box.x + 12, box.y + 32);
+    await page.mouse.down();
+    await page.mouse.move(box.x + 52, box.y + 32, { steps: 8 });
+    await page.mouse.up();
+    expect((await cards.nth(1).boundingBox())!.x).toBeCloseTo(initialX);
+    await page.mouse.wheel(0, 200);
+    expect((await cards.nth(1).boundingBox())!.width).toBeCloseTo(initialWidth);
+    await page.getByLabel("Tutup detail subbab").click();
     await expect(page.locator(".graph-node-detail")).toHaveCount(0);
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
     ).toBe(true);
   }
+  expect(errors).toEqual([]);
 });
 
 test("save current desktop and mobile design previews", async ({ page }) => {

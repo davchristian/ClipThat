@@ -107,12 +107,14 @@ const server = createServer(async (req, res) => {
               id: "basis",
               title: "Basis",
               description: "Vektor pembangun ruang.",
+              topics: ["Vektor basis"],
               source_ids: [transcript[0].id],
             },
             {
               id: "matrix",
               title: "Matriks",
               description: "Kolom dari hasil pemetaan basis.",
+              topics: ["Kolom matriks"],
               source_ids: [transcript[1].id],
             },
           ],
@@ -200,6 +202,12 @@ const server = createServer(async (req, res) => {
   }
   if (table === "rpc/calendar_status") return send([]);
   if (table === "rpc/handle_notifications") return send(null);
+  if (table === "rpc/correct_graph") {
+    if (id !== teacher || body.sid !== sessionId || !result)
+      return send({ message: "Only the session owner can correct this graph." }, 403);
+    result.graph = body.content;
+    return send(null);
+  }
 
   if (table === "session_results" || table === "personal_reviews" || table === "personal_notes")
     return send(null);
