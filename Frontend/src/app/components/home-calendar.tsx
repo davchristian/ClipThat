@@ -1,5 +1,6 @@
 "use client";
 
+import { liveMode } from "@/lib/app-mode";
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
@@ -15,7 +16,9 @@ export type HomeCalendarEvent = {
 };
 
 const weekdays = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
-const demoMonth = new Date(demoCalendarMonth.year, demoCalendarMonth.monthIndex, 1, 12);
+const demoMonth = liveMode
+  ? new Date(new Date().getFullYear(), new Date().getMonth(), 1, 12)
+  : new Date(demoCalendarMonth.year, demoCalendarMonth.monthIndex, 1, 12);
 
 function isoDay(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -32,8 +35,13 @@ export function HomeCalendar({
   events: HomeCalendarEvent[];
   initialDate: string;
 }) {
+  const today = liveMode
+    ? new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" })
+    : demoToday;
   const [monthOffset, setMonthOffset] = useState(0);
-  const [selectedDate, setSelectedDate] = useState(initialDate);
+  const [selectedDate, setSelectedDate] = useState(
+    liveMode ? new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" }) : initialDate,
+  );
   const month = new Date(demoMonth.getFullYear(), demoMonth.getMonth() + monthOffset, 1, 12);
   const monthName = month.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
   const firstWeekday = (month.getDay() + 6) % 7;
@@ -94,7 +102,7 @@ export function HomeCalendar({
           });
           return (
             <button
-              className={`home-calendar-day ${selectedDate === date ? "selected" : ""} ${demoToday === date ? "today" : ""}`}
+              className={`home-calendar-day ${selectedDate === date ? "selected" : ""} ${today === date ? "today" : ""}`}
               aria-label={`${readableDate}, ${dayEvents.length} agenda`}
               aria-pressed={selectedDate === date}
               onClick={() => setSelectedDate(date)}

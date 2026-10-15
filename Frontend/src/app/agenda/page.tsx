@@ -1,32 +1,43 @@
 "use client";
 
+import { liveMode } from "@/lib/app-mode";
 import { useState } from "react";
 import Link from "next/link";
 import { Check, ChevronLeft, ChevronRight, Download, Pencil, Plus } from "lucide-react";
 import { useApp } from "@/state/app-provider";
 import { ActionMenu, Breadcrumbs, Empty, Modal, PageHeading } from "@/components/ui";
-import { courseFor, demoToday } from "@/data";
+import { demoToday } from "@/data";
+import { useContent } from "@/data/use-content";
 import { calendarText } from "./components/calendar-export";
 import { downloadText } from "@/lib/files";
 import type { Agenda } from "@/lib/types";
 import { demoCalendarMonth } from "@/data";
 import { AgendaEditor } from "./components/agenda-editor";
+import { dateLabel } from "@/lib/format";
 
 function isoDay(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
 const weekdays = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"];
-const demoMonth = new Date(demoCalendarMonth.year, demoCalendarMonth.monthIndex, 1, 12);
+const demoMonth = liveMode
+  ? new Date(new Date().getFullYear(), new Date().getMonth(), 1, 12)
+  : new Date(demoCalendarMonth.year, demoCalendarMonth.monthIndex, 1, 12);
 
 function kindClass(kind: Agenda["kind"]) {
   return kind === "Kuis" ? "quiz" : kind === "Tugas" ? "assignment" : "study";
 }
 
 export default function AgendaPage() {
-  const { data, update, notify } = useApp();
+  const today = liveMode
+    ? new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" })
+    : demoToday;
+  const { courseFor, courses } = useContent();
+  const { data, update, notify, pending } = useApp();
   const [monthOffset, setMonthOffset] = useState(0);
-  const [selectedDate, setSelectedDate] = useState("2026-10-08");
+  const [selectedDate, setSelectedDate] = useState(
+    liveMode ? new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" }) : "2026-10-08",
+  );
   const [editing, setEditing] = useState<Agenda | "new" | null>(null);
   const [dayOpen, setDayOpen] = useState(false);
   const [deleting, setDeleting] = useState<Agenda | null>(null);
@@ -92,7 +103,10 @@ export default function AgendaPage() {
                   }
                   downloadText(
                     "clipthat-agenda.ics",
-                    calendarText(data.agenda),
+                    calendarText(
+                      data.agenda,
+                      Object.fromEntries(courses.map((c) => [c.id, c.name])),
+                    ),
                     "text/calendar;charset=utf-8",
                   );
                   notify("Kalender diunduh.");
@@ -106,12 +120,32 @@ export default function AgendaPage() {
           </div>
         }
       />
+      {data.agenda.some((a) => !a.confirmed) && (
+        <section className="panel agenda-drafts">
+          <h2>Usulan dari kelas</h2>
+          {data.agenda
+            .filter((a) => !a.confirmed)
+            .map((a) => (
+              <article className="agenda-draft" key={a.id}>
+                <div>
+                  <strong>{a.title}</strong>
+                  <small>
+                    {a.date ? `${dateLabel(a.date)} · ${a.time}` : "Tanggal perlu dipastikan"}
+                  </small>
+                </div>
+                <button className="button secondary small" onClick={() => openEditor(a)}>
+                  Tinjau
+                </button>
+              </article>
+            ))}
+        </section>
+      )}
       <div className="agenda-workspace">
         <section className="calendar-panel" aria-label="Kalender agenda">
           <div className="calendar-toolbar">
             <h2>{monthName}</h2>
             <div className="calendar-controls">
-              <button className="button secondary small" onClick={() => showDate(demoToday)}>
+              <button className="button secondary small" onClick={() => showDate(today)}>
                 Hari ini
               </button>
               <button
@@ -161,10 +195,10 @@ export default function AgendaPage() {
                     return (
                       <td key={date}>
                         <button
-                          className={`calendar-day ${selectedDate === date ? "selected" : ""} ${demoToday === date ? "today" : ""}`}
+                          className={`calendar-day ${selectedDate === date ? "selected" : ""} ${today === date ? "today" : ""}`}
                           aria-label={`${readableDate}, ${dayEntries.length} agenda`}
                           aria-pressed={selectedDate === date}
-                          aria-current={demoToday === date ? "date" : undefined}
+                          aria-current={today === date ? "date" : undefined}
                           onClick={() => {
                             setSelectedDate(date);
                             setDayOpen(true);
@@ -219,6 +253,7 @@ export default function AgendaPage() {
                 <article className={`agenda-item ${item.done ? "done" : ""}`} key={item.id}>
                   <button
                     className="task-check"
+                    disabled={pending}
                     aria-label={`${item.done ? "Batalkan selesai: " : "Selesaikan: "}${item.title}`}
                     aria-pressed={item.done}
                     onClick={() =>
@@ -295,8 +330,13 @@ export default function AgendaPage() {
           </button>
           <button
             className="button danger"
-            onClick={() => {
-              update((d) => ({ ...d, agenda: d.agenda.filter((a) => a.id !== deleting?.id) }));
+            disabled={pending}
+            onClick={async () => {
+              const ok = await update((d) => ({
+                ...d,
+                agenda: d.agenda.filter((a) => a.id !== deleting?.id),
+              }));
+              if (!ok) return;
               setDeleting(null);
               notify("Agenda dihapus.");
             }}

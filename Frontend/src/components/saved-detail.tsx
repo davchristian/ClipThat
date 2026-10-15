@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
+import { liveMode } from "@/lib/app-mode";
 import Link from "next/link";
 import { ArrowRight, Check, Send, Trash2 } from "lucide-react";
 import { useApp } from "@/state/app-provider";
@@ -9,12 +11,25 @@ import { seconds } from "@/lib/format";
 import type { SavedItem } from "@/lib/types";
 
 export function SavedDetail({ item, onClose }: { item: SavedItem | null; onClose: () => void }) {
-  const { data, update, notify } = useApp();
+  const { data, update, notify, pending } = useApp();
+  const [photo, setPhoto] = useState<{ id: string; url: string } | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    setDraft(null);
+    if (liveMode && item?.type === "photo")
+      void api<{ signedUrl: string }>(`files/photos/${item.id}`)
+        .then((v) => {
+          if (!cancelled) setPhoto({ id: item.id, url: v.signedUrl });
+        })
+        .catch(() => notify("Foto belum dapat dimuat."));
+    return () => {
+      cancelled = true;
+    };
+  }, [item?.id, notify]);
   const [draft, setDraft] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const exists = item && data.lessons.some((s) => s.id === item.sessionId);
-  const editable =
-    item && data.lessons.some((lesson) => lesson.id === item.sessionId && lesson.status === "live");
+  const editable = !!item;
   function close() {
     setDraft(null);
     setDeleting(false);
@@ -39,8 +54,12 @@ export function SavedDetail({ item, onClose }: { item: SavedItem | null; onClose
             </button>
             <button
               className="button danger"
-              onClick={() => {
-                update((d) => ({ ...d, saved: d.saved.filter((s) => s.id !== item.id) }));
+              disabled={pending}
+              onClick={async () => {
+                if (
+                  !(await update((d) => ({ ...d, saved: d.saved.filter((s) => s.id !== item.id) })))
+                )
+                  return;
                 notify("Simpanan dihapus.");
                 close();
               }}
@@ -50,7 +69,13 @@ export function SavedDetail({ item, onClose }: { item: SavedItem | null; onClose
           </div>
         ) : (
           <>
-            {item.image && <img className="photo-preview" src={item.image} alt={item.title} />}
+            {(item.image || photo?.id === item.id) && (
+              <img
+                className="photo-preview"
+                src={photo?.id === item.id ? photo.url : item.image}
+                alt={item.title}
+              />
+            )}
             <p className="capture-excerpt">{item.summary || item.text}</p>
             {item.summary && (
               <details className="detail-section">
@@ -69,11 +94,11 @@ export function SavedDetail({ item, onClose }: { item: SavedItem | null; onClose
                 />
                 <button
                   className="button secondary small mt-3"
-                  disabled={!exists || !(draft ?? item.draft ?? "").trim()}
-                  onClick={() => {
+                  disabled={pending || !exists || (draft ?? item.draft ?? "").trim().length < 3}
+                  onClick={async () => {
                     const text = (draft ?? item.draft ?? "").trim();
                     if (!text) return;
-                    update((d) => ({
+                    const ok = await update((d) => ({
                       ...d,
                       questions: [
                         ...d.questions,
@@ -87,6 +112,7 @@ export function SavedDetail({ item, onClose }: { item: SavedItem | null; onClose
                         },
                       ],
                     }));
+                    if (!ok) return;
                     notify("Pertanyaan terkirim.");
                     close();
                   }}
@@ -94,12 +120,6 @@ export function SavedDetail({ item, onClose }: { item: SavedItem | null; onClose
                   <Send size={14} />
                   Kirim anonim
                 </button>
-              </details>
-            )}
-            {item.type === "capture" && !editable && item.draft && (
-              <details className="detail-section">
-                <summary>Pertanyaan dari capture</summary>
-                <p className="capture-excerpt">{item.draft}</p>
               </details>
             )}
             <div className="dialog-actions">
@@ -124,13 +144,15 @@ export function SavedDetail({ item, onClose }: { item: SavedItem | null; onClose
                   </button>
                   <button
                     className="button primary small"
-                    onClick={() => {
-                      update((d) => ({
+                    disabled={pending}
+                    onClick={async () => {
+                      const ok = await update((d) => ({
                         ...d,
                         saved: d.saved.map((s) =>
                           s.id === item.id ? { ...s, reviewed: !s.reviewed } : s,
                         ),
                       }));
+                      if (!ok) return;
                       notify(item.reviewed ? "Masuk daftar review." : "Ditandai sudah paham.");
                       close();
                     }}

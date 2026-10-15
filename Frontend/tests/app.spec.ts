@@ -28,7 +28,13 @@ test("course shows schedule, overall summary, nearest agenda and past class sour
   await main.locator(".course-summary-panel").getByRole("link", { name: "Lihat materi" }).click();
   await expect(page).toHaveURL(/classes\/aljabar\/materials/);
   await expect(main).toContainText("Basis adalah himpunan vektor");
-  await expect(main.getByLabel("Alur konsep materi")).toContainText("Dimensi");
+  await expect(main.getByLabel("Peta konsep interaktif")).toBeVisible();
+  await expect(main.getByLabel("Pilih subbab").locator("option")).toContainText([
+    "Pilih subbab",
+    "Bebas linear",
+    "Basis sebuah ruang",
+    "Dimensi",
+  ]);
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.reload();
   await expect(main.getByRole("heading", { name: "Materi Aljabar Linear" })).toBeVisible();
@@ -65,45 +71,43 @@ test("course shows schedule, overall summary, nearest agenda and past class sour
   await expect(main.locator(".course-summary-panel")).toContainText("Belum ada rangkuman materi.");
 });
 
-test("completed classes preserve their history without student or lecturer editing controls", async ({
+test("completed classes retain transcript history and allow private review and lecturer answers", async ({
   page,
 }) => {
   await page.goto("/session/basis-04?tab=transcript");
   await expect(page.locator(".transcript-segment.marked")).toHaveCount(1);
   await expect(page.getByRole("button", { name: "Capture 90 detik" })).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Tambahkan foto" })).toHaveCount(0);
-  await expect(page.getByRole("button", { name: /^(Simpan bagian|Hapus penanda)/ })).toHaveCount(0);
   await page.getByRole("button", { name: "Tersimpan (1)" }).click();
   await page
     .getByRole("dialog")
-    .getByRole("button", { name: /Menentukan basis sebuah ruang/ })
+    .getByRole("button", { name: /Menentukan basis/ })
     .click();
-  await expect(page.getByRole("dialog")).toContainText("Basis adalah himpunan vektor");
-  await expect(page.getByRole("button", { name: "Hapus bagian pribadi" })).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Sudah paham", exact: true })).toHaveCount(0);
-  await page.getByRole("dialog").getByRole("button", { name: "Tutup dialog" }).click();
-  await page.getByRole("button", { name: "Pertanyaan", exact: true }).click();
-  await expect(page.locator(".question-card")).toContainText("Bagaimana mengecek");
-  await expect(page.getByLabel("Pertanyaan anonim")).toHaveCount(0);
-  await expect(
-    page.getByRole("button", { name: /^(Dukung pertanyaan|Batalkan dukungan)/ }),
-  ).toHaveCount(0);
-  await expect(page.getByLabel("6 dukungan saat kelas")).toBeVisible();
-  await page.getByRole("button", { name: "Ringkasan", exact: true }).click();
-  await expect(page.getByLabel("Catatan pribadimu")).toHaveCount(0);
+  await page.getByRole("button", { name: "Sudah paham", exact: true }).click();
+  await page.getByRole("button", { name: "Catatan", exact: true }).click();
+  await page.getByText("Catatan pribadi", { exact: true }).click();
+  await page.getByLabel("Catatan pribadimu").fill("Ulangi basis sebelum matriks.");
+  await page.getByRole("button", { name: "Simpan catatan", exact: true }).click();
+  await page.reload();
+  await page.getByText("Catatan pribadi", { exact: true }).click();
+  await expect(page.getByLabel("Catatan pribadimu")).toHaveValue("Ulangi basis sebelum matriks.");
   await page.locator("#main-sidebar").hover();
   await page.getByRole("button", { name: "Pilih peran demo" }).click();
   await page.getByRole("button", { name: "Dosen", exact: true }).click();
   await page.getByRole("button", { name: "Pertanyaan", exact: true }).click();
-  await expect(
-    page.getByRole("button", { name: /^(Tandai sudah dijawab|Batalkan tanda)$/ }),
-  ).toHaveCount(0);
-  await expect(page.getByLabel("Lainnya di kelas")).toHaveCount(0);
-  await page.goto("/session/basis-04?tab=graph");
-  await expect(page.getByRole("button", { name: "Koreksi hubungan" })).toHaveCount(0);
-  await page.goto("/session/basis-04?tab=materials");
-  await expect(page.getByRole("button", { name: "Tambah materi" })).toHaveCount(0);
-  await expect(page.getByLabel("Unggah materi")).toHaveCount(0);
+  await page
+    .locator(".question-card")
+    .first()
+    .getByRole("button", { name: "Jawab", exact: true })
+    .click();
+  await page
+    .getByLabel("Jawaban dosen", { exact: true })
+    .fill("Periksa bebas linear dan apakah vektor membangun ruang.");
+  await page.getByRole("button", { name: "Simpan jawaban" }).click();
+  await page.reload();
+  await expect(page.locator(".answer")).toContainText("Periksa bebas linear");
+  await page.getByRole("button", { name: "Materi", exact: true }).click();
+  await page.getByRole("button", { name: "Peta konsep", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Koreksi hubungan" })).toBeVisible();
 });
 
 test("sidebar wheel stays separate and compact role options leave the name visible", async ({
@@ -178,7 +182,11 @@ test("sidebar expands on hover and folds on leave without shifting the page", as
   await expect(page.locator(".main-wrapper")).toHaveCSS("margin-left", "76px");
   await expect(sidebar.locator(".nav-item > span").first()).toBeHidden();
   await expect(page.getByRole("button", { name: /Lipat sidebar|Buka sidebar/ })).toHaveCount(0);
-  await page.screenshot({ path: "docs/screenshots/sidebar-collapsed.png", animations: "disabled" });
+  await page.screenshot({
+    path: "docs/screenshots/sidebar-collapsed.png",
+    animations: "disabled",
+    caret: "initial",
+  });
   await sidebar.hover();
   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(216);
   await expect(sidebar.locator(".nav-item > span").first()).toBeVisible();
@@ -205,83 +213,48 @@ test("sidebar expands on hover and folds on leave without shifting the page", as
   await expect(page.locator(".main-wrapper")).toHaveCSS("margin-left", "0px");
 });
 
-test("simple navigation, one-tap capture, bookmarks and personal review", async ({ page }) => {
+test("capture previews and discards without saving, then saves only after confirmation", async ({
+  page,
+}) => {
   const errors: string[] = [];
-  page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Selamat datang, Davin" })).toBeVisible();
-  await expect(
-    page.getByRole("navigation", { name: "Navigasi utama" }).getByRole("link"),
-  ).toHaveCount(3);
-  await expect(page.locator("main").getByRole("heading", { name: "Kalender" })).toBeVisible();
-  await expect(page.locator(".active-class")).toHaveCount(0);
-  await page
-    .getByRole("link", { name: "Masuk kelas Transformasi linear di Aljabar Linear" })
-    .first()
-    .click();
-  await expect(page).toHaveURL(/session\/linear-05/);
-  await page
-    .getByRole("navigation", { name: "Navigasi utama" })
-    .getByRole("link", { name: "Course", exact: true })
-    .click();
-  await expect(page.getByRole("button", { name: "Gabung kelas" })).toHaveCount(0);
-  await page.locator(".course-tile").filter({ hasText: "Aljabar Linear" }).click();
-  await expect(page).toHaveURL(/classes\/aljabar/);
-  await expect(page.getByRole("link", { name: "Buka rangkuman kelas" })).toBeVisible();
-  await page.getByRole("link", { name: "Masuk kelas" }).click();
-  await expect(page.locator(".tabs button")).toHaveCount(2);
-  await expect(page.getByRole("button", { name: "Ringkasan", exact: true })).toHaveCount(0);
-  await page.getByRole("button", { name: "Simpan bagian 17:45" }).click();
-  await expect(page.getByRole("button", { name: "Hapus penanda 17:45" })).toHaveAttribute(
-    "aria-pressed",
-    "true",
-  );
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto("/session/linear-05");
+  await expect(page.locator(".tabs button")).toHaveCount(4);
+  await page.getByRole("button", { name: "Simpan bagian 17:45", exact: true }).click();
   await page.getByRole("button", { name: "Capture 90 detik" }).click();
-  await expect(page.getByRole("dialog")).toHaveCount(0);
-  await page.getByRole("button", { name: "Tersimpan (2)" }).click();
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: /Capture · 17:00/ })
-    .click();
-  await expect(page.getByRole("dialog")).toContainText("17:00 – 18:30");
-  await page
-    .getByRole("dialog")
-    .locator("summary")
-    .filter({ hasText: "Ajukan pertanyaan" })
-    .click();
-  await page.getByLabel("Draf pertanyaan capture").fill("Apakah rotasi juga transformasi linear?");
-  await page.getByRole("button", { name: "Kirim anonim", exact: true }).click();
-  await page.getByRole("button", { name: "Pertanyaan", exact: true }).click();
-  await expect(
-    page.getByText("Apakah rotasi juga transformasi linear?", { exact: true }),
-  ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Dukung pertanyaan: Apakah rotasi juga transformasi linear?" })
-    .click();
-  await expect(
-    page.getByRole("button", {
-      name: "Batalkan dukungan: Apakah rotasi juga transformasi linear?",
-    }),
-  ).toContainText("1");
-  await page
-    .getByRole("button", { name: "Batalkan dukungan: Apakah rotasi juga transformasi linear?" })
-    .click();
+  const preview = page.getByRole("complementary", { name: "Preview capture" });
+  await expect(preview).toBeVisible();
+  await expect(page.getByRole("button", { name: "Tersimpan (1)" })).toBeVisible();
+  const left = (await page.locator(".transcript-panel").boundingBox())!;
+  const right = (await preview.boundingBox())!;
+  expect(left.height).toBeGreaterThanOrEqual(740);
+  expect(Math.abs(left.height - right.height)).toBeLessThan(1);
+  expect(Math.abs(left.y - right.y)).toBeLessThan(1);
+  await page.screenshot({
+    path: "docs/screenshots/capture-preview.png",
+    animations: "disabled",
+    caret: "initial",
+  });
+  await preview.getByRole("button", { name: "Buang preview capture" }).click();
+  await expect(preview).toHaveCount(0);
   await page.reload();
-  await expect(
-    page.getByText("Apakah rotasi juga transformasi linear?", { exact: true }),
-  ).toBeVisible();
-  await page.goto("/session/linear-05?tab=notes");
-  await expect(page.getByRole("button", { name: "Ringkasan", exact: true })).toHaveCount(0);
-  await expect(page.locator(".notes-panel")).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Capture 90 detik" })).toBeVisible();
-  await page.getByRole("button", { name: "Tersimpan (2)" }).click();
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: /Capture · 17:00/ })
-    .click();
-  await page.getByRole("dialog").getByRole("button", { name: "Sudah paham", exact: true }).click();
-  await page.getByRole("button", { name: "Tersimpan (2)" }).click();
-  await expect(page.getByRole("button", { name: /Capture · 17:00/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Tersimpan (1)" })).toBeVisible();
+  await page.getByRole("button", { name: "Capture 90 detik" }).click();
+  await page.getByLabel("Edit saran pertanyaan").fill("Apakah rotasi juga transformasi linear?");
+  await preview.getByRole("button", { name: "Tinjau pertanyaan" }).click();
+  await expect(page.getByLabel("Pertanyaan anonim")).toHaveValue(
+    "Apakah rotasi juga transformasi linear?",
+  );
+  await page.getByRole("button", { name: "Kirim", exact: true }).click();
+  await expect(page.locator(".question-card")).toContainText([
+    "Apakah rotasi juga transformasi linear?",
+  ]);
+  await page.getByRole("button", { name: "Transkrip", exact: true }).click();
+  await preview.getByRole("button", { name: "Simpan capture" }).click();
+  await expect(preview).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Tersimpan (2)" })).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Tersimpan (2)" })).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -295,7 +268,11 @@ test("compact questions support anonymous posting, voting and reload on mobile",
   await composer.fill("   ");
   await expect(send).toBeDisabled();
   await composer.fill("");
-  await page.screenshot({ path: "docs/screenshots/questions.png", animations: "disabled" });
+  await page.screenshot({
+    path: "docs/screenshots/questions.png",
+    animations: "disabled",
+    caret: "initial",
+  });
   await composer.fill("  Bagaimana cara memilih basis yang tepat?  ");
   await send.click();
   const question = page
@@ -315,57 +292,53 @@ test("compact questions support anonymous posting, voting and reload on mobile",
   expect(
     await page.locator("#main-content").evaluate((main) => main.scrollWidth <= main.clientWidth),
   ).toBe(true);
-  await page.screenshot({ path: "docs/screenshots/questions-mobile.png", animations: "disabled" });
+  await page.screenshot({
+    path: "docs/screenshots/questions-mobile.png",
+    animations: "disabled",
+    caret: "initial",
+  });
 });
 
-test("class agenda is saved after its source class ends and remains saved after reload", async ({
+test("class agenda stays a draft after class ends until the student confirms it", async ({
   page,
 }) => {
-  await page.goto("/agenda");
-  await expect(page.getByText("Perlu konfirmasi")).toHaveCount(0);
-  await expect(page.getByText("Latihan matriks transformasi")).toHaveCount(0);
-  await page.evaluate(() => {
-    const state = JSON.parse(localStorage.getItem("clipthat-frontend-v1")!);
-    const announced = state.agenda.find((item: { id: string }) => item.id === "a4");
-    state.agenda.push({
-      ...announced,
-      id: "other-class",
-      title: "Agenda kelas lain",
-      sourceSessionId: "algoritma-06",
-    });
-    localStorage.setItem("clipthat-frontend-v1", JSON.stringify(state));
-  });
-  await page.reload();
+  await page.goto("/session/linear-05");
   await page.locator("#main-sidebar").hover();
   await page.getByRole("button", { name: "Pilih peran demo" }).click();
   await page.getByRole("button", { name: "Dosen", exact: true }).click();
-  await page.goto("/session/linear-05");
   await page.getByRole("button", { name: "Akhiri", exact: true }).click();
   await page.getByRole("button", { name: "Selesaikan kelas", exact: true }).click();
-  await expect(
-    page.getByRole("heading", { name: "Yang dipelajari hari ini", exact: true }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Catatan kelas", exact: true })).toBeVisible();
   await page.locator("#main-sidebar").hover();
   await page.getByRole("button", { name: "Pilih peran demo" }).click();
   await page.getByRole("button", { name: "Mahasiswa", exact: true }).click();
   await page.goto("/agenda");
-  await page.getByRole("button", { name: /^Jumat, 9 Oktober 2026, 1 agenda$/ }).click();
-  await expect(page.locator(".agenda-item")).toContainText("Latihan matriks transformasi");
-  await page.getByRole("button", { name: "Edit Latihan matriks transformasi" }).click();
-  await expect(page.getByRole("dialog", { name: "Edit agenda" })).toContainText("Pengumuman kelas");
-  await expect(page.getByRole("button", { name: "Konfirmasi agenda" })).toHaveCount(0);
+  await page.reload();
+  const draft = page
+    .locator(".agenda-draft:visible")
+    .filter({ hasText: "Latihan matriks transformasi" });
+  await expect(draft).toBeVisible();
+  expect(
+    await page.evaluate(
+      () =>
+        JSON.parse(localStorage.getItem("clipthat-frontend-v1")!).agenda.find(
+          (a: { id: string }) => a.id === "a4",
+        ).confirmed,
+    ),
+  ).toBe(false);
+  await draft.getByRole("button", { name: "Tinjau", exact: true }).click();
+  await page.getByRole("button", { name: "Konfirmasi agenda", exact: true }).click();
+  await expect(draft).toHaveCount(0);
   await page.keyboard.press("Escape");
   await page.reload();
-  await expect(
-    page.getByRole("button", { name: /^Jumat, 9 Oktober 2026, 1 agenda$/ }),
-  ).toBeVisible();
-  const flags = await page.evaluate(() => {
-    const state = JSON.parse(localStorage.getItem("clipthat-frontend-v1")!);
-    return state.agenda
-      .filter((item: { id: string }) => ["a4", "other-class"].includes(item.id))
-      .map((item: { confirmed: boolean }) => item.confirmed);
-  });
-  expect(flags).toEqual([true, false]);
+  expect(
+    await page.evaluate(
+      () =>
+        JSON.parse(localStorage.getItem("clipthat-frontend-v1")!).agenda.find(
+          (a: { id: string }) => a.id === "a4",
+        ).confirmed,
+    ),
+  ).toBe(true);
 });
 
 test("agenda supports date selection, quick creation, edit, completion, export and delete", async ({
@@ -443,12 +416,11 @@ test("lecturer marks spoken answers, updates map, ends class, archives, restores
   await page.getByRole("button", { name: "Koreksi hubungan" }).click();
   await page.getByLabel("Jenis hubungan").selectOption("penerapan");
   await page.getByRole("button", { name: "Simpan hubungan" }).click();
-  await expect(page.locator(".concept-edge").first()).toHaveText("penerapan");
+  await page.getByLabel("Pilih subbab").selectOption("linear-05-0");
+  await expect(page.locator(".graph-relations")).toContainText("penerapan");
   await page.getByRole("button", { name: "Akhiri", exact: true }).click();
   await page.getByRole("button", { name: "Selesaikan kelas", exact: true }).click();
-  await expect(
-    page.getByRole("heading", { name: "Yang dipelajari hari ini", exact: true }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Catatan kelas", exact: true })).toBeVisible();
   await expect(page.getByLabel("Catatan pribadimu")).toHaveCount(0);
   await page.goto("/classes/aljabar");
   await page.getByLabel("Opsi Transformasi linear").click();
@@ -564,7 +536,7 @@ test("home notification modal tracks handled items without adding a sidebar item
   const dialog = page.getByRole("dialog", { name: "Notifikasi" });
   await expect(dialog).toBeVisible();
   await expect(dialog.locator(".notifications-meta")).toHaveCount(0);
-  await expect(dialog.locator(".notification-card")).toHaveCount(2);
+  await expect(dialog.locator(".notification-card")).toHaveCount(3);
   await expect(dialog.locator(".notification-card time")).toHaveCount(0);
   await expect(
     dialog.getByRole("button", { name: /Tandai belum diatasi: Rangkuman/ }),
@@ -575,6 +547,9 @@ test("home notification modal tracks handled items without adding a sidebar item
   await expect(
     dialog.getByRole("button", { name: /Tandai belum diatasi: 2 bagian ingin kamu ulangi/ }),
   ).toBeVisible();
+  await dialog
+    .getByRole("button", { name: /Tandai sudah diatasi: 1 agenda kelas perlu dikonfirmasi/ })
+    .click();
   await expect(page.getByText("Semua sudah tertangani.")).toBeVisible();
   await page.reload();
   await page.getByRole("button", { name: "Lihat lengkapnya" }).click();
@@ -593,6 +568,7 @@ test("home notification modal tracks handled items without adding a sidebar item
   await page.screenshot({
     path: "docs/screenshots/notifications-mobile.png",
     animations: "disabled",
+    caret: "initial",
   });
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog", { name: "Notifikasi" })).not.toBeVisible();
@@ -669,7 +645,7 @@ test("personal item in a course opens beside its source lesson", async ({ page }
   await page.getByRole("button", { name: /Menentukan basis sebuah ruang/ }).click();
   await expect(page.getByRole("dialog")).toContainText("Menentukan basis sebuah ruang");
   await page.getByRole("button", { name: "Tutup dialog" }).click();
-  await expect(page.getByRole("heading", { name: "Yang dipelajari hari ini" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Catatan kelas" })).toBeVisible();
 });
 
 test("a private bookmark remains available when its lesson is archived", async ({ page }) => {
@@ -691,17 +667,63 @@ test("calendar preferences remain explicit about connection state and reset work
   page,
 }) => {
   await page.goto("/settings");
-  await page.locator(".settings-calendars summary").click();
+  await page.locator(".settings-calendars:visible > summary").click();
   await page.getByRole("button", { name: "Atur tujuan" }).first().click();
   await page.getByLabel("Nama kalender tujuan").fill("Kuliah semester 3");
   await page.getByRole("button", { name: "Simpan tujuan" }).click();
   await expect(page.getByText("Tujuan: Kuliah semester 3 · belum terhubung")).toBeVisible();
   await page.reload();
-  await page.locator(".settings-calendars summary").click();
+  await page.locator(".settings-calendars:visible > summary").click();
   await expect(page.getByText("Tujuan: Kuliah semester 3 · belum terhubung")).toBeVisible();
   await page.getByRole("button", { name: "Reset demo", exact: true }).click();
   await page.getByRole("button", { name: "Reset sekarang", exact: true }).click();
   await expect(page.getByText("Belum terhubung", { exact: true })).toHaveCount(3);
+});
+
+test("login and registration remain readable on phone, tablet and desktop", async ({ page }) => {
+  for (const width of [320, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const path of ["/login", "/register"]) {
+      await page.goto(path);
+      await expect(page.getByRole("button", { name: "Lanjutkan dengan Google" })).toBeVisible();
+      await expect(page.getByLabel("Email", { exact: true })).toBeVisible();
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+      ).toBe(true);
+      if (width === 390)
+        await page.screenshot({
+          path: `docs/screenshots/${path.slice(1)}-mobile.png`,
+          animations: "disabled",
+          caret: "initial",
+        });
+    }
+  }
+  await page.getByRole("button", { name: "Lanjutkan dengan Google" }).click();
+  await expect(page.locator(".field-error")).toContainText(
+    "Google Sign-In tersedia setelah mode live",
+  );
+});
+
+test("graph can be explored with keyboard controls on desktop and phone", async ({ page }) => {
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/session/linear-05?tab=materials&view=graph");
+    await expect(page.getByLabel("Peta konsep interaktif")).toBeVisible();
+    await page.getByLabel("Pilih subbab").selectOption({ index: 1 });
+    await expect(page.locator(".graph-node-detail")).toContainText("Apa itu transformasi linear?");
+    await page.screenshot({
+      path: `docs/screenshots/graph-${width === 390 ? "mobile" : "desktop"}.png`,
+      animations: "disabled",
+      caret: "initial",
+    });
+    await page.getByLabel("Cari subbab").fill("matriks");
+    await page.getByRole("button", { name: "Perbesar peta" }).click();
+    await page.getByRole("button", { name: "Tampilkan seluruh peta" }).click();
+    await expect(page.locator(".graph-node-detail")).toHaveCount(0);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true);
+  }
 });
 
 test("save current desktop and mobile design previews", async ({ page }) => {
@@ -719,6 +741,7 @@ test("save current desktop and mobile design previews", async ({ page }) => {
       path: `docs/screenshots/${name}.png`,
       fullPage: true,
       animations: "disabled",
+      caret: "initial",
     });
   }
   await page.goto("/");
@@ -727,6 +750,7 @@ test("save current desktop and mobile design previews", async ({ page }) => {
   await page.screenshot({
     path: "docs/screenshots/notifications.png",
     animations: "disabled",
+    caret: "initial",
   });
   await page.goto("/agenda");
   await page.getByRole("button", { name: /^Selasa, 6 Oktober 2026, 1 agenda$/ }).click();
@@ -735,6 +759,7 @@ test("save current desktop and mobile design previews", async ({ page }) => {
   await page.screenshot({
     path: "docs/screenshots/modal.png",
     animations: "disabled",
+    caret: "initial",
   });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
@@ -743,6 +768,7 @@ test("save current desktop and mobile design previews", async ({ page }) => {
     path: "docs/screenshots/mobile.png",
     fullPage: true,
     animations: "disabled",
+    caret: "initial",
   });
   await page.setViewportSize({ width: 390, height: 1100 });
   await page.goto("/agenda");
@@ -751,5 +777,6 @@ test("save current desktop and mobile design previews", async ({ page }) => {
     path: "docs/screenshots/agenda-mobile.png",
     fullPage: true,
     animations: "disabled",
+    caret: "initial",
   });
 });

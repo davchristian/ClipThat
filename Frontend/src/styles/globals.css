@@ -13,3 +13,5 @@
 @import "./responsive.css";
 @import "../app/agenda/agenda.css";
 @import "../app/session/questions.css";
+@import "./auth.css";
+@import "./learning.css";

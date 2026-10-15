@@ -1,22 +1,29 @@
 "use client";
+import { liveMode } from "@/lib/app-mode";
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { courses, courseFor } from "@/data";
+import { useContent } from "@/data/use-content";
 import { getNotifications } from "./components/notification-model";
 import { Breadcrumbs, PageHeading, SectionTitle } from "@/components/ui";
 import { useApp } from "@/state/app-provider";
 import { HomeCalendar, type HomeCalendarEvent } from "./components/home-calendar";
 import { NotificationStrip } from "./components/notifications";
+import { SessionEntry } from "./classes/components/session-entry";
 import { CourseCard } from "./components/course-card";
 
 export default function Home() {
+  const { courses, courseFor } = useContent();
   const { data } = useApp();
   const lecturer = data.role === "lecturer";
   const notifications = getNotifications(data);
-  const lessons = data.lessons.filter((lesson) => !lecturer || lesson.courseId === "aljabar");
+  const lessons = data.lessons.filter(
+    (lesson) => liveMode || !lecturer || lesson.courseId === "aljabar",
+  );
   const live = lessons.find((lesson) => lesson.status === "live");
-  const visibleCourses = courses.filter((course) => !lecturer || course.id === "aljabar");
+  const visibleCourses = courses.filter(
+    (course) => liveMode || !lecturer || course.id === "aljabar",
+  );
   const calendarEvents: HomeCalendarEvent[] = lecturer
     ? lessons.map((lesson) => ({
         id: lesson.id,
@@ -39,7 +46,16 @@ export default function Home() {
   return (
     <div className="home-page">
       <Breadcrumbs items={[]} />
-      <PageHeading title={lecturer ? "Selamat datang, Bu Nadia!" : "Selamat datang, Davin!"} />
+      <PageHeading
+        action={<SessionEntry />}
+        title={
+          data.profile
+            ? `Selamat datang, ${data.profile.name.split(" ")[0]}!`
+            : lecturer
+              ? "Selamat datang, Bu Nadia!"
+              : "Selamat datang, Davin!"
+        }
+      />
       <p className="page-intro">
         {lecturer ? "Siap lanjut mengajar hari ini?" : "Mau lanjut belajar apa hari ini?"}
       </p>

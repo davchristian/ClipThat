@@ -1,5 +1,5 @@
-import { courseFor } from "@/data";
 import type { DemoState } from "@/lib/types";
+import { liveMode } from "@/lib/app-mode";
 
 export type AppNotification = {
   id: string;
@@ -14,10 +14,10 @@ export function getNotifications(data: DemoState): AppNotification[] {
   const latestDone = [...data.lessons].reverse().find((lesson) => lesson.status === "done");
 
   if (data.role === "lecturer") {
-    const lessons = data.lessons.filter((lesson) => lesson.courseId === "aljabar");
+    const lessons = data.lessons.filter((lesson) => liveMode || lesson.courseId === "aljabar");
     const live = lessons.find((lesson) => lesson.status === "live");
     const latestCourseLesson = [...lessons].reverse().find((lesson) => lesson.status === "done");
-    const unanswered = data.questions.filter((item) => !item.oral);
+    const unanswered = data.questions.filter((item) => !item.oral && !item.answer);
     const notifications: AppNotification[] = [];
 
     if (unanswered.length && lessons.length)
@@ -43,14 +43,14 @@ export function getNotifications(data: DemoState): AppNotification[] {
 
   const notifications: AppNotification[] = [];
   const classAgenda = data.agenda.filter(
-    (item) => item.confirmed && item.sourceSessionId && !item.done,
+    (item) => !item.confirmed && item.sourceSessionId && !item.done,
   );
   const savedToReview = data.saved.filter((item) => !item.reviewed);
 
   if (classAgenda.length)
     notifications.push({
       id: `student:agenda:${classAgenda.map((item) => item.id).join(",")}`,
-      title: `${classAgenda.length} agenda dari kelas sudah tersimpan`,
+      title: `${classAgenda.length} agenda kelas perlu dikonfirmasi`,
       detail: "Lihat jadwal tugas dan kuis yang dibahas di kelas.",
       href: "/agenda",
       kind: "agenda",
@@ -62,7 +62,7 @@ export function getNotifications(data: DemoState): AppNotification[] {
       id: `student:review:${savedToReview.map((item) => item.id).join(",")}`,
       title: `${savedToReview.length} bagian ingin kamu ulangi`,
       detail: "Buka penanda, capture, dan foto di course asalnya.",
-      href: `/classes/${courseFor(lesson?.courseId || "aljabar").id}`,
+      href: lesson ? `/classes/${lesson.courseId}` : "/classes",
       kind: "review",
       label: "Untuk dipelajari",
     });

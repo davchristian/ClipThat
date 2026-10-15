@@ -1,16 +1,22 @@
 "use client";
+import { liveMode } from "@/lib/app-mode";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { GraphExplorer } from "@/features/graph/graph-explorer";
+import { graphForLesson, mergeGraphs } from "@/features/graph/graph-data";
 import { ArrowRight } from "lucide-react";
-import { courses, notesForLesson } from "@/data";
+import { useContent } from "@/data/use-content";
 import { Breadcrumbs, Empty, PageHeading, SectionTitle } from "@/components/ui";
 import { dateLabel } from "@/lib/format";
 import { useApp } from "@/state/app-provider";
 
 export function CourseMaterials({ courseId }: { courseId: string }) {
+  const { courses, notesForLesson } = useContent();
   const { data } = useApp();
+  const router = useRouter();
   const course = courses.find((item) => item.id === courseId);
-  if (!course || (data.role === "lecturer" && course.id !== "aljabar")) {
+  if (!course || (!liveMode && data.role === "lecturer" && course.id !== "aljabar")) {
     return (
       <Empty
         title="Mata kuliah tidak tersedia"
@@ -43,20 +49,34 @@ export function CourseMaterials({ courseId }: { courseId: string }) {
         <>
           <section className="course-materials-map panel">
             <SectionTitle>Peta konsep</SectionTitle>
-            <div className="course-map-full" aria-label="Alur konsep materi">
-              {topics.map((topic, index) => (
-                <div className="course-map-step" key={`${topic}-${index}`}>
-                  {index > 0 && <ArrowRight size={16} aria-hidden="true" />}
-                  <span>{topic}</span>
-                </div>
-              ))}
-              {active && (
-                <div className="course-map-step current">
-                  <ArrowRight size={16} aria-hidden="true" />
-                  <span>{active.title} · sedang dibahas</span>
-                </div>
+            <GraphExplorer
+              graph={mergeGraphs(
+                completed.map((lesson) => ({
+                  sessionId: lesson.id,
+                  graph: graphForLesson(
+                    lesson,
+                    notesForLesson(lesson),
+                    data.conceptGraphs?.[lesson.id],
+                  ),
+                })),
               )}
-            </div>
+              onSource={(id, source) => {
+                const node = mergeGraphs(
+                  completed.map((lesson) => ({
+                    sessionId: lesson.id,
+                    graph: graphForLesson(
+                      lesson,
+                      notesForLesson(lesson),
+                      data.conceptGraphs?.[lesson.id],
+                    ),
+                  })),
+                ).nodes.find((n) => n.id === id);
+                if (node?.sessionId)
+                  router.push(
+                    `/session/${node.sessionId}?tab=transcript${source ? `#segment-${source}` : ""}`,
+                  );
+              }}
+            />
           </section>
           <section className="course-materials-summary panel">
             <SectionTitle>Rangkuman materi</SectionTitle>

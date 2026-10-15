@@ -1,8 +1,10 @@
 "use client";
 
+import { liveMode } from "@/lib/app-mode";
 import Link from "next/link";
 import { ArrowRight, CalendarDays, Network } from "lucide-react";
-import { demoToday, notesForLesson } from "@/data";
+import { demoToday } from "@/data";
+import { useContent } from "@/data/use-content";
 import { dateLabel } from "@/lib/format";
 import type { Agenda, Course, Lesson } from "@/lib/types";
 
@@ -15,6 +17,7 @@ export function CourseOverview({
   lessons: Lesson[];
   agenda: Agenda[];
 }) {
+  const { notesForLesson } = useContent();
   const completed = lessons
     .filter((lesson) => lesson.status === "done")
     .sort((a, b) => a.number - b.number);
@@ -23,7 +26,13 @@ export function CourseOverview({
   const nextAgenda = agenda
     .filter(
       (item) =>
-        item.courseId === course.id && item.confirmed && !item.done && item.date >= demoToday,
+        item.courseId === course.id &&
+        item.confirmed &&
+        !item.done &&
+        item.date >=
+          (liveMode
+            ? new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" })
+            : demoToday),
     )
     .sort((a, b) => `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`))[0];
 

@@ -1,4 +1,7 @@
 "use client";
+import { Suspense } from "react";
+import { liveMode } from "@/lib/app-mode";
+import { IntegrationSettings } from "@/features/integrations/integration-settings";
 
 import { useEffect, useState } from "react";
 import { ExternalLink, RotateCcw } from "lucide-react";
@@ -13,7 +16,7 @@ const integrations = [
 ];
 const preferenceKey = "clipthat-calendar-preferences";
 
-export default function SettingsPage() {
+function DemoSettingsPage() {
   const { data, update, reset, notify } = useApp();
   const [connection, setConnection] = useState<string | null>(null);
   const [target, setTarget] = useState("");
@@ -155,5 +158,15 @@ export default function SettingsPage() {
         </div>
       </Modal>
     </>
+  );
+}
+
+export default function SettingsPage() {
+  return liveMode ? (
+    <Suspense fallback={<p>Memuat pengaturan?</p>}>
+      <IntegrationSettings />
+    </Suspense>
+  ) : (
+    <DemoSettingsPage />
   );
 }

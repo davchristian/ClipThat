@@ -1,7 +1,7 @@
-import type { DemoState, Question } from "@/lib/types";
+import type { DemoState } from "@/lib/types";
 import { initialState } from "./mock/initial-state";
 
-// Persistence boundary for the frontend demo. Replace these functions with API calls later.
+// Demo-only persistence. Live accounts are loaded through the API in AppProvider.
 const storageKey = "clipthat-frontend-v1";
 
 export function readStoredState(): DemoState | null {
@@ -19,10 +19,7 @@ export function readStoredState(): DemoState | null {
   )
     return {
       ...saved,
-      questions: saved.questions.map((item) => {
-        const legacy = item as Question & { answer?: string };
-        return legacy.answer ? { ...item, oral: true } : item;
-      }),
+      questions: saved.questions,
       agenda: saved.agenda.map((item) => {
         const original = initialState.agenda.find((entry) => entry.id === item.id);
         return !item.sourceSessionId && original?.sourceSessionId

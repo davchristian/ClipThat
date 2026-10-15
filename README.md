@@ -16,4 +16,4 @@ Buka alamat **Local** di terminal, biasanya http://localhost:3000. Kode kelas co
 | `docs/` | PRD dan functional requirements |
 | [archive](archive/README.md) | Wireframe, eksperimen Figma, plugin, dan hasil validasi lama |
 
-Dependency aplikasi hanya dikelola di `Frontend/`. Mode demo menyimpan data di browser; backend, AI, dan sinkronisasi akun belum terhubung.
+Dependency aplikasi hanya dikelola di `Frontend/`. Mode demo menyimpan data di browser; kode backend, AI, dan sinkronisasi kalender tersedia pada mode live setelah layanan dikonfigurasi. Lihat [panduan setup](Frontend/docs/backend-setup.md).

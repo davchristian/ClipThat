@@ -1,0 +1,45 @@
+import { defineConfig } from "@playwright/test";
+export default defineConfig({
+  testDir: "./tests",
+  testMatch: "live.spec.ts",
+  outputDir: "test-results/live",
+  timeout: 45000,
+  workers: 1,
+  reporter: "list",
+  use: {
+    channel: "chrome",
+    baseURL: "http://127.0.0.1:3188",
+    viewport: { width: 1440, height: 1000 },
+    trace: "retain-on-failure",
+    screenshot: "only-on-failure",
+  },
+  webServer: [
+    {
+      command: "node tests/fixtures/supabase.mjs",
+      url: "http://127.0.0.1:54339/health",
+      reuseExistingServer: false,
+      timeout: 20000,
+    },
+    {
+      command: "npm run dev -- --port 3188",
+      url: "http://127.0.0.1:3188/login",
+      reuseExistingServer: false,
+      timeout: 90000,
+      env: {
+        NEXT_PUBLIC_APP_MODE: "live",
+        NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54339",
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "test-publishable",
+        SUPABASE_SECRET_KEY: "test-server",
+        SUPABASE_SERVICE_ROLE_KEY: "",
+        CLIPTHAT_DIST_DIR: ".next-live-integration",
+        APP_URL: "http://127.0.0.1:3188",
+        CAPTURE_SIGNING_SECRET: "test-signing-secret-".repeat(4),
+        GEMINI_API_KEY: "",
+        OPENAI_API_KEY: "",
+        MICROSOFT_CLIENT_ID: "",
+        GOOGLE_CALENDAR_CLIENT_ID: "",
+        NOTION_CLIENT_ID: "",
+      },
+    },
+  ],
+});

@@ -6,11 +6,13 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowUpRight, Menu, Search } from "lucide-react";
 import { useApp } from "@/state/app-provider";
 import { CourseIcon, Logo, Modal } from "@/components/ui";
-import { courseFor } from "@/data";
+import { useContent } from "@/data/use-content";
 import { Sidebar } from "./sidebar";
+import { liveMode } from "@/lib/app-mode";
 export function Shell({ children }: { children: ReactNode }) {
+  const { courseFor } = useContent();
   const pathname = usePathname();
-  const { data } = useApp();
+  const { data, ready, error, reload } = useApp();
   const mainRef = useRef<HTMLDivElement>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -18,7 +20,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const lecturer = data.role === "lecturer";
   const filtered = data.lessons.filter(
     (s) =>
-      (!lecturer || s.courseId === "aljabar") &&
+      (liveMode || !lecturer || s.courseId === "aljabar") &&
       (s.title + courseFor(s.courseId).name).toLowerCase().includes(query.toLowerCase()),
   );
   useEffect(() => {
@@ -36,6 +38,25 @@ export function Shell({ children }: { children: ReactNode }) {
     setMobile(false);
     mainRef.current?.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, [pathname]);
+  if (["/login", "/register", "/onboarding"].includes(pathname)) return <>{children}</>;
+  if (liveMode && (!ready || error))
+    return (
+      <div className="workspace-status" role="status">
+        <Logo />
+        <h1>{error ? "Koneksi belum siap" : "Memuat ruang belajarmu…"}</h1>
+        <p>{error}</p>
+        {error && (
+          <>
+            <button className="button primary" onClick={() => void reload()}>
+              Coba lagi
+            </button>
+            <Link href="/login" className="text-button">
+              Kembali ke login
+            </Link>
+          </>
+        )}
+      </div>
+    );
   return (
     <div className="app-layout">
       <a className="skip-link" href="#main-content">

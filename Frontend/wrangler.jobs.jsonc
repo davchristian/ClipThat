@@ -1,0 +1,8 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "clipthat-job-scheduler",
+  "main": "workers/job-scheduler.ts",
+  "compatibility_date": "2026-10-10",
+  "triggers": { "crons": ["* * * * *"] },
+  "vars": { "APP_URL": "https://replace-with-your-clipthat-domain.example" },
+}

@@ -4,7 +4,8 @@ import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import { useApp } from "@/state/app-provider";
 import { Modal } from "@/components/ui";
-import { courses, demoTime } from "@/data";
+import { demoTime } from "@/data";
+import { useContent } from "@/data/use-content";
 import type { Agenda } from "@/lib/types";
 
 export function AgendaEditor({
@@ -20,14 +21,15 @@ export function AgendaEditor({
   onSaved: (item: Agenda) => void;
   onDelete: (item: Agenda) => void;
 }) {
-  const { update, notify } = useApp();
+  const { courses } = useContent();
+  const { update, notify, pending } = useApp();
   const [form, setForm] = useState<Agenda>(
     item || {
       id: crypto.randomUUID(),
       title: "",
       date,
       time: demoTime,
-      courseId: "aljabar",
+      courseId: courses[0]?.id || "",
       kind: "Belajar",
       confirmed: true,
       done: false,
@@ -38,19 +40,30 @@ export function AgendaEditor({
     setForm((f) => ({ ...f, [key]: value }));
   }
   return (
-    <Modal open title={item ? "Edit agenda" : "Tambah agenda"} onClose={onClose}>
+    <Modal
+      open
+      title={
+        item?.isDraft || (item && !item.confirmed)
+          ? "Konfirmasi agenda"
+          : item
+            ? "Edit agenda"
+            : "Tambah agenda"
+      }
+      onClose={onClose}
+    >
       <form
         className="form-stack"
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
           if (!form.title.trim()) return;
           const result = { ...form, title: form.title.trim(), confirmed: true };
-          update((d) => ({
+          const ok = await update((d) => ({
             ...d,
             agenda: item
               ? d.agenda.map((a) => (a.id === item.id ? result : a))
               : [...d.agenda, result],
           }));
+          if (!ok) return;
           notify("Agenda tersimpan.");
           onSaved(result);
           onClose();
@@ -96,6 +109,7 @@ export function AgendaEditor({
             <label>
               Mata kuliah
               <select value={form.courseId} onChange={(e) => field("courseId", e.target.value)}>
+                <option value="">Pribadi</option>
                 {courses.map((c) => (
                   <option value={c.id} key={c.id}>
                     {c.name}
@@ -138,8 +152,8 @@ export function AgendaEditor({
           <button type="button" className="button secondary" onClick={onClose}>
             Batal
           </button>
-          <button className="button primary" disabled={!form.title.trim()}>
-            Simpan agenda
+          <button className="button primary" disabled={pending || !form.title.trim()}>
+            {item && !item.confirmed ? "Konfirmasi agenda" : "Simpan agenda"}
           </button>
         </div>
       </form>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowRight, Bookmark, LoaderCircle, Play, Square } from "lucide-react";
@@ -11,13 +11,17 @@ import { useSession } from "./use-session";
 import { TranscriptPanel } from "./transcript-panel";
 import { NotesPanel } from "./notes-panel";
 import { QuestionsPanel } from "./questions-panel";
-import { GraphPanel, MaterialsPanel } from "./learning-resources";
+import { MaterialsPanel } from "./learning-resources";
+import { CapturePreview } from "./capture-preview";
+import { Microphone } from "@/features/live/microphone";
+import { liveMode } from "@/lib/app-mode";
 import { PhotoDialog } from "./photo-dialog";
 
 const primaryTabs = [
   { id: "transcript", label: "Transkrip" },
-  { id: "notes", label: "Ringkasan" },
+  { id: "notes", label: "Catatan" },
   { id: "questions", label: "Pertanyaan" },
+  { id: "materials", label: "Materi" },
 ];
 const allowedTabs = [...primaryTabs.map((t) => t.id), "graph", "materials"];
 
@@ -31,14 +35,34 @@ export function SessionView({ id }: { id: string }) {
   const [savedOpen, setSavedOpen] = useState(false);
   const [photo, setPhoto] = useState(false);
   const [end, setEnd] = useState(false);
+  const [recordingBusy, setRecordingBusy] = useState(false);
+  const [questionDraft, setQuestionDraft] = useState("");
+  const sourceQuery = searchParams.get("source");
+  useEffect(() => {
+    const source = sourceQuery || window.location.hash.replace(/^#segment-/, "");
+    if (!source || !ready || query !== "transcript") return;
+    const frame = requestAnimationFrame(() => {
+      const element = [
+        ...document.querySelectorAll<HTMLElement>(`#${CSS.escape(`segment-${source}`)}`),
+      ].find((node) => node.getClientRects().length > 0);
+      element?.scrollIntoView({ block: "center", behavior: "smooth" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [sourceQuery, ready, query, session.segments.length]);
   const currentTab =
-    query && allowedTabs.includes(query) && (query !== "notes" || lesson?.status === "done")
-      ? query
-      : lesson?.status === "done"
-        ? "notes"
-        : "transcript";
+    query === "graph"
+      ? "materials"
+      : query && allowedTabs.includes(query)
+        ? query
+        : lesson?.status === "done"
+          ? "notes"
+          : "transcript";
   function changeTab(tab: string) {
-    window.history.replaceState(null, "", `?tab=${tab}`);
+    window.history.replaceState(
+      null,
+      "",
+      tab === "graph" ? "?tab=materials&view=graph" : `?tab=${tab}`,
+    );
   }
   if (!ready)
     return (
@@ -83,8 +107,46 @@ export function SessionView({ id }: { id: string }) {
           </p>
         </div>
         <div className="session-actions">
+          {lecturer && lesson.status === "failed" && (
+            <button
+              className="button secondary"
+              disabled={session.pending}
+              onClick={() =>
+                void update((d) => ({
+                  ...d,
+                  lessons: d.lessons.map((l) => (l.id === id ? { ...l, status: "processing" } : l)),
+                }))
+              }
+            >
+              Coba proses lagi
+            </button>
+          )}
+          {lecturer && live && liveMode && lesson.startedAt && (
+            <Microphone
+              sessionId={id}
+              startedAt={lesson.startedAt}
+              onChange={setRecordingBusy}
+              onUploaded={session.reload}
+            />
+          )}
+          {lecturer && live && lesson.code && (
+            <button
+              className="button secondary small"
+              onClick={() => {
+                void navigator.clipboard
+                  .writeText(lesson.code!)
+                  .then(() => notify("Kode kelas disalin."));
+              }}
+            >
+              Kode: {lesson.code}
+            </button>
+          )}
           {lecturer && live && (
-            <button className="button secondary small" onClick={() => setEnd(true)}>
+            <button
+              className="button secondary small"
+              disabled={recordingBusy || session.pending}
+              onClick={() => setEnd(true)}
+            >
               <Square size={13} />
               Akhiri
             </button>
@@ -92,12 +154,13 @@ export function SessionView({ id }: { id: string }) {
           {lecturer && upcoming && (
             <button
               className="button primary"
-              onClick={() => {
-                update((d) => ({
+              disabled={session.pending}
+              onClick={async () => {
+                const ok = await update((d) => ({
                   ...d,
                   lessons: d.lessons.map((l) => (l.id === id ? { ...l, status: "live" } : l)),
                 }));
-                notify("Kelas demo dimulai.");
+                if (ok) notify(liveMode ? "Kelas dimulai." : "Kelas demo dimulai.");
               }}
             >
               <Play size={15} />
@@ -108,18 +171,16 @@ export function SessionView({ id }: { id: string }) {
       </div>
       <div className="class-tabs">
         <div className="tabs" aria-label="Bagian kelas">
-          {primaryTabs
-            .filter((tab) => tab.id !== "notes" || lesson.status === "done")
-            .map((t) => (
-              <button
-                key={t.id}
-                className={currentTab === t.id ? "active" : ""}
-                aria-current={currentTab === t.id ? "page" : undefined}
-                onClick={() => changeTab(t.id)}
-              >
-                {t.label}
-              </button>
-            ))}
+          {primaryTabs.map((t) => (
+            <button
+              key={t.id}
+              className={currentTab === t.id ? "active" : ""}
+              aria-current={currentTab === t.id ? "page" : undefined}
+              onClick={() => changeTab(t.id)}
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
       </div>
       {lesson.status === "processing" ? (
@@ -140,16 +201,44 @@ export function SessionView({ id }: { id: string }) {
                 </button>
               </section>
             ) : (
-              <TranscriptPanel
-                {...session}
-                readOnly={!live}
-                onPhoto={() => setPhoto(true)}
-                onSaved={() => setSavedOpen(true)}
-                onOpenSaved={setDetail}
-                onAsk={() => changeTab("questions")}
-              />
+              <div
+                className={`session-workspace ${session.preview || session.previewLoading ? "has-preview" : ""}`}
+              >
+                <TranscriptPanel
+                  {...session}
+                  readOnly={!live}
+                  previewRange={
+                    session.preview
+                      ? {
+                          start: session.preview.time,
+                          end: session.preview.end || session.preview.time,
+                        }
+                      : undefined
+                  }
+                  captureBusy={session.previewLoading || !!session.preview || session.pending}
+                  captureLoading={session.previewLoading}
+                  onPhoto={() => setPhoto(true)}
+                  onSaved={() => setSavedOpen(true)}
+                  onOpenSaved={setDetail}
+                  onAsk={() => changeTab("questions")}
+                />
+                {(session.preview || session.previewLoading) && (
+                  <CapturePreview
+                    item={session.preview}
+                    loading={session.previewLoading}
+                    pending={session.pending}
+                    onSave={() => void session.saveCapture()}
+                    onDiscard={session.discardCapture}
+                    onChange={(text) => session.setPreview((p) => (p ? { ...p, draft: text } : p))}
+                    onAsk={(text) => {
+                      setQuestionDraft(text);
+                      changeTab("questions");
+                    }}
+                  />
+                )}
+              </div>
             ))}
-          {currentTab === "notes" && lesson.status === "done" && (
+          {currentTab === "notes" && (
             <NotesPanel
               lesson={lesson}
               saved={saved}
@@ -158,13 +247,18 @@ export function SessionView({ id }: { id: string }) {
               onSaved={setDetail}
             />
           )}
-          {currentTab === "questions" && <QuestionsPanel sessionId={id} />}
-          {currentTab === "materials" && <MaterialsPanel lesson={lesson} />}
-          {currentTab === "graph" && (
-            <GraphPanel
+          {currentTab === "questions" && <QuestionsPanel sessionId={id} draft={questionDraft} />}
+          {currentTab === "materials" && (
+            <MaterialsPanel
               lesson={lesson}
-              onSource={() => changeTab("transcript")}
-              onMaterial={() => changeTab("materials")}
+              showGraph={query === "graph" || searchParams.get("view") === "graph"}
+              onSource={(sourceId) =>
+                window.history.replaceState(
+                  null,
+                  "",
+                  `?tab=transcript${sourceId ? `&source=${encodeURIComponent(sourceId)}` : ""}`,
+                )
+              }
             />
           )}
         </>
@@ -214,7 +308,7 @@ export function SessionView({ id }: { id: string }) {
       <Modal
         open={end}
         title="Akhiri kelas?"
-        subtitle="Catatan dan pertanyaan tetap tersedia. Agenda dari kelas langsung tersimpan."
+        subtitle="Catatan akan diproses. Agenda dari kelas perlu dikonfirmasi mahasiswa."
         onClose={() => setEnd(false)}
       >
         <div className="dialog-actions">
@@ -223,13 +317,16 @@ export function SessionView({ id }: { id: string }) {
           </button>
           <button
             className="button primary"
-            onClick={() => {
+            disabled={session.pending || recordingBusy}
+            onClick={async () => {
               window.history.replaceState(null, "", `?tab=notes`);
-              update((d) => ({
-                ...d,
-                lessons: d.lessons.map((l) => (l.id === id ? { ...l, status: "processing" } : l)),
-              }));
-              setEnd(false);
+              if (
+                await update((d) => ({
+                  ...d,
+                  lessons: d.lessons.map((l) => (l.id === id ? { ...l, status: "processing" } : l)),
+                }))
+              )
+                setEnd(false);
             }}
           >
             Selesaikan kelas

@@ -1,13 +1,13 @@
 "use client";
-
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { ArrowRight, Bookmark, Camera, LockKeyhole, Network, ScanLine } from "lucide-react";
 import { useApp } from "@/state/app-provider";
-import { notesForLesson } from "@/data";
+import { useContent } from "@/data/use-content";
+import { liveMode } from "@/lib/app-mode";
 import { seconds } from "@/lib/format";
 import type { Lesson, SavedItem } from "@/lib/types";
 import { SectionTitle } from "@/components/ui";
-
 export function NotesPanel({
   lesson,
   saved,
@@ -21,44 +21,42 @@ export function NotesPanel({
   onGraph: () => void;
   onSaved: (id: string) => void;
 }) {
-  const { data, update } = useApp();
+  const { data, update, notify, pending } = useApp();
+  const { notesForLesson } = useContent();
   const lecturer = data.role === "lecturer";
+  const notes = notesForLesson(lesson);
+  const [text, setText] = useState(data.notes[lesson.id] || "");
+  useEffect(() => {
+    setText(data.notes[lesson.id] || "");
+  }, [lesson.id]);
+  const review = data.reviews?.[lesson.id];
   return (
     <section className="panel notes-panel">
-      <p className="eyebrow">HASIL KELAS · UNTUK SEMUA PESERTA</p>
       <SectionTitle
         action={
           <button className="text-button" onClick={onSource}>
-            Transkrip
-            <ArrowRight size={14} />
+            Transkrip <ArrowRight size={14} />
           </button>
         }
       >
-        Yang dipelajari hari ini
+        Catatan kelas
       </SectionTitle>
-      <p className="notes-lead">
-        Baca inti pembahasan, lalu lihat hubungannya dengan materi sebelumnya.
-      </p>
-      {notesForLesson(lesson).map((note, index) => (
-        <details className="reading-note" key={note.title} open={index === 0}>
-          <summary>{note.title}</summary>
-          <p>{note.body}</p>
-          {note.formula && <div className="formula">{note.formula}</div>}
-        </details>
-      ))}
+      {notes.length ? (
+        notes.map((note, i) => (
+          <details className="reading-note" key={note.title} open={i === 0}>
+            <summary>{note.title}</summary>
+            <p>{note.body}</p>
+            {note.formula && <div className="formula">{note.formula}</div>}
+          </details>
+        ))
+      ) : (
+        <p className="muted">Catatan otomatis tersedia setelah kelas selesai diproses.</p>
+      )}
       <div className="concept-preview">
-        <span className="activity-icon">
-          <Network size={18} />
-        </span>
+        <Network size={18} />
         <div>
           <strong>Peta konsep</strong>
-          <p>
-            {lesson.id === "linear-05"
-              ? "Basis dan dimensi → representasi matriks → kernel dan image"
-              : notesForLesson(lesson)
-                  .map((note) => note.title)
-                  .join(" → ")}
-          </p>
+          <p>Lihat hubungan antar subbab.</p>
         </div>
         <button className="text-button" onClick={onGraph}>
           Jelajahi <ArrowRight size={14} />
@@ -66,10 +64,54 @@ export function NotesPanel({
       </div>
       {!lecturer ? (
         <>
+          {review && (
+            <details className="detail-section">
+              <summary>Panduan review untukmu</summary>
+              {review.sections.map((n) => (
+                <div className="reading-note" key={n.title}>
+                  <h3>{n.title}</h3>
+                  <p>{n.body}</p>
+                </div>
+              ))}
+              {review.previous.map((p) => (
+                <Link
+                  className="related-lesson"
+                  key={p.session_id}
+                  href={`/session/${p.session_id}?tab=notes`}
+                >
+                  {p.reason}
+                  <ArrowRight size={14} />
+                </Link>
+              ))}
+            </details>
+          )}
+          <details className="detail-section personal-note">
+            <summary>
+              <LockKeyhole size={16} /> Catatan pribadi
+            </summary>
+            <label htmlFor="personal-note" className="sr-only">
+              Catatan pribadimu
+            </label>
+            <textarea
+              id="personal-note"
+              placeholder="Tulis catatanmu…"
+              maxLength={50000}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+            />
+            <button
+              className="button secondary small"
+              disabled={pending || text === (data.notes[lesson.id] || "")}
+              onClick={async () => {
+                if (await update((d) => ({ ...d, notes: { ...d.notes, [lesson.id]: text } })))
+                  notify("Catatan pribadi tersimpan.");
+              }}
+            >
+              Simpan catatan
+            </button>
+          </details>
           <div className="personal-results">
-            <p className="eyebrow">PRIBADI · HANYA KAMU YANG MELIHAT</p>
-            <h2>Bagianmu dari kelas ini</h2>
-            <p>Penanda, capture, dan foto tetap terhubung ke waktu pembahasannya.</p>
+            <h2>Bagian tersimpan</h2>
             {saved.length ? (
               saved.map((s) => {
                 const Icon =
@@ -84,57 +126,26 @@ export function NotesPanel({
                 );
               })
             ) : (
-              <p className="personal-empty">
-                Belum ada bagian yang kamu simpan dari pertemuan ini.
-              </p>
+              <p className="muted">Belum ada bagian tersimpan.</p>
             )}
           </div>
-          {lesson.id === "linear-05" && (
-            <Link className="related-lesson" href="/session/basis-04">
-              Ulangi: Basis dan dimensi
-              <ArrowRight size={14} />
-            </Link>
-          )}
-          {(lesson.status === "live" || data.notes[lesson.id]) && (
-            <details className="detail-section personal-note">
-              <summary>
-                <LockKeyhole size={16} />
-                Catatan pribadi
-              </summary>
-              {lesson.status === "live" ? (
-                <>
-                  <label htmlFor="personal-note" className="sr-only">
-                    Catatan pribadimu
-                  </label>
-                  <textarea
-                    id="personal-note"
-                    placeholder="Tulis catatanmu…"
-                    maxLength={5000}
-                    value={data.notes[lesson.id] || ""}
-                    onChange={(e) =>
-                      update((d) => ({ ...d, notes: { ...d.notes, [lesson.id]: e.target.value } }))
-                    }
-                  />
-                </>
-              ) : (
-                <p className="capture-excerpt">{data.notes[lesson.id]}</p>
-              )}
-            </details>
-          )}
         </>
       ) : (
         <details className="detail-section">
-          <summary>Rekap kelas</summary>
-          <p className="field-hint">Contoh agregat · tanpa identitas</p>
-          {["Representasi matriks", "Kernel", "Sifat linear"].map((s, i) => (
-            <div className="aggregate-row" key={s}>
-              <span>{s}</span>
-              <div>
-                <i style={{ width: `${[64, 38, 21][i]}%` }} />
-              </div>
-              <strong>{[64, 38, 21][i]}%</strong>
-            </div>
-          ))}
+          <summary>Rekap kebingungan kelas</summary>
+          {liveMode ? (
+            data.confusion?.[lesson.id]?.length ? (
+              data.confusion[lesson.id].map((c) => (
+                <p key={c.start_seconds}>
+                  {seconds(c.start_seconds)} ? {c.total} mahasiswa menandai bagian ini
+                </p>
+              ))
+            ) : (
+              <p className="muted">Belum ada penanda kebingungan.</p>
+            )
+          ) : (
+            <p className="muted">Contoh agregat ? 8 mahasiswa menandai representasi matriks.</p>
+          )}
         </details>
       )}
     </section>

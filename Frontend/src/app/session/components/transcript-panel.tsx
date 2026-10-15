@@ -1,6 +1,6 @@
 "use client";
 
-import { Bookmark, Camera, MessageCircle, ScanLine } from "lucide-react";
+import { Bookmark, Camera, CircleHelp, MessageCircle, ScanLine, LoaderCircle } from "lucide-react";
 import { seconds } from "@/lib/format";
 import type { SavedItem, Segment } from "@/lib/types";
 
@@ -15,17 +15,23 @@ export function TranscriptPanel({
   onSaved,
   onOpenSaved,
   onAsk,
+  previewRange,
+  captureBusy = false,
+  captureLoading = false,
 }: {
   segments: Segment[];
   saved: SavedItem[];
   lecturer: boolean;
   readOnly: boolean;
-  bookmark: (segment: Segment) => void;
+  bookmark: (segment: Segment, label?: "Bingung" | "Review nanti") => void;
   capture: () => void;
   onPhoto: () => void;
   onSaved: () => void;
   onOpenSaved: (id: string) => void;
   onAsk: () => void;
+  previewRange?: { start: number; end: number };
+  captureBusy?: boolean;
+  captureLoading?: boolean;
 }) {
   const photos = saved.filter((item) => item.type === "photo");
   const photoSegment = (time: number) =>
@@ -46,16 +52,29 @@ export function TranscriptPanel({
         )}
       </div>
       <div className="transcript-content">
+        {!segments.length && (
+          <p className="empty-transcript">Transkrip akan muncul saat dosen mulai merekam.</p>
+        )}
         {segments.map((segment) => {
           const marked = saved.some((s) => s.type === "bookmark" && s.time === segment.time);
           return (
             <article
               key={segment.id}
-              className={`transcript-segment ${!lecturer && marked ? "marked" : ""}`}
+              id={`segment-${segment.id}`}
+              className={`transcript-segment ${!lecturer && marked ? "marked" : ""} ${previewRange && segment.time < previewRange.end && (segment.end ?? segment.time + 45) > previewRange.start ? "capture-highlight" : ""}`}
             >
               <time>{seconds(segment.time)}</time>
               <div className="transcript-entry">
                 <p>{segment.text}</p>
+                {!lecturer && !readOnly && (
+                  <button
+                    className="text-button confusion-marker"
+                    aria-label={`Bingung pada ${seconds(segment.time)}`}
+                    onClick={() => bookmark(segment, "Bingung")}
+                  >
+                    <CircleHelp size={13} /> Bingung
+                  </button>
+                )}
                 {!lecturer &&
                   photos
                     .filter((photo) => photoSegment(photo.time) === segment.id)
@@ -99,10 +118,17 @@ export function TranscriptPanel({
       </div>
       {!lecturer && !readOnly && (
         <div className="capture-bar">
-          <button className="button primary" onClick={capture}>
-            <ScanLine size={17} />
-            Capture 90 detik
-          </button>
+          <div className="capture-action">
+            <button
+              className="button primary"
+              onClick={capture}
+              disabled={captureBusy || !segments.length}
+            >
+              {captureLoading ? <LoaderCircle size={17} /> : <ScanLine size={17} />}
+              Capture 90 detik
+            </button>
+            <small>Lihat preview sebelum menyimpan</small>
+          </div>
           <button className="button secondary" onClick={onAsk}>
             <MessageCircle size={16} />
             Tanya

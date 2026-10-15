@@ -15,6 +15,7 @@ import {
 import { Logo } from "@/components/ui";
 import { useApp } from "@/state/app-provider";
 import type { Role } from "@/lib/types";
+import { liveMode } from "@/lib/app-mode";
 
 const navigation = [
   { href: "/", label: "Home", icon: House },
@@ -41,7 +42,14 @@ const timeFormatter = new Intl.DateTimeFormat("id-ID", {
 
 export function Sidebar({ mobile }: { mobile: boolean }) {
   const pathname = usePathname();
-  const lecturer = useApp().data.role === "lecturer";
+  const { data } = useApp();
+  const lecturer = data.role === "lecturer";
+  const name = data.profile?.name || (lecturer ? "Nadia Putri" : "Davin Farel");
+  const initials = name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((n) => n[0])
+    .join("");
 
   return (
     <aside id="main-sidebar" className={`sidebar ${mobile ? "is-open" : ""}`}>
@@ -87,15 +95,15 @@ export function Sidebar({ mobile }: { mobile: boolean }) {
         </Link>
         <SidebarClock />
         <div className="sidebar-profile-avatar" aria-hidden="true">
-          <span className="avatar">{lecturer ? "NP" : "DF"}</span>
+          <span className="avatar">{initials}</span>
         </div>
         <div className="profile">
-          <span className="avatar">{lecturer ? "NP" : "DF"}</span>
+          <span className="avatar">{initials}</span>
           <div className="profile-info">
-            <strong>{lecturer ? "Nadia Putri" : "Davin Farel"}</strong>
-            <RoleSwitcher />
+            <strong>{name}</strong>
+            {liveMode ? <small>{lecturer ? "Dosen" : "Mahasiswa"}</small> : <RoleSwitcher />}
           </div>
-          <span className="demo-badge">Demo</span>
+          {!liveMode && <span className="demo-badge">Demo</span>}
         </div>
       </div>
     </aside>

@@ -1,5 +1,6 @@
 "use client";
 
+import { liveMode } from "@/lib/app-mode";
 import { useState } from "react";
 import { Camera } from "lucide-react";
 import { Modal } from "@/components/ui";
@@ -16,14 +17,17 @@ export function PhotoDialog({
   elapsed: number;
   onClose: () => void;
 }) {
-  const { update, notify } = useApp();
+  const { update, notify, pending } = useApp();
   const [image, setImage] = useState("");
   const [timeInput, setTimeInput] = useState(seconds(elapsed));
   const [error, setError] = useState("");
   async function select(file?: File) {
     if (!file) return;
     setError("");
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size > 1024 * 1024) {
+    if (
+      !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
+      file.size > (liveMode ? 5 : 1) * 1024 * 1024
+    ) {
       setError("JPG, PNG, atau WebP · maksimal 1 MB.");
       return;
     }
@@ -37,7 +41,7 @@ export function PhotoDialog({
     <Modal open title="Tambahkan foto" onClose={onClose}>
       <form
         className="form-stack"
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
           const match = /^(\d{1,3}):([0-5]\d)$/.exec(timeInput);
           const time = match ? Number(match[1]) * 60 + Number(match[2]) : -1;
@@ -45,7 +49,7 @@ export function PhotoDialog({
             setError(`Waktu harus antara 00:00–${seconds(elapsed)}.`);
             return;
           }
-          update((d) => ({
+          const ok = await update((d) => ({
             ...d,
             saved: [
               ...d.saved,
@@ -61,6 +65,7 @@ export function PhotoDialog({
               },
             ],
           }));
+          if (!ok) return;
           notify("Foto tersimpan.");
           onClose();
         }}
@@ -91,7 +96,7 @@ export function PhotoDialog({
             {error}
           </p>
         )}
-        <button className="button primary" disabled={!image}>
+        <button className="button primary" disabled={!image || pending}>
           <Camera size={16} />
           Simpan foto
         </button>

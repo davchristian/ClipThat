@@ -1,9 +1,11 @@
 "use client";
+import { liveMode } from "@/lib/app-mode";
 
 import Link from "next/link";
 import { useState } from "react";
 import { Archive, ArrowRight, Bookmark, Clock3, RotateCcw, UserRound } from "lucide-react";
-import { courses, demoNow } from "@/data";
+import { demoNow } from "@/data";
+import { useContent } from "@/data/use-content";
 import type { Lesson } from "@/lib/types";
 import { useApp } from "@/state/app-provider";
 import { Breadcrumbs, CourseIcon, Empty, Modal, PageHeading, SectionTitle } from "@/components/ui";
@@ -13,14 +15,15 @@ import { CourseSessionCard } from "./course-session-card";
 import { CourseOverview } from "./course-overview";
 
 export function CoursesView({ courseId }: { courseId?: string }) {
-  const { data, update, notify } = useApp();
+  const { courses } = useContent();
+  const { data, update, notify, pending } = useApp();
   const lecturer = data.role === "lecturer";
   const [archive, setArchive] = useState<Lesson | null>(null);
   const [showArchive, setShowArchive] = useState(false);
   const [selectedSaved, setSelectedSaved] = useState<string | null>(null);
   const course = courses.find((c) => c.id === courseId);
-  const visible = courses.filter((c) => !lecturer || c.id === "aljabar");
-  if (courseId && (!course || (lecturer && course.id !== "aljabar")))
+  const visible = courses.filter((c) => liveMode || !lecturer || c.id === "aljabar");
+  if (courseId && (!course || (!liveMode && lecturer && course.id !== "aljabar")))
     return (
       <Empty
         title="Mata kuliah tidak tersedia"
@@ -32,7 +35,8 @@ export function CoursesView({ courseId }: { courseId?: string }) {
       />
     );
   const lessons = data.lessons.filter(
-    (s) => (!course || s.courseId === course.id) && (!lecturer || s.courseId === "aljabar"),
+    (s) =>
+      (!course || s.courseId === course.id) && (liveMode || !lecturer || s.courseId === "aljabar"),
   );
   const currentLessons = lessons.filter((lesson) => lesson.status !== "done");
   const previousLessons = lessons
@@ -49,13 +53,14 @@ export function CoursesView({ courseId }: { courseId?: string }) {
   const archivedPersonal = courseSaved.filter((item) =>
     data.archived.some((entry) => entry.lesson.id === item.sessionId),
   );
-  function archiveLesson() {
+  async function archiveLesson() {
     if (!archive || ["live", "processing"].includes(archive.status)) return;
-    update((d) => ({
+    const ok = await update((d) => ({
       ...d,
       lessons: d.lessons.filter((s) => s.id !== archive.id),
       archived: [...d.archived, { lesson: archive, archivedAt: new Date(demoNow).toISOString() }],
     }));
+    if (!ok) return;
     setArchive(null);
     notify("Sesi diarsipkan.");
   }
@@ -70,7 +75,7 @@ export function CoursesView({ courseId }: { courseId?: string }) {
       />
       <PageHeading
         title={course?.name || "Course"}
-        action={lecturer ? <SessionEntry /> : undefined}
+        action={<SessionEntry courseId={course?.id} />}
       />
       {!course && (
         <div className="course-grid">
@@ -184,7 +189,9 @@ export function CoursesView({ courseId }: { courseId?: string }) {
                 0,
                 30 -
                   Math.floor(
-                    (new Date(demoNow).getTime() - new Date(item.archivedAt).getTime()) / 86400000,
+                    ((liveMode ? Date.now() : new Date(demoNow).getTime()) -
+                      new Date(item.archivedAt).getTime()) /
+                      86400000,
                   ),
               );
               return (
@@ -198,14 +205,14 @@ export function CoursesView({ courseId }: { courseId?: string }) {
                   </span>
                   <button
                     className="button secondary small"
-                    disabled={!remaining}
-                    onClick={() => {
-                      update((d) => ({
+                    disabled={!remaining || pending}
+                    onClick={async () => {
+                      const ok = await update((d) => ({
                         ...d,
                         lessons: [...d.lessons, item.lesson],
                         archived: d.archived.filter((a) => a.lesson.id !== item.lesson.id),
                       }));
-                      notify("Sesi dipulihkan.");
+                      if (ok) notify("Sesi dipulihkan.");
                     }}
                   >
                     <RotateCcw size={14} />
@@ -230,7 +237,7 @@ export function CoursesView({ courseId }: { courseId?: string }) {
           <button className="button secondary" onClick={() => setArchive(null)}>
             Batal
           </button>
-          <button className="button danger" onClick={archiveLesson}>
+          <button className="button danger" disabled={pending} onClick={archiveLesson}>
             Arsipkan
           </button>
         </div>
