@@ -1,4 +1,19 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function openSavedItem(page: Page, sessionId: string, title: string) {
+  const id = await page.evaluate(
+    ({ sessionId, title }) => {
+      const data = JSON.parse(localStorage.getItem("clipthat-frontend-v1")!);
+      return data.saved.find(
+        (item: { id: string; sessionId: string; title: string }) =>
+          item.sessionId === sessionId && item.title.includes(title),
+      )?.id;
+    },
+    { sessionId, title },
+  );
+  expect(id).toBeTruthy();
+  await page.goto(`/session/${sessionId}?tab=transcript&saved=${encodeURIComponent(id)}`);
+}
 
 test("course shows schedule, overall summary, nearest agenda and past class sources", async ({
   page,
@@ -77,11 +92,11 @@ test("completed classes retain transcript history and allow private review and l
   await page.goto("/session/basis-04?tab=transcript");
   await expect(page.locator(".transcript-segment.marked")).toHaveCount(1);
   await expect(page.getByRole("button", { name: "Capture 90 detik" })).toHaveCount(0);
-  await page.getByRole("button", { name: "Tersimpan (1)" }).click();
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: /Menentukan basis/ })
-    .click();
+  await expect(page.getByRole("button", { name: "Tambahkan foto" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /^(Simpan bagian|Hapus penanda)/ })).toHaveCount(0);
+  await expect(page.locator(".transcript-toolbar button")).toHaveCount(0);
+  await openSavedItem(page, "basis-04", "Menentukan basis sebuah ruang");
+  await expect(page.getByRole("dialog")).toContainText("Basis adalah himpunan vektor");
   await page.getByRole("button", { name: "Sudah paham", exact: true }).click();
   await page.getByRole("button", { name: "Catatan", exact: true }).click();
   await page.getByText("Catatan pribadi", { exact: true }).click();
@@ -179,6 +194,8 @@ test("sidebar expands on hover and folds on leave without shifting the page", as
   const sidebar = page.locator("#main-sidebar");
   const navigation = page.getByRole("navigation", { name: "Navigasi utama" });
   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(76);
+  const logo = sidebar.locator(".brand-symbol");
+  const logoPosition = await logo.boundingBox();
   await expect(page.locator(".main-wrapper")).toHaveCSS("margin-left", "76px");
   await expect(sidebar.locator(".nav-item > span").first()).toBeHidden();
   await expect(page.getByRole("button", { name: /Lipat sidebar|Buka sidebar/ })).toHaveCount(0);
@@ -189,6 +206,7 @@ test("sidebar expands on hover and folds on leave without shifting the page", as
   });
   await sidebar.hover();
   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(216);
+  expect(await logo.boundingBox()).toEqual(logoPosition);
   await expect(sidebar.locator(".nav-item > span").first()).toBeVisible();
   await expect(sidebar.getByText("Davin Farel", { exact: true })).toBeVisible();
   await expect(page.locator(".main-wrapper")).toHaveCSS("margin-left", "76px");
@@ -196,11 +214,13 @@ test("sidebar expands on hover and folds on leave without shifting the page", as
   await expect(page).toHaveURL(/\/agenda$/);
   await page.mouse.move(900, 200);
   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(76);
+  expect(await logo.boundingBox()).toEqual(logoPosition);
   await page.reload();
   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(76);
   await page.locator("#main-content").focus();
   await page.keyboard.press("Shift+Tab");
   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(216);
+  expect(await logo.boundingBox()).toEqual(logoPosition);
   await page.locator("#main-content").focus();
   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(76);
   await page.setViewportSize({ width: 390, height: 844 });
@@ -218,13 +238,19 @@ test("capture previews and discards without saving, then saves only after confir
 }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
+  const savedCount = () =>
+    page.evaluate(() => {
+      const data = JSON.parse(localStorage.getItem("clipthat-frontend-v1")!);
+      return data.saved.filter((item: { sessionId: string }) => item.sessionId === "linear-05")
+        .length;
+    });
   await page.goto("/session/linear-05");
   await expect(page.locator(".tabs button")).toHaveCount(4);
   await page.getByRole("button", { name: "Simpan bagian 17:45", exact: true }).click();
   await page.getByRole("button", { name: "Capture 90 detik" }).click();
   const preview = page.getByRole("complementary", { name: "Preview capture" });
   await expect(preview).toBeVisible();
-  await expect(page.getByRole("button", { name: "Tersimpan (1)" })).toBeVisible();
+  await expect.poll(savedCount).toBe(1);
   const left = (await page.locator(".transcript-panel").boundingBox())!;
   const right = (await preview.boundingBox())!;
   expect(left.height).toBeGreaterThanOrEqual(740);
@@ -238,7 +264,7 @@ test("capture previews and discards without saving, then saves only after confir
   await preview.getByRole("button", { name: "Buang preview capture" }).click();
   await expect(preview).toHaveCount(0);
   await page.reload();
-  await expect(page.getByRole("button", { name: "Tersimpan (1)" })).toBeVisible();
+  await expect.poll(savedCount).toBe(1);
   await page.getByRole("button", { name: "Capture 90 detik" }).click();
   await page.getByLabel("Edit saran pertanyaan").fill("Apakah rotasi juga transformasi linear?");
   await preview.getByRole("button", { name: "Tinjau pertanyaan" }).click();
@@ -252,9 +278,9 @@ test("capture previews and discards without saving, then saves only after confir
   await page.getByRole("button", { name: "Transkrip", exact: true }).click();
   await preview.getByRole("button", { name: "Simpan capture" }).click();
   await expect(preview).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Tersimpan (2)" })).toBeVisible();
+  await expect.poll(savedCount).toBe(2);
   await page.reload();
-  await expect(page.getByRole("button", { name: "Tersimpan (2)" })).toBeVisible();
+  await expect.poll(savedCount).toBe(2);
   expect(errors).toEqual([]);
 });
 
@@ -574,15 +600,27 @@ test("home notification modal tracks handled items without adding a sidebar item
   await expect(page.getByRole("dialog", { name: "Notifikasi" })).not.toBeVisible();
 });
 
-test("live sidebar clock and page padding stay consistent across main views", async ({ page }) => {
+test("live heading clock and page padding stay consistent across main views", async ({ page }) => {
   await page.clock.install({ time: new Date("2026-10-10T03:30:00Z") });
-  const paths = ["/", "/classes", "/classes/aljabar", "/session/linear-05", "/agenda", "/settings"];
+  const paths = [
+    "/",
+    "/classes",
+    "/classes/aljabar",
+    "/classes/aljabar/materials",
+    "/session/linear-05",
+    "/agenda",
+    "/settings",
+  ];
   let homeLeft = 0;
   let homeTitleSize = "";
   for (const path of paths) {
     await page.goto(path);
-    await page.locator("#main-sidebar").hover();
     const clock = page.getByLabel("Waktu saat ini");
+    await expect(clock).toHaveCount(1);
+    await expect(page.locator("#main-sidebar").getByLabel("Waktu saat ini")).toHaveCount(0);
+    await expect(
+      page.locator("#main-content .page-heading:visible").getByLabel("Waktu saat ini"),
+    ).toBeVisible();
     await expect(clock).toContainText("Sabtu, 10 Oktober 2026");
     await expect(clock).toContainText("10.30 WIB");
     const left = await page
@@ -593,6 +631,11 @@ test("live sidebar clock and page padding stay consistent across main views", as
       );
     const title = page.locator("h1").first();
     const titleLeft = (await title.boundingBox())!.x;
+    const clockBox = (await clock.boundingBox())!;
+    const titleBox = (await title.boundingBox())!;
+    expect(clockBox.x).toBeGreaterThan(titleBox.x + titleBox.width);
+    expect(clockBox.y).toBeLessThan(titleBox.y + titleBox.height);
+    expect(clockBox.y + clockBox.height).toBeGreaterThan(titleBox.y);
     const titleSize = await title.evaluate((element) => getComputedStyle(element).fontSize);
     if (path === "/") {
       homeLeft = left;
@@ -606,9 +649,19 @@ test("live sidebar clock and page padding stay consistent across main views", as
   await page.clock.fastForward(60_000);
   await expect(page.getByLabel("Waktu saat ini")).toContainText("10.31 WIB");
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
-  await page.getByRole("button", { name: "Buka navigasi" }).click();
-  await expect(page.getByLabel("Waktu saat ini")).toBeVisible();
+  for (const path of paths) {
+    await page.goto(path);
+    const clock = page.locator("#main-content .page-heading:visible").getByLabel("Waktu saat ini");
+    await expect(clock).toBeVisible();
+    const clockBox = (await clock.boundingBox())!;
+    const titleBox = (await page.locator("h1").first().boundingBox())!;
+    expect(clockBox.x).toBeGreaterThanOrEqual(titleBox.x + titleBox.width);
+    expect(clockBox.x + clockBox.width).toBeLessThanOrEqual(390);
+    expect(clockBox.y).toBe(titleBox.y);
+    expect(
+      await page.locator(".main-wrapper").evaluate((el) => el.scrollWidth),
+    ).toBeLessThanOrEqual(390);
+  }
 });
 
 test("photo upload validates timestamp and persists in the saved collection", async ({ page }) => {
@@ -628,11 +681,7 @@ test("photo upload validates timestamp and persists in the saved collection", as
   await page.getByRole("button", { name: "Simpan foto" }).click();
   await page.reload();
   await expect(page.getByRole("button", { name: /Foto kamu · 17:20/ })).toBeVisible();
-  await page.getByRole("button", { name: "Tersimpan (1)" }).click();
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: /Foto papan · 17:20/ })
-    .click();
+  await page.getByRole("button", { name: /Foto kamu · 17:20/ }).click();
   await expect(
     page.getByRole("dialog").getByRole("img", { name: "Foto papan · 17:20", exact: true }),
   ).toBeVisible();

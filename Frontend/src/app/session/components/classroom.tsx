@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ArrowRight, Bookmark, LoaderCircle, Play, Square } from "lucide-react";
+import { ArrowRight, LoaderCircle, Maximize, Minimize, Play, Square } from "lucide-react";
 import { Breadcrumbs, Empty, Modal } from "@/components/ui";
-import { dateLabel, seconds } from "@/lib/format";
+import { dateLabel } from "@/lib/format";
 import { SavedDetail } from "@/components/saved-detail";
 import { useSession } from "./use-session";
 import { TranscriptPanel } from "./transcript-panel";
@@ -16,6 +16,7 @@ import { CapturePreview } from "./capture-preview";
 import { Microphone } from "@/features/live/microphone";
 import { liveMode } from "@/lib/app-mode";
 import { PhotoDialog } from "./photo-dialog";
+import { PageClock } from "@/components/ui/page-clock";
 
 const primaryTabs = [
   { id: "transcript", label: "Transkrip" },
@@ -32,7 +33,6 @@ export function SessionView({ id }: { id: string }) {
   const session = useSession(id);
   const { ready, lesson, lecturer, course, saved, update, notify } = session;
   const [detail, setDetail] = useState<string | null>(savedQuery);
-  const [savedOpen, setSavedOpen] = useState(false);
   const [photo, setPhoto] = useState(false);
   const [end, setEnd] = useState(false);
   const [recordingBusy, setRecordingBusy] = useState(false);
@@ -49,6 +49,28 @@ export function SessionView({ id }: { id: string }) {
     });
     return () => cancelAnimationFrame(frame);
   }, [sourceQuery, ready, query, session.segments.length]);
+  const classroomRef = useRef<HTMLDivElement>(null);
+  const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    const syncFullscreen = () => setFocused(document.fullscreenElement === classroomRef.current);
+    document.addEventListener("fullscreenchange", syncFullscreen);
+    return () => document.removeEventListener("fullscreenchange", syncFullscreen);
+  }, []);
+
+  async function toggleFocus() {
+    try {
+      if (document.fullscreenElement === classroomRef.current) {
+        await document.exitFullscreen();
+      } else if (classroomRef.current?.requestFullscreen) {
+        await classroomRef.current.requestFullscreen();
+      } else {
+        notify("Mode layar penuh belum didukung browser ini.");
+      }
+    } catch {
+      notify("Mode layar penuh tidak bisa dibuka. Coba klik Focus Mode lagi.");
+    }
+  }
   const currentTab =
     query === "graph"
       ? "materials"
@@ -85,7 +107,7 @@ export function SessionView({ id }: { id: string }) {
   const upcoming = lesson.status === "upcoming";
   const live = lesson.status === "live";
   return (
-    <div className="classroom">
+    <div className="classroom" ref={classroomRef}>
       <Breadcrumbs
         items={[
           { label: "Course", href: "/classes" },
@@ -94,7 +116,7 @@ export function SessionView({ id }: { id: string }) {
         ]}
       />
       <div className="page-heading session-heading">
-        <div>
+        <div className="page-heading-title session-title">
           <h1>{lesson.title}</h1>
           <p className="session-meta">
             Pertemuan {lesson.number} · {dateLabel(lesson.date)}
@@ -106,7 +128,7 @@ export function SessionView({ id }: { id: string }) {
             )}
           </p>
         </div>
-        <div className="session-actions">
+        <div className="page-heading-actions session-actions">
           {lecturer && lesson.status === "failed" && (
             <button
               className="button secondary"
@@ -168,6 +190,7 @@ export function SessionView({ id }: { id: string }) {
             </button>
           )}
         </div>
+        <PageClock />
       </div>
       <div className="class-tabs">
         <div className="tabs" aria-label="Bagian kelas">
@@ -182,6 +205,17 @@ export function SessionView({ id }: { id: string }) {
             </button>
           ))}
         </div>
+        <button
+          type="button"
+          className="text-button focus-mode-button"
+          onClick={toggleFocus}
+          aria-label={focused ? "Keluar Focus Mode" : "Focus Mode"}
+          aria-pressed={focused}
+          title={focused ? "Keluar Focus Mode (Esc)" : "Focus Mode"}
+        >
+          {focused ? <Minimize size={18} /> : <Maximize size={18} />}
+          <span>{focused ? "Keluar Focus Mode" : "Focus Mode"}</span>
+        </button>
       </div>
       {lesson.status === "processing" ? (
         <div className="processing" role="status">
@@ -218,7 +252,6 @@ export function SessionView({ id }: { id: string }) {
                   captureBusy={session.previewLoading || !!session.preview || session.pending}
                   captureLoading={session.previewLoading}
                   onPhoto={() => setPhoto(true)}
-                  onSaved={() => setSavedOpen(true)}
                   onOpenSaved={setDetail}
                   onAsk={() => changeTab("questions")}
                 />
@@ -265,34 +298,6 @@ export function SessionView({ id }: { id: string }) {
       )}
       {!lecturer && (
         <>
-          <Modal
-            open={savedOpen}
-            title="Tersimpan di kelas ini"
-            onClose={() => setSavedOpen(false)}
-          >
-            {saved.length ? (
-              saved
-                .slice()
-                .reverse()
-                .map((s) => (
-                  <button
-                    className="saved-preview"
-                    key={s.id}
-                    onClick={() => {
-                      setSavedOpen(false);
-                      setDetail(s.id);
-                    }}
-                  >
-                    <Bookmark size={16} />
-                    <strong>{s.title}</strong>
-                    <small>{seconds(s.time)}</small>
-                    <ArrowRight size={15} />
-                  </button>
-                ))
-            ) : (
-              <p className="muted py-4">Belum ada simpanan.</p>
-            )}
-          </Modal>
           <SavedDetail
             item={session.data.saved.find((s) => s.id === detail) || null}
             onClose={() => {

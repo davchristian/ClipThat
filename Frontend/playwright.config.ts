@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./tests",
-  testMatch: "app.spec.ts",
+  testMatch: ["app.spec.ts", "focus-mode.spec.ts"],
   outputDir: "test-results/demo",
   timeout: 25000,
   fullyParallel: false,

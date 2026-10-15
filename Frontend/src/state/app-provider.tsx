@@ -116,7 +116,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [authPage, pending, reload]);
   useEffect(() => {
     if (toast) {
-      const timer = setTimeout(() => setToast(null), 4000);
+      const timer = setTimeout(() => setToast(null), 3000);
       return () => clearTimeout(timer);
     }
   }, [toast]);
@@ -176,12 +176,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       {children}
       <div className="toast-region" aria-live="polite" aria-atomic="true">
         {toast && (
-          <div className="toast">
+          <div className="toast" key={toast.id}>
             <span className="toast-check">✓</span>
             {toast.text}
-            <button aria-label="Tutup pemberitahuan" onClick={() => setToast(null)}>
-              ×
-            </button>
           </div>
         )}
       </div>

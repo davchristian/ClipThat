@@ -56,9 +56,6 @@ export default function Home() {
               : "Selamat datang, Davin!"
         }
       />
-      <p className="page-intro">
-        {lecturer ? "Siap lanjut mengajar hari ini?" : "Mau lanjut belajar apa hari ini?"}
-      </p>
       <NotificationStrip
         notifications={notifications}
         handledIds={data.handledNotifications || []}

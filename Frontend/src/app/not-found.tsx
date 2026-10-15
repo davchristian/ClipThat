@@ -1,11 +1,14 @@
 import Link from "next/link";
+import { PageHeading } from "@/components/ui";
 export default function NotFound() {
   return (
-    <div className="empty">
-      <h1>Halaman tidak ditemukan</h1>
-      <Link href="/" className="button primary">
-        Buka kelas
-      </Link>
-    </div>
+    <>
+      <PageHeading title="Halaman tidak ditemukan" />
+      <div className="empty">
+        <Link href="/" className="button primary">
+          Buka kelas
+        </Link>
+      </div>
+    </>
   );
 }

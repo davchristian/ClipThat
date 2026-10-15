@@ -1,7 +1,6 @@
 /* Compact anonymous questions and a single, quiet list. */
 .questions-panel {
-  max-width: 840px;
-  margin: 0 auto;
+  width: 100%;
 }
 .questions-panel .ask-form {
   display: flex;
