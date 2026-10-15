@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { PageClock } from "./page-clock";
 
 export function PageHeading({
   title,
@@ -19,7 +20,8 @@ export function PageHeading({
       ) : (
         <h1>{title}</h1>
       )}
-      {action}
+      {action && <div className="page-heading-actions">{action}</div>}
+      <PageClock />
     </div>
   );
 }

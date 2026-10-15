@@ -13,6 +13,7 @@ import { NotesPanel } from "./notes-panel";
 import { QuestionsPanel } from "./questions-panel";
 import { GraphPanel, MaterialsPanel } from "./learning-resources";
 import { PhotoDialog } from "./photo-dialog";
+import { PageClock } from "@/components/ui/page-clock";
 
 const primaryTabs = [
   { id: "transcript", label: "Transkrip" },
@@ -70,7 +71,7 @@ export function SessionView({ id }: { id: string }) {
         ]}
       />
       <div className="page-heading session-heading">
-        <div>
+        <div className="page-heading-title session-title">
           <h1>{lesson.title}</h1>
           <p className="session-meta">
             Pertemuan {lesson.number} · {dateLabel(lesson.date)}
@@ -82,7 +83,7 @@ export function SessionView({ id }: { id: string }) {
             )}
           </p>
         </div>
-        <div className="session-actions">
+        <div className="page-heading-actions session-actions">
           {lecturer && live && (
             <button className="button secondary small" onClick={() => setEnd(true)}>
               <Square size={13} />
@@ -105,6 +106,7 @@ export function SessionView({ id }: { id: string }) {
             </button>
           )}
         </div>
+        <PageClock />
       </div>
       <div className="class-tabs">
         <div className="tabs" aria-label="Bagian kelas">

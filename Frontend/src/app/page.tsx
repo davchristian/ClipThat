@@ -40,9 +40,7 @@ export default function Home() {
     <div className="home-page">
       <Breadcrumbs items={[]} />
       <PageHeading title={lecturer ? "Selamat datang, Bu Nadia!" : "Selamat datang, Davin!"} />
-      <p className="page-intro">
-        {lecturer ? "Siap lanjut mengajar hari ini?" : "Mau lanjut belajar apa hari ini?"}
-      </p>
+      
       <NotificationStrip
         notifications={notifications}
         handledIds={data.handledNotifications || []}

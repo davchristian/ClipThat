@@ -3,15 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
-import {
-  CalendarDays,
-  Check,
-  ChevronUp,
-  Clock3,
-  GraduationCap,
-  House,
-  Settings2,
-} from "lucide-react";
+import { CalendarDays, Check, ChevronUp, GraduationCap, House, Settings2 } from "lucide-react";
 import { Logo } from "@/components/ui";
 import { useApp } from "@/state/app-provider";
 import type { Role } from "@/lib/types";
@@ -25,19 +17,6 @@ const roles: { value: Role; label: string }[] = [
   { value: "student", label: "Mahasiswa" },
   { value: "lecturer", label: "Dosen" },
 ];
-const dateFormatter = new Intl.DateTimeFormat("id-ID", {
-  weekday: "long",
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-  timeZone: "Asia/Jakarta",
-});
-const timeFormatter = new Intl.DateTimeFormat("id-ID", {
-  hour: "2-digit",
-  minute: "2-digit",
-  hourCycle: "h23",
-  timeZone: "Asia/Jakarta",
-});
 
 export function Sidebar({ mobile }: { mobile: boolean }) {
   const pathname = usePathname();
@@ -85,7 +64,6 @@ export function Sidebar({ mobile }: { mobile: boolean }) {
           <Settings2 size={19} strokeWidth={1.7} />
           <span>Pengaturan</span>
         </Link>
-        <SidebarClock />
         <div className="sidebar-profile-avatar" aria-hidden="true">
           <span className="avatar">{lecturer ? "NP" : "DF"}</span>
         </div>
@@ -99,30 +77,6 @@ export function Sidebar({ mobile }: { mobile: boolean }) {
         </div>
       </div>
     </aside>
-  );
-}
-
-function SidebarClock() {
-  const [now, setNow] = useState<Date | null>(null);
-
-  useEffect(() => {
-    const refresh = () => setNow(new Date());
-    refresh();
-    const timer = window.setInterval(refresh, 1000);
-    document.addEventListener("visibilitychange", refresh);
-    return () => {
-      window.clearInterval(timer);
-      document.removeEventListener("visibilitychange", refresh);
-    };
-  }, []);
-
-  return (
-    <div className="sidebar-clock text-xs" aria-label="Waktu saat ini">
-      <time dateTime={now?.toISOString()}>
-        <span>{now ? dateFormatter.format(now) : ""}</span>
-        <span>{now ? `${timeFormatter.format(now)} WIB` : ""}</span>
-      </time>
-    </div>
   );
 }
 

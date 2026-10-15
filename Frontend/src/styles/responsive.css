@@ -186,7 +186,8 @@
   .session-heading h1 {
     font-size: var(--font-page-mobile);
   }
-  .page-heading > .button {
+  .page-heading > .button,
+  .page-heading-actions > .button {
     min-height: 38px;
     padding: 9px 11px;
     font-size: var(--font-caption);

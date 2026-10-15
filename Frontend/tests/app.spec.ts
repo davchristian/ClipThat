@@ -175,12 +175,15 @@ test("sidebar expands on hover and folds on leave without shifting the page", as
   const sidebar = page.locator("#main-sidebar");
   const navigation = page.getByRole("navigation", { name: "Navigasi utama" });
   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(76);
+  const logo = sidebar.locator(".brand-symbol");
+  const logoPosition = await logo.boundingBox();
   await expect(page.locator(".main-wrapper")).toHaveCSS("margin-left", "76px");
   await expect(sidebar.locator(".nav-item > span").first()).toBeHidden();
   await expect(page.getByRole("button", { name: /Lipat sidebar|Buka sidebar/ })).toHaveCount(0);
   await page.screenshot({ path: "docs/screenshots/sidebar-collapsed.png", animations: "disabled" });
   await sidebar.hover();
   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(216);
+  expect(await logo.boundingBox()).toEqual(logoPosition);
   await expect(sidebar.locator(".nav-item > span").first()).toBeVisible();
   await expect(sidebar.getByText("Davin Farel", { exact: true })).toBeVisible();
   await expect(page.locator(".main-wrapper")).toHaveCSS("margin-left", "76px");
@@ -188,11 +191,13 @@ test("sidebar expands on hover and folds on leave without shifting the page", as
   await expect(page).toHaveURL(/\/agenda$/);
   await page.mouse.move(900, 200);
   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(76);
+  expect(await logo.boundingBox()).toEqual(logoPosition);
   await page.reload();
   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(76);
   await page.locator("#main-content").focus();
   await page.keyboard.press("Shift+Tab");
   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(216);
+  expect(await logo.boundingBox()).toEqual(logoPosition);
   await page.locator("#main-content").focus();
   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(76);
   await page.setViewportSize({ width: 390, height: 844 });
@@ -598,15 +603,27 @@ test("home notification modal tracks handled items without adding a sidebar item
   await expect(page.getByRole("dialog", { name: "Notifikasi" })).not.toBeVisible();
 });
 
-test("live sidebar clock and page padding stay consistent across main views", async ({ page }) => {
+test("live heading clock and page padding stay consistent across main views", async ({ page }) => {
   await page.clock.install({ time: new Date("2026-10-10T03:30:00Z") });
-  const paths = ["/", "/classes", "/classes/aljabar", "/session/linear-05", "/agenda", "/settings"];
+  const paths = [
+    "/",
+    "/classes",
+    "/classes/aljabar",
+    "/classes/aljabar/materials",
+    "/session/linear-05",
+    "/agenda",
+    "/settings",
+  ];
   let homeLeft = 0;
   let homeTitleSize = "";
   for (const path of paths) {
     await page.goto(path);
-    await page.locator("#main-sidebar").hover();
     const clock = page.getByLabel("Waktu saat ini");
+    await expect(clock).toHaveCount(1);
+    await expect(page.locator("#main-sidebar").getByLabel("Waktu saat ini")).toHaveCount(0);
+    await expect(
+      page.locator("#main-content .page-heading:visible").getByLabel("Waktu saat ini"),
+    ).toBeVisible();
     await expect(clock).toContainText("Sabtu, 10 Oktober 2026");
     await expect(clock).toContainText("10.30 WIB");
     const left = await page
@@ -617,6 +634,11 @@ test("live sidebar clock and page padding stay consistent across main views", as
       );
     const title = page.locator("h1").first();
     const titleLeft = (await title.boundingBox())!.x;
+    const clockBox = (await clock.boundingBox())!;
+    const titleBox = (await title.boundingBox())!;
+    expect(clockBox.x).toBeGreaterThan(titleBox.x + titleBox.width);
+    expect(clockBox.y).toBeLessThan(titleBox.y + titleBox.height);
+    expect(clockBox.y + clockBox.height).toBeGreaterThan(titleBox.y);
     const titleSize = await title.evaluate((element) => getComputedStyle(element).fontSize);
     if (path === "/") {
       homeLeft = left;
@@ -630,9 +652,19 @@ test("live sidebar clock and page padding stay consistent across main views", as
   await page.clock.fastForward(60_000);
   await expect(page.getByLabel("Waktu saat ini")).toContainText("10.31 WIB");
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
-  await page.getByRole("button", { name: "Buka navigasi" }).click();
-  await expect(page.getByLabel("Waktu saat ini")).toBeVisible();
+  for (const path of paths) {
+    await page.goto(path);
+    const clock = page.locator("#main-content .page-heading:visible").getByLabel("Waktu saat ini");
+    await expect(clock).toBeVisible();
+    const clockBox = (await clock.boundingBox())!;
+    const titleBox = (await page.locator("h1").first().boundingBox())!;
+    expect(clockBox.x).toBeGreaterThanOrEqual(titleBox.x + titleBox.width);
+    expect(clockBox.x + clockBox.width).toBeLessThanOrEqual(390);
+    expect(clockBox.y).toBe(titleBox.y);
+    expect(
+      await page.locator(".main-wrapper").evaluate((el) => el.scrollWidth),
+    ).toBeLessThanOrEqual(390);
+  }
 });
 
 test("photo upload validates timestamp and persists in the saved collection", async ({ page }) => {
