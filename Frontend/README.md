@@ -38,6 +38,21 @@ workers/               Pemicu antrean lewat Cloudflare Cron
 
 Data live tidak disimpan ke localStorage dan tidak menggunakan course contoh. Mode demo mempertahankan key penyimpanan browser lama. Peran demo dapat diganti; peran akun asli terkunci setelah pendaftaran/onboarding.
 
+## Build Cloudflare di Windows
+
+Jalankan dari folder `Frontend` dengan dependency proyek terpasang. Gunakan `npm.cmd` di PowerShell agar tidak terhalang kebijakan eksekusi `npm.ps1`.
+
+```powershell
+npm.cmd run cf:build
+npm.cmd run cf:preview:built -- --port 8788
+```
+
+Build berhasil bila muncul `OpenNext build complete.` dan `.open-next/worker.js` tersedia. Buka preview di http://127.0.0.1:8788; tekan Ctrl+C untuk menghentikannya. `cf:preview:built` memakai hasil build terakhir, jadi jalankan build lagi setelah mengubah kode atau environment build. Untuk build dan preview sekaligus, gunakan `npm.cmd run cf:preview`.
+
+Adapter memakai direktori `.next` untuk build produksi. Jangan menetapkan `CLIPTHAT_DIST_DIR` khusus saat menjalankan build Cloudflare. Build standar telah lulus di Windows dengan dependency lokal pada 16 Oktober 2026; hasil lengkap ada di [laporan verifikasi](docs/qa/2026-10-16/CLOUDFLARE-WINDOWS.md).
+
+Sebelum menguji akun asli, isi konfigurasi publik Cloudflare dan secret sesuai [panduan setup](docs/backend-setup.md#7-cloudflare). Nilai kosong di `wrangler.jsonc` dapat menimpa nilai `.env` pada runtime Worker. Keberhasilan build belum membuktikan login, email, Storage, atau job produksi berfungsi. Perintah di atas hanya build dan preview lokal.
+
 ## Pemeriksaan
 
 ```powershell

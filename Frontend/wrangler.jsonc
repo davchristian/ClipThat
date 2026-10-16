@@ -8,8 +8,8 @@
   "vars": {
     "NEXT_PUBLIC_APP_MODE": "live",
     "APP_URL": "https://replace-with-your-clipthat-domain.example",
-    "NEXT_PUBLIC_SUPABASE_URL": "",
-    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "",
+    "NEXT_PUBLIC_SUPABASE_URL": "https://awvznfxftqquauknnlqf.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_BM3dV2PxJqpSWwlqNgEsFQ_6XFJNz0s",
     "GEMINI_MODEL": "gemini-2.5-flash",
     "MICROSOFT_TENANT_ID": "common",
   },

@@ -53,7 +53,7 @@ Run awal setelah perubahan sempat gagal karena locator/alur lama serta assertion
 
 ## Batas yang masih tersisa
 
-- Build/deploy Cloudflare belum diperbaiki atau diverifikasi di Linux/WSL/CI. Build Next.js lokal sudah dapat dijalankan tanpa menimpa direktori build server pengguna.
+- Pembaruan: build Cloudflare dan preview workerd lokal sudah lulus di Windows menggunakan proyek utama dan dependency lokal. Lihat [verifikasi Windows](CLOUDFLARE-WINDOWS.md). Deployment produksi, Linux/WSL/CI, dan alur akun asli pada Worker belum diverifikasi; konfigurasi Wrangler publik masih perlu diisi.
 - Auth email, Storage, job runner dan migration pada Supabase asli belum diuji end-to-end dengan akun kelas nyata. Pengujian live browser di atas menggunakan fixture; pengujian Gemini memakai layanan asli dengan data sintetis.
 - Representasi agenda tanggal saja sebagai event all-day (Q-01 dalam laporan awal) belum diubah. Jam 00:00 masih menjadi penanda ketika pengumuman tidak menyebut jam.
 - Backlog format seluruh repository tidak diformat massal. Hanya file yang disentuh pada perbaikan ini yang dirapikan.

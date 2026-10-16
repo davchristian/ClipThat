@@ -17,6 +17,7 @@
     "setup:check": "tsx scripts/check-services.ts",
     "cf:build": "opennextjs-cloudflare build",
     "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf:preview:built": "opennextjs-cloudflare preview",
     "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "cf:deploy:jobs": "wrangler deploy --config wrangler.jobs.jsonc"
   },
