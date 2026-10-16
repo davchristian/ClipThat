@@ -10,7 +10,9 @@
     "APP_URL": "https://clipthat.tech",
     "NEXT_PUBLIC_SUPABASE_URL": "https://awvznfxftqquauknnlqf.supabase.co",
     "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_BM3dV2PxJqpSWwlqNgEsFQ_6XFJNz0s",
-    "GEMINI_MODEL": "gemini-2.5-flash",
+    "GEMINI_MODEL": "gemini-3.5-flash-lite",
+    "GEMINI_TRANSCRIPTION_MODEL": "gemini-3.5-transcribe",
+    "TRANSCRIPTION_PROVIDER": "deepgram",
     "MICROSOFT_TENANT_ID": "common",
   },
 }
