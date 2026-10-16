@@ -24,6 +24,7 @@ type Context = {
   update: (fn: (data: DemoState) => DemoState) => Promise<boolean>;
   run: (work: () => Promise<unknown>, message?: string) => Promise<boolean>;
   reload: () => Promise<void>;
+  refreshSession: () => Promise<void>;
   notify: (message: string) => void;
   reset: () => void;
 };
@@ -35,6 +36,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const current = useRef(data);
   const queue = useRef(Promise.resolve());
   const loading = useRef(false);
+  const sessionRefresh = useRef<{
+    path: string;
+    promise: Promise<void>;
+    again: boolean;
+  } | null>(null);
+  const revision = useRef(0);
   const [ready, setReady] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -46,6 +53,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
   const authPage = ["/login", "/register", "/onboarding"].includes(pathname);
   const load = useCallback(async () => {
+    const version = ++revision.current;
     const boot = await api<Boot & { profile: { onboarded?: boolean } }>("boot");
     if (boot.profile.onboarded === false && pathname !== "/onboarding") {
       router.replace("/onboarding");
@@ -59,7 +67,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (next.role === "lecturer")
         next.confusion = { ...next.confusion, [id]: await api(`sessions/${id}/confusion`) };
     }
-    if (window.location.pathname !== pathname) return;
+    if (window.location.pathname !== pathname || version !== revision.current) return;
     commit(next);
     setError("");
     setReady(true);
@@ -79,6 +87,53 @@ export function AppProvider({ children }: { children: ReactNode }) {
       loading.current = false;
     }
   }, [load, router, commit]);
+  const refreshSession = useCallback((): Promise<void> => {
+    const id = /^\/session\/([^/]+)$/.exec(pathname)?.[1];
+    if (!id || !current.current.profile || !current.current.lessons.some((s) => s.id === id))
+      return reload();
+    if (sessionRefresh.current?.path === pathname) {
+      sessionRefresh.current.again = true;
+      return sessionRefresh.current.promise;
+    }
+    const refresh = { path: pathname, promise: Promise.resolve(), again: false };
+    sessionRefresh.current = refresh;
+    const promise = (async () => {
+      do {
+        refresh.again = false;
+        const version = revision.current;
+        try {
+          const [detail, confusion] = await Promise.all([
+            api<BackendDetail>(`sessions/${id}`),
+            current.current.role === "lecturer"
+              ? api<NonNullable<DemoState["confusion"]>[string]>(`sessions/${id}/confusion`)
+              : Promise.resolve(undefined),
+          ]);
+          if (window.location.pathname !== pathname) return;
+          if (version !== revision.current) {
+            refresh.again = true;
+            continue;
+          }
+          // A removed/archived session must be reconciled with the account's course list.
+          if (detail.session.archived_at) return await reload();
+          let next = withDetail(current.current, id, detail);
+          if (confusion) next = { ...next, confusion: { ...next.confusion, [id]: confusion } };
+          commit(next);
+          setError("");
+        } catch (e) {
+          if (window.location.pathname !== pathname || version !== revision.current) return;
+          if (e instanceof RequestError && e.status === 401) {
+            commit(emptyLiveState);
+            router.replace("/login");
+          } else setError(e instanceof Error ? e.message : "Koneksi terputus. Coba lagi.");
+        }
+      } while (refresh.again && window.location.pathname === pathname);
+      if (sessionRefresh.current === refresh) sessionRefresh.current = null;
+    })();
+    refresh.promise = promise.finally(() => {
+      if (sessionRefresh.current === refresh) sessionRefresh.current = null;
+    });
+    return refresh.promise;
+  }, [pathname, reload, router, commit]);
   useEffect(() => {
     if (liveMode) {
       if (!authPage) {
@@ -110,10 +165,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!liveMode || authPage) return;
     const timer = setInterval(() => {
-      if (!document.hidden && !pending) void reload();
+      if (!document.hidden && !pending) void refreshSession();
     }, 7000);
-    return () => clearInterval(timer);
-  }, [authPage, pending, reload]);
+    const accountTimer = /^\/session\//.test(pathname)
+      ? setInterval(() => {
+          if (!document.hidden && !pending) void reload();
+        }, 30000)
+      : undefined;
+    const visible = () => {
+      if (!document.hidden) void refreshSession();
+    };
+    document.addEventListener("visibilitychange", visible);
+    return () => {
+      clearInterval(timer);
+      clearInterval(accountTimer);
+      document.removeEventListener("visibilitychange", visible);
+    };
+  }, [authPage, pathname, pending, reload, refreshSession]);
   useEffect(() => {
     if (toast) {
       const timer = setTimeout(() => setToast(null), 3000);
@@ -125,6 +193,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       let result = false;
       const task = queue.current.then(async () => {
         setPending(true);
+        revision.current++;
         try {
           await work();
           if (liveMode) await load();
@@ -164,6 +233,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         update,
         run,
         reload,
+        refreshSession,
         notify,
         reset: () => {
           if (!liveMode) {

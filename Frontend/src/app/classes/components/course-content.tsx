@@ -97,6 +97,7 @@ export function CoursesView({ courseId }: { courseId?: string }) {
       />
       {!course && (
         <div className="course-grid">
+          {!visible.length && <p className="muted">Belum ada course.</p>}
           {visible.map((c) => (
             <Link
               className={`course-tile course-tile-${c.color}`}

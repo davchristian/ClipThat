@@ -15,6 +15,112 @@ async function login(page: import("@playwright/test").Page, teacher = false) {
     teacher ? "Nadia Putri" : "Davin Farel",
   );
 }
+
+test("session polling updates transcript and class status without fetching account boot again", async ({
+  page,
+}) => {
+  await login(page, true);
+  let boots = 0;
+  let details = 0;
+  let publish = false;
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname === "/api/v1/boot") boots++;
+  });
+  await page.route(`**/api/v1/sessions/${sid}`, async (route) => {
+    const response = await route.fetch();
+    const body = await response.json();
+    details++;
+    if (publish) {
+      body.data.transcript.push({
+        id: randomUUID(),
+        start_seconds: 1150,
+        end_seconds: 1155,
+        text: "Transkrip baru tanpa bootstrap akun.",
+      });
+      body.data.session.status = "processing";
+      body.data.session.ended_at = new Date().toISOString();
+    }
+    await route.fulfill({ response, json: body });
+  });
+  await page.goto(`/session/${sid}?tab=transcript`);
+  await expect(
+    page.getByLabel("Bagian kelas").getByRole("button", { name: "Transkrip", exact: true }),
+  ).toBeVisible();
+  await page.waitForLoadState("networkidle");
+  const initialBoots = boots;
+  const initialDetails = details;
+  publish = true;
+  await expect(page.getByText("Transkrip baru tanpa bootstrap akun.", { exact: true })).toBeVisible(
+    { timeout: 10000 },
+  );
+  expect(boots).toBe(initialBoots);
+  expect(details).toBeGreaterThan(initialDetails);
+  await page
+    .getByLabel("Bagian kelas")
+    .getByRole("button", { name: "Catatan", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Menyiapkan catatan…", exact: true }),
+  ).toBeVisible();
+  expect(boots).toBe(initialBoots);
+});
+
+test("session refresh coalesces bursts and fetches changes arriving during an in-flight request", async ({
+  page,
+}) => {
+  await login(page);
+  let calls = 0;
+  let active = 0;
+  let maxActive = 0;
+  let holdNext = false;
+  let held = false;
+  let publish = false;
+  let release!: () => void;
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route(`**/api/v1/sessions/${sid}`, async (route) => {
+    calls++;
+    const hold = holdNext;
+    holdNext = false;
+    active++;
+    maxActive = Math.max(maxActive, active);
+    const response = await route.fetch();
+    const body = await response.json();
+    if (hold) {
+      held = true;
+      await gate;
+    }
+    if (publish && !hold)
+      body.data.transcript.push({
+        id: randomUUID(),
+        start_seconds: 1160,
+        end_seconds: 1165,
+        text: "Perubahan saat refresh tetap masuk.",
+      });
+    active--;
+    await route.fulfill({ response, json: body });
+  });
+  await page.goto(`/session/${sid}?tab=transcript`);
+  await expect(
+    page.getByLabel("Bagian kelas").getByRole("button", { name: "Transkrip", exact: true }),
+  ).toBeVisible();
+  await page.waitForLoadState("networkidle");
+  maxActive = 0;
+  holdNext = true;
+  await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+  await expect.poll(() => held).toBe(true);
+  publish = true;
+  await page.evaluate(() => {
+    document.dispatchEvent(new Event("visibilitychange"));
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  release();
+  await expect(
+    page.getByText("Perubahan saat refresh tetap masuk.", { exact: true }),
+  ).toBeVisible();
+  expect(maxActive).toBe(1);
+});
 test("live email login uses Supabase and rejects invalid credentials without opening the dashboard", async ({
   page,
 }) => {

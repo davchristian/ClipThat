@@ -1,20 +1,15 @@
 import { authenticated, checked } from "./db";
 import { setting } from "./config";
 import { ApiError, body, failure, json, sameOrigin } from "./http";
-import { courseInput } from "./schemas";
-import { authRoute } from "./routes/auth";
-import { sessionRoute } from "./routes/sessions";
-import { personalRoute } from "./routes/personal";
-import { questionRoute } from "./routes/questions";
-import { filesRoute } from "./routes/files";
 import { z } from "zod";
-import { transcriptionConfigured, transcriptionProvider } from "./transcription";
 import { supabaseConfigError } from "../lib/supabase-config";
 
 export async function dispatch(request: Request, path: string[]) {
   try {
     sameOrigin(request);
-    if (path.length === 1 && path[0] === "health" && request.method === "GET")
+    if (path.length === 1 && path[0] === "health" && request.method === "GET") {
+      const { transcriptionConfigured, transcriptionProvider } =
+        await import("./transcription-config");
       return json({
         status: "ok",
         database_configured: !supabaseConfigError(
@@ -25,7 +20,11 @@ export async function dispatch(request: Request, path: string[]) {
         transcription_configured: transcriptionConfigured(),
         transcription_provider: transcriptionProvider(),
       });
-    if (path[0] === "auth" && path.length === 2) return await authRoute(request, path[1]);
+    }
+    if (path[0] === "auth" && path.length === 2) {
+      const { authRoute } = await import("./routes/auth");
+      return await authRoute(request, path[1]);
+    }
     const { db, user } = await authenticated();
     if (path[0] === "boot" && path.length === 1 && request.method === "GET") {
       const [profile, courses, sessions, saved, agenda, results, questions] = await Promise.all([
@@ -91,7 +90,8 @@ export async function dispatch(request: Request, path: string[]) {
     if (path[0] === "courses" && path.length === 1) {
       if (request.method === "GET")
         return json(checked(await db.from("courses").select("*").order("created_at").limit(500)));
-      if (request.method === "POST")
+      if (request.method === "POST") {
+        const { courseInput } = await import("./schemas");
         return json(
           checked(
             await db
@@ -102,14 +102,24 @@ export async function dispatch(request: Request, path: string[]) {
           ),
           201,
         );
+      }
     }
-    if (path[0] === "sessions" && path.length <= 3)
+    if (path[0] === "sessions" && path.length <= 3) {
+      const { sessionRoute } = await import("./routes/sessions");
       return await sessionRoute(request, path, db, user.id);
-    if (["saved", "agenda"].includes(path[0]) && path.length <= 2)
+    }
+    if (["saved", "agenda"].includes(path[0]) && path.length <= 2) {
+      const { personalRoute } = await import("./routes/personal");
       return await personalRoute(request, path, db, user.id);
-    if (path[0] === "questions" && path.length === 3) return await questionRoute(request, path, db);
-    if (path[0] === "files" && path.length <= 4)
+    }
+    if (path[0] === "questions" && path.length === 3) {
+      const { questionRoute } = await import("./routes/questions");
+      return await questionRoute(request, path, db);
+    }
+    if (path[0] === "files" && path.length <= 4) {
+      const { filesRoute } = await import("./routes/files");
       return await filesRoute(request, path, db, user.id);
+    }
     throw new ApiError(404, "not_found", "Endpoint tidak ditemukan.");
   } catch (error) {
     return failure(error);

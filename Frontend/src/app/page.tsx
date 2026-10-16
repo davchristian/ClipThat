@@ -64,6 +64,7 @@ export default function Home() {
         <section>
           <SectionTitle>Course</SectionTitle>
           <div className="home-course-list">
+            {!visibleCourses.length && <p className="muted">Belum ada course.</p>}
             {visibleCourses.map((course) => (
               <CourseCard
                 course={course}

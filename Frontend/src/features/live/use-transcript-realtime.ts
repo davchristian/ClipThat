@@ -17,8 +17,12 @@ export function useTranscriptRealtime(
     const db = createBrowserClient(url!, key!);
     let timer: ReturnType<typeof setTimeout> | undefined;
     const refresh = () => {
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(() => void reload(), 300);
+      // Throttle rather than debounce: continuous inserts must not postpone refresh forever.
+      if (timer) return;
+      timer = setTimeout(() => {
+        timer = undefined;
+        void reload();
+      }, 300);
     };
     const channel = db
       .channel(`transcript:${sessionId}`)

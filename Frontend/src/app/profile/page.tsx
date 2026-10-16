@@ -81,11 +81,7 @@ export default function ProfilePage() {
                       </Link>
                     ))
                   ) : (
-                    <p className="profile-empty">
-                      {lecturer
-                        ? "Belum ada course yang dibuat."
-                        : "Belum ada course yang diikuti."}
-                    </p>
+                    <p className="profile-empty">Belum ada course.</p>
                   )}
                 </div>
               </div>

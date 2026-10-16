@@ -9,7 +9,7 @@ import { liveMode } from "@/lib/app-mode";
 import { api } from "@/lib/api";
 import { useTranscriptRealtime } from "@/features/live/use-transcript-realtime";
 export function useSession(id: string) {
-  const { data, ready, update, notify, pending, reload } = useApp();
+  const { data, ready, update, notify, pending, refreshSession: reload } = useApp();
   useTranscriptRealtime(id, ready, reload);
   const { courseFor, notesForLesson, transcriptByLesson } = useContent();
   const lecturer = data.role === "lecturer";

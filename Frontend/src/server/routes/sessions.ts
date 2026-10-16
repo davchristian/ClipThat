@@ -9,10 +9,6 @@ import {
   secondsSchema,
 } from "../schemas";
 import { body, boundedBody, json, ApiError } from "../http";
-import { captureWindow, summarizeCapture } from "../ai";
-import { transcribeAudio, validateAudio, transcriptionProvider } from "../transcription";
-import { deepgramToken } from "../deepgram";
-import { signCapture } from "../capture-token";
 import { required } from "../config";
 import { readTranscript } from "../transcript";
 
@@ -60,6 +56,8 @@ export async function sessionRoute(request: Request, path: string[], db: Db, use
   uuid.parse(id);
   const lesson = await readSession(db, id);
   if (resource === "speech-token" && method === "POST") {
+    const { transcriptionProvider } = await import("../transcription-config");
+    const { deepgramToken } = await import("../deepgram");
     await readSession(db, id, true);
     if (lesson.status !== "live" || lesson.archived_at)
       throw new ApiError(409, "invalid_state", "Kelas harus sedang berlangsung.");
@@ -119,6 +117,7 @@ export async function sessionRoute(request: Request, path: string[], db: Db, use
     }
   }
   if (resource === "transcribe" && method === "POST") {
+    const transcription: typeof import("../transcription") = await import("../transcription");
     await readSession(db, id, true);
     if (lesson.status !== "live" || lesson.archived_at)
       throw new ApiError(409, "invalid_state", "Kelas harus sedang berlangsung.");
@@ -137,7 +136,7 @@ export async function sessionRoute(request: Request, path: string[], db: Db, use
       .max(90)
       .parse(Number(form.get("duration")));
     const file = form.get("file");
-    validateAudio(file);
+    transcription.validateAudio(file);
     const existing = checked(
       await db
         .from("transcript_segments")
@@ -147,12 +146,14 @@ export async function sessionRoute(request: Request, path: string[], db: Db, use
         .limit(1),
     );
     if (existing?.length) return json({ saved: true, duplicate: true });
-    const segments = await transcribeAudio(file, offset, duration);
+    const segments = await transcription.transcribeAudio(file, offset, duration);
     if (segments.length)
       checked(await db.rpc("append_transcript", { sid: id, chunk: chunkId, segments }));
     return json({ saved: true, segments: segments.length });
   }
   if (resource === "capture-preview" && method === "POST") {
+    const { captureWindow, summarizeCapture } = await import("../ai");
+    const { signCapture } = await import("../capture-token");
     const input = await body(request, z.object({ end: secondsSchema.optional() }).strict());
     if (lesson.archived_at) throw new ApiError(409, "invalid_state", "Kelas telah diarsipkan.");
     const profile = checked(await db.from("profiles").select("role").eq("id", userId).single());

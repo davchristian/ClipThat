@@ -182,6 +182,22 @@ export function fromBoot(boot: Boot, previous: DemoState): DemoState {
 export function withDetail(state: DemoState, id: string, detail: BackendDetail): DemoState {
   return {
     ...state,
+    lessons: state.lessons.map((lesson) =>
+      lesson.id === id
+        ? {
+            ...lesson,
+            title: detail.session.title,
+            ...parts(detail.session.starts_at),
+            status: detail.session.status,
+            startedAt: detail.session.started_at,
+            endedAt: detail.session.ended_at,
+            duration:
+              detail.session.started_at && detail.session.ended_at
+                ? `${Math.ceil((+new Date(detail.session.ended_at) - +new Date(detail.session.started_at)) / 60000)} menit`
+                : "",
+          }
+        : lesson,
+    ),
     questions: [
       ...state.questions.filter((q) => q.sessionId !== id),
       ...detail.questions.map((q) => ({
