@@ -39,6 +39,8 @@ export default defineConfig({
         CAPTURE_SIGNING_SECRET: "test-signing-secret-".repeat(4),
         GEMINI_API_KEY: "",
         OPENAI_API_KEY: "",
+        DEEPGRAM_API_KEY: "",
+        TRANSCRIPTION_PROVIDER: "gemini",
         MICROSOFT_CLIENT_ID: "",
         GOOGLE_CALENDAR_CLIENT_ID: "",
         NOTION_CLIENT_ID: "",

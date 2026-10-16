@@ -5,20 +5,27 @@ import { setting } from "./config";
 import { ApiError } from "./http";
 import { geminiTranscribe } from "./gemini-transcribe";
 
-export function transcriptionProvider(): "gemini" | "whisper" {
+export function transcriptionProvider(): "gemini" | "whisper" | "deepgram" {
   const provider =
     setting("TRANSCRIPTION_PROVIDER") || (setting("GEMINI_API_KEY") ? "gemini" : "whisper");
-  if (provider !== "gemini" && provider !== "whisper")
+  if (provider !== "gemini" && provider !== "whisper" && provider !== "deepgram")
     throw new ApiError(
       503,
       "invalid_provider",
-      "TRANSCRIPTION_PROVIDER harus gemini atau whisper.",
+      "TRANSCRIPTION_PROVIDER harus gemini, whisper, atau deepgram.",
     );
   return provider;
 }
 
 export function transcriptionConfigured() {
-  return !!setting(transcriptionProvider() === "gemini" ? "GEMINI_API_KEY" : "OPENAI_API_KEY");
+  const provider = transcriptionProvider();
+  return !!setting(
+    provider === "deepgram"
+      ? "DEEPGRAM_API_KEY"
+      : provider === "gemini"
+        ? "GEMINI_API_KEY"
+        : "OPENAI_API_KEY",
+  );
 }
 
 const audioTypes = ["audio/webm", "audio/mp4", "audio/ogg", "audio/wav", "audio/mpeg"];
@@ -65,6 +72,12 @@ export async function transcribeAudio(
   )
     throw new ApiError(422, "invalid_duration", "Potongan audio harus berdurasi 0,1–90 detik.");
   if (transcriptionProvider() === "whisper") return whisper(file, offset, duration, fetcher);
+  if (transcriptionProvider() === "deepgram")
+    throw new ApiError(
+      409,
+      "streaming_required",
+      "Deepgram memakai rekaman streaming. Buka ulang halaman kelas.",
+    );
   const model =
     setting("GEMINI_TRANSCRIPTION_MODEL") || setting("GEMINI_MODEL") || "gemini-2.5-flash";
   if (model === "gemini-3.5-transcribe") return geminiTranscribe(file, offset, duration, fetcher);

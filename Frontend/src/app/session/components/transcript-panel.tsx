@@ -3,6 +3,7 @@
 import { Bookmark, Camera, CircleHelp, MessageCircle, ScanLine, LoaderCircle } from "lucide-react";
 import { seconds } from "@/lib/format";
 import type { SavedItem, Segment } from "@/lib/types";
+import type { SpeechDraft } from "@/features/live/deepgram-results";
 
 export function TranscriptPanel({
   segments,
@@ -17,6 +18,7 @@ export function TranscriptPanel({
   previewRange,
   captureBusy = false,
   captureLoading = false,
+  speechDraft,
 }: {
   segments: Segment[];
   saved: SavedItem[];
@@ -30,6 +32,7 @@ export function TranscriptPanel({
   previewRange?: { start: number; end: number };
   captureBusy?: boolean;
   captureLoading?: boolean;
+  speechDraft?: SpeechDraft;
 }) {
   const photos = saved.filter((item) => item.type === "photo");
   const photoSegment = (time: number) =>
@@ -44,7 +47,7 @@ export function TranscriptPanel({
         <span>Transkrip</span>
       </div>
       <div className="transcript-content">
-        {!segments.length && (
+        {!segments.length && !speechDraft && (
           <p className="empty-transcript">Transkrip akan muncul saat dosen mulai merekam.</p>
         )}
         {segments.map((segment) => {
@@ -107,6 +110,15 @@ export function TranscriptPanel({
             </article>
           );
         })}
+        {lecturer && speechDraft && (
+          <article className="transcript-segment transcript-draft" aria-label="Transkrip langsung">
+            <time>{seconds(speechDraft.time)}</time>
+            <div className="transcript-entry">
+              <p>{speechDraft.text}</p>
+              <small>Langsung · menunggu hasil tersimpan</small>
+            </div>
+          </article>
+        )}
       </div>
       {!lecturer && !readOnly && (
         <div className="capture-bar">

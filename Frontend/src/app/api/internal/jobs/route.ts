@@ -19,6 +19,8 @@ export async function POST(request: Request) {
     return json({
       processed: study.processed || calendar.processed,
       status: calendar.processed ? calendar.status : study.status,
+      study,
+      calendar,
     });
   } catch (error) {
     return failure(error);

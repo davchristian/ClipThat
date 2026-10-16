@@ -11,12 +11,27 @@ async function main() {
     });
     if (!response.ok)
       throw new Error(`Job runner HTTP ${response.status}. Periksa konfigurasi server.`);
-    const value = (await response.json()) as { data: { processed: boolean; status?: string } };
+    const value = (await response.json()) as {
+      data: {
+        processed: boolean;
+        status?: string;
+        study?: { processed: boolean; status?: string; error?: { code: string; message: string } };
+        calendar?: { processed: boolean; status?: string };
+      };
+    };
     if (!value.data.processed) {
-      console.log("Tidak ada pekerjaan yang menunggu.");
+      console.log(
+        "Tidak ada pekerjaan yang siap diproses saat ini (antrean bisa menunggu jadwal retry).",
+      );
       break;
     }
     console.log(`Pekerjaan: ${value.data.status}`);
+    if (value.data.study?.error) {
+      console.error(
+        `Catatan: ${value.data.study.status} [${value.data.study.error.code}] ${value.data.study.error.message}`,
+      );
+      process.exitCode = 1;
+    }
   }
 }
 main().catch((error: unknown) => {

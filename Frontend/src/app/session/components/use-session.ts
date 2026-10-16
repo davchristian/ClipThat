@@ -7,8 +7,10 @@ import type { CaptureDraft } from "@/lib/backend-types";
 import { useApp } from "@/state/app-provider";
 import { liveMode } from "@/lib/app-mode";
 import { api } from "@/lib/api";
+import { useTranscriptRealtime } from "@/features/live/use-transcript-realtime";
 export function useSession(id: string) {
   const { data, ready, update, notify, pending, reload } = useApp();
+  useTranscriptRealtime(id, ready, reload);
   const { courseFor, notesForLesson, transcriptByLesson } = useContent();
   const lecturer = data.role === "lecturer";
   const lesson = data.lessons.find(

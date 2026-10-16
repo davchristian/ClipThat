@@ -86,6 +86,10 @@ Gunakan `GEMINI_TRANSCRIPTION_MODEL=gemini-3.5-transcribe` untuk model khusus sp
 
 ### Tes transkripsi dengan suara sendiri
 
+Untuk transkripsi **streaming Deepgram**, ikuti [panduan Deepgram](deepgram-setup.md).
+Gemini tetap digunakan untuk capture dan catatan. Transkripsi Gemini/Whisper di
+bawah memakai potongan audio 15 detik.
+
 1. Pada `.env` atau `.env.local` yang digunakan, set `NEXT_PUBLIC_APP_MODE=live` dan `TRANSCRIPTION_PROVIDER=gemini`. Pastikan key Gemini dan konfigurasi Supabase sudah diisi. `.env.local` memiliki prioritas lebih tinggi daripada `.env`.
 2. Restart `npm.cmd run dev`. Buka origin yang sama persis dengan `APP_URL`, misalnya `http://localhost:3000`.
 3. Login/register sebagai **dosen**. Pilihan peran demo tidak membuat akun dosen live. Buat sesi, buka sesi, lalu klik **Mulai kelas**.
@@ -161,6 +165,13 @@ Terminal kedua, saat ada pekerjaan siap diproses:
 ```powershell
 npm.cmd run jobs:run
 ```
+
+Runner memproses pekerjaan yang siap saat perintah dijalankan, lalu keluar. Pesan
+"Tidak ada pekerjaan yang siap diproses saat ini" juga bisa berarti job menunggu
+jadwal retry (2, 4, 8, lalu 16 menit setelah kegagalan). Jalankan ulang setelah
+waktu tersebut. Jika muncul `retry_scheduled` atau `failed`, alasan aman dari
+server sekarang dicetak bersama kode error; API key dan isi transkrip tidak dicetak.
+Setelah lima kegagalan, dosen dapat memilih **Coba proses lagi** pada pertemuan.
 
 1. Register dosen, konfirmasi email, login, buat mata kuliah dan sesi. Mulai kelas dan bagikan kodenya.
 2. Dengan browser/profil lain, register mahasiswa dan gabung melalui kode.

@@ -180,6 +180,85 @@ test("generated class graph links to its transcript and agenda confirmation surv
   await expect(page.locator(".graph-relations")).toContainText("penerapan");
 });
 
+test("Deepgram shows interim speech, persists finals on stop and protects the token endpoint", async ({
+  page,
+}) => {
+  await login(page);
+  const denied = await page.request.post(`/api/v1/sessions/${sid}/speech-token`, {
+    headers: { origin: "http://127.0.0.1:3188" },
+  });
+  expect(denied.status()).toBe(403);
+  await login(page, true);
+  await page.context().grantPermissions(["microphone"]);
+  await page.route("**/api/v1/health", (route) =>
+    route.fulfill({
+      json: { data: { transcription_configured: true, transcription_provider: "deepgram" } },
+    }),
+  );
+  await page.route(`**/api/v1/sessions/${sid}/speech-token`, (route) =>
+    route.fulfill({ json: { data: { access_token: "temporary-test-only", expires_in: 30 } } }),
+  );
+  let saved:
+    { chunk_id: string; segments: { start: number; end: number; text: string }[] } | undefined;
+  let attempts = 0;
+  let firstBatchId = "";
+  await page.route(`**/api/v1/sessions/${sid}/transcript`, async (route) => {
+    if (++attempts === 1) {
+      firstBatchId = route.request().postDataJSON().chunk_id;
+      await route.fulfill({ status: 503, json: { error: { message: "Uji simpan ulang" } } });
+      return;
+    }
+    saved = route.request().postDataJSON();
+    await route.fulfill({ json: { data: { saved: true } } });
+  });
+  await page.routeWebSocket("wss://api.deepgram.com/v1/listen**", (ws) => {
+    let sent = false;
+    ws.onMessage((message) => {
+      if (typeof message === "string" && message.includes("CloseStream")) {
+        ws.send(
+          JSON.stringify({
+            type: "Results",
+            start: 0,
+            duration: 2,
+            is_final: true,
+            channel: { alternatives: [{ transcript: "Matriks terdiri dari baris dan kolom." }] },
+          }),
+        );
+        ws.close();
+      } else if (!sent) {
+        sent = true;
+        ws.send(
+          JSON.stringify({
+            type: "Results",
+            start: 0,
+            duration: 1,
+            is_final: false,
+            channel: { alternatives: [{ transcript: "Matriks terdiri" }] },
+          }),
+        );
+      }
+    });
+  });
+  await page.goto(`/session/${sid}?tab=transcript`);
+  await page.getByRole("button", { name: "Rekam suara dosen", exact: true }).click();
+  await expect(page.getByLabel("Transkrip langsung")).toContainText("Matriks terdiri");
+  await expect(page.getByRole("button", { name: "Akhiri", exact: true })).toBeDisabled();
+  expect(saved).toBeUndefined();
+  await page.getByRole("button", { name: "Hentikan rekaman", exact: true }).click();
+  await expect(
+    page.getByRole("region", { name: "Rekaman kelas" }).getByRole("alert"),
+  ).toContainText("Uji simpan ulang");
+  await expect(page.getByRole("button", { name: "Akhiri", exact: true })).toBeDisabled();
+  await page.getByRole("button", { name: "Coba kirim ulang", exact: true }).click();
+  await expect.poll(() => saved?.segments[0].text).toBe("Matriks terdiri dari baris dan kolom.");
+  expect(saved!.segments[0].start).toBeGreaterThanOrEqual(0);
+  expect(attempts).toBe(2);
+  expect(saved!.chunk_id).toBe(firstBatchId);
+  expect(saved!.segments[0].end - saved!.segments[0].start).toBeCloseTo(2);
+  await expect(page.getByRole("button", { name: "Akhiri", exact: true })).toBeEnabled();
+  await expect(page.getByLabel("Transkrip langsung")).toHaveCount(0);
+});
+
 for (const width of [1440, 390]) {
   test(`lecturer recording stays compact and fractional transcript timestamps do not overlap at ${width}px`, async ({
     page,

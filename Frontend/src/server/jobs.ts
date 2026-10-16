@@ -1,6 +1,8 @@
 import { adminDb, checked } from "./db";
 import { createLessonResult, createReview, type SourceSegment } from "./ai";
 import { readTranscript } from "./transcript";
+import { ApiError } from "./http";
+import { ConfigError } from "./config";
 
 export async function processOneJob() {
   const db = adminDb();
@@ -48,8 +50,19 @@ export async function processOneJob() {
     }
     checked(await db.rpc("complete_job", { jid: job.id, token: job.lease, result }));
     return { processed: true, status: "done" };
-  } catch {
+  } catch (error) {
     checked(await db.rpc("fail_job", { jid: job.id, token: job.lease }));
-    return { processed: true, status: "retry_scheduled" };
+    // Only expose controlled errors, never raw provider responses or class data.
+    const detail =
+      error instanceof ApiError
+        ? { code: error.code, message: error.message }
+        : error instanceof ConfigError
+          ? { code: "not_configured", message: `Konfigurasi ${error.settingName} belum valid.` }
+          : { code: "processing_failed", message: "Pemrosesan gagal. Periksa konfigurasi server." };
+    return {
+      processed: true,
+      status: job.attempts >= 5 ? "failed" : "retry_scheduled",
+      error: detail,
+    };
   }
 }

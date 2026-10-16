@@ -1,5 +1,46 @@
 import { expect, test, type Page } from "@playwright/test";
 
+test("processing notes leave transcript and questions accessible", async ({ page }) => {
+  await page.goto("/session/linear-05");
+  await expect(page.locator(".transcript-panel")).toBeVisible();
+  await page.evaluate(() => {
+    const key = "clipthat-frontend-v1";
+    const data = JSON.parse(localStorage.getItem(key)!);
+    data.lessons.find((lesson: { id: string }) => lesson.id === "linear-05").status = "processing";
+    localStorage.setItem(key, JSON.stringify(data));
+  });
+  // Keep demo's simulated completion from hiding the processing state during the test.
+  await page.clock.install();
+  await page.reload();
+  await expect(page.locator(".transcript-panel")).toBeVisible();
+  await expect(page.getByText("Catatan sedang disiapkan.", { exact: false })).toBeVisible();
+  await page.getByRole("button", { name: "Pertanyaan", exact: true }).click();
+  await expect(page.locator(".questions-panel")).toBeVisible();
+  await page.getByRole("button", { name: "Catatan", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Menyiapkan catatan…" })).toBeVisible();
+});
+
+test("course cards keep their size with one, two or four courses", async ({ page }) => {
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto("/classes");
+    const cards = page.locator(".course-grid .course-tile");
+    await expect(cards).toHaveCount(4);
+    const original = (await cards.first().boundingBox())!;
+    for (const count of [2, 1]) {
+      // Isolate grid sizing from the demo's fixed list of four courses.
+      await cards.evaluateAll(
+        (nodes, count) => nodes.slice(count).forEach((node) => node.remove()),
+        count,
+      );
+      await expect(cards).toHaveCount(count);
+      const current = (await cards.first().boundingBox())!;
+      expect(current.width).toBeCloseTo(original.width);
+      expect(current.height).toBeCloseTo(original.height);
+    }
+  }
+});
+
 async function openSavedItem(page: Page, sessionId: string, title: string) {
   const id = await page.evaluate(
     ({ sessionId, title }) => {

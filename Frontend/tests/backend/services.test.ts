@@ -1,13 +1,42 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { captureWindow, gemini, whisper } from "../../src/server/ai";
-import { captureSchema } from "../../src/server/schemas";
+import { captureSchema, lessonResultSchema } from "../../src/server/schemas";
 import { signCapture, verifyCapture } from "../../src/server/capture-token";
 import { sameOrigin, body } from "../../src/server/http";
 import { z } from "zod";
 import { seconds } from "../../src/lib/format";
 
 const user = "00000000-0000-4000-8000-000000000001";
+test("lesson generation omits nested provider array caps but validates output limits locally", async () => {
+  process.env.GEMINI_API_KEY = "test-only";
+  const note = { title: "Matriks", body: "Baris dan kolom", source_ids: [user] };
+  let notes = [note];
+  const fake: typeof fetch = async (_, init) => {
+    const schema = JSON.parse(String(init?.body)).generationConfig.responseJsonSchema;
+    assert.equal(JSON.stringify(schema).includes('"maxItems"'), false);
+    assert.equal(
+      schema.properties.graph.properties.nodes.items.properties.source_ids.items.format,
+      "uuid",
+    );
+    assert.ok(schema.required.includes("notes"));
+    return Response.json({
+      candidates: [
+        {
+          content: {
+            parts: [
+              { text: JSON.stringify({ notes, graph: { nodes: [], edges: [] }, agenda: [] }) },
+            ],
+          },
+        },
+      ],
+    });
+  };
+  assert.equal((await gemini(lessonResultSchema, "Materi uji", [], fake)).notes.length, 1);
+  notes = Array.from({ length: 41 }, () => note);
+  await assert.rejects(gemini(lessonResultSchema, "Materi uji", [], fake), /Hasil AI belum valid/);
+});
+
 test("transcript timestamps display whole seconds without floating-point overflow", () => {
   assert.equal(seconds(1214.906499), "20:14");
   assert.equal(seconds(1241.988), "20:41");

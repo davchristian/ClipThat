@@ -10,7 +10,8 @@ import {
 } from "../schemas";
 import { body, boundedBody, json, ApiError } from "../http";
 import { captureWindow, summarizeCapture } from "../ai";
-import { transcribeAudio, validateAudio } from "../transcription";
+import { transcribeAudio, validateAudio, transcriptionProvider } from "../transcription";
+import { deepgramToken } from "../deepgram";
 import { signCapture } from "../capture-token";
 import { required } from "../config";
 import { readTranscript } from "../transcript";
@@ -58,6 +59,19 @@ export async function sessionRoute(request: Request, path: string[], db: Db, use
   }
   uuid.parse(id);
   const lesson = await readSession(db, id);
+  if (resource === "speech-token" && method === "POST") {
+    await readSession(db, id, true);
+    if (lesson.status !== "live" || lesson.archived_at)
+      throw new ApiError(409, "invalid_state", "Kelas harus sedang berlangsung.");
+    if (transcriptionProvider() !== "deepgram")
+      throw new ApiError(
+        409,
+        "invalid_provider",
+        "Pilih Deepgram pada konfigurasi transkripsi server.",
+      );
+    await limit(db, "transcribe");
+    return json(await deepgramToken());
+  }
   if (!resource && method === "GET") {
     const [transcript, questions, results, materials, notes, review] = await Promise.all([
       readTranscript(db, id),

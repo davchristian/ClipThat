@@ -9,6 +9,16 @@ export type SourceSegment = {
   end_seconds: number;
   text: string;
 };
+function generationSchema(schema: unknown): unknown {
+  if (Array.isArray(schema)) return schema.map(generationSchema);
+  if (schema && typeof schema === "object")
+    return Object.fromEntries(
+      Object.entries(schema)
+        .filter(([key]) => key !== "maxItems")
+        .map(([key, value]) => [key, generationSchema(value)]),
+    );
+  return schema;
+}
 export function checkGeminiResponse(response: Response, model: string) {
   if (!response.ok) {
     if (response.status === 402)
@@ -82,7 +92,9 @@ export async function gemini<T>(
           temperature: 0.2,
           maxOutputTokens: 32768,
           responseMimeType: "application/json",
-          responseJsonSchema: z.toJSONSchema(schema, { unrepresentable: "any" }),
+          // Nested array limits can make Gemini reject the schema with HTTP 400.
+          // Enforce those limits with the original Zod schema after generation.
+          responseJsonSchema: generationSchema(z.toJSONSchema(schema, { unrepresentable: "any" })),
         },
       }),
     },

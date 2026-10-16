@@ -17,6 +17,7 @@ import { Microphone } from "@/features/live/microphone";
 import { liveMode } from "@/lib/app-mode";
 import { PhotoDialog } from "./photo-dialog";
 import { PageClock } from "@/components/ui/page-clock";
+import type { SpeechDraft } from "@/features/live/deepgram-results";
 
 const primaryTabs = [
   { id: "transcript", label: "Transkrip" },
@@ -35,6 +36,9 @@ export function SessionView({ id }: { id: string }) {
   const [detail, setDetail] = useState<string | null>(savedQuery);
   const [photo, setPhoto] = useState(false);
   const [end, setEnd] = useState(false);
+  const [recordingBusy, setRecordingBusy] = useState(false);
+  const [speechDraft, setSpeechDraft] = useState<SpeechDraft>(null);
+  const [questionDraft, setQuestionDraft] = useState("");
   const classroomRef = useRef<HTMLDivElement>(null);
   const [focused, setFocused] = useState(false);
 
@@ -129,14 +133,6 @@ export function SessionView({ id }: { id: string }) {
               Coba proses lagi
             </button>
           )}
-          {lecturer && live && liveMode && lesson.startedAt && (
-            <Microphone
-              sessionId={id}
-              startedAt={lesson.startedAt}
-              onChange={setRecordingBusy}
-              onUploaded={session.reload}
-            />
-          )}
           {lecturer && live && lesson.code && (
             <button
               className="button secondary small"
@@ -203,7 +199,21 @@ export function SessionView({ id }: { id: string }) {
           <span>{focused ? "Keluar Focus Mode" : "Focus Mode"}</span>
         </button>
       </div>
-      {lesson.status === "processing" ? (
+      {lecturer && live && liveMode && lesson.startedAt && (
+        <div className="lecture-recording">
+          <Microphone
+            sessionId={id}
+            startedAt={lesson.startedAt}
+            onChange={setRecordingBusy}
+            onUploaded={session.reload}
+            onDraft={setSpeechDraft}
+          />
+        </div>
+      )}
+      {lesson.status === "processing" && currentTab !== "notes" && (
+        <p role="status">Catatan sedang disiapkan. Transkrip dan pertanyaan tetap bisa dibuka.</p>
+      )}
+      {lesson.status === "processing" && currentTab === "notes" ? (
         <div className="processing" role="status">
           <LoaderCircle size={28} />
           <h2>Menyiapkan catatan…</h2>
@@ -222,10 +232,11 @@ export function SessionView({ id }: { id: string }) {
               </section>
             ) : (
               <div
-                className={`session-workspace ${session.preview || session.previewLoading ? "has-preview" : ""}`}
+                className={`session-workspace ${lecturer ? "lecturer-workspace" : ""} ${session.preview || session.previewLoading ? "has-preview" : ""}`}
               >
                 <TranscriptPanel
                   {...session}
+                  speechDraft={speechDraft}
                   readOnly={!live}
                   previewRange={
                     session.preview
@@ -238,7 +249,6 @@ export function SessionView({ id }: { id: string }) {
                   captureBusy={session.previewLoading || !!session.preview || session.pending}
                   captureLoading={session.previewLoading}
                   onPhoto={() => setPhoto(true)}
-                  onSaved={() => setSavedOpen(true)}
                   onOpenSaved={setDetail}
                   onAsk={() => changeTab("questions")}
                 />

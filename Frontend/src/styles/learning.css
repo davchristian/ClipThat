@@ -98,7 +98,7 @@
 .lecturer-transcript .transcript-segment {
   grid-template-columns: minmax(5ch, max-content) minmax(0, 1fr);
   max-width: 960px;
-  margin-inline: auto;
+  margin-inline: 0;
   padding-block: 18px;
   gap: 24px;
 }

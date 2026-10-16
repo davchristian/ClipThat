@@ -9,7 +9,7 @@ import { questionRoute } from "./routes/questions";
 import { filesRoute } from "./routes/files";
 import { z } from "zod";
 import { integrationsRoute } from "./routes/integrations";
-import { transcriptionConfigured } from "./transcription";
+import { transcriptionConfigured, transcriptionProvider } from "./transcription";
 import { supabaseConfigError } from "../lib/supabase-config";
 
 export async function dispatch(request: Request, path: string[]) {
@@ -24,6 +24,7 @@ export async function dispatch(request: Request, path: string[]) {
         ),
         ai_configured: !!setting("GEMINI_API_KEY"),
         transcription_configured: transcriptionConfigured(),
+        transcription_provider: transcriptionProvider(),
       });
     if (path[0] === "auth" && path.length === 2) return await authRoute(request, path[1]);
     const { db, user } = await authenticated();

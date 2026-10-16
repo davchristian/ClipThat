@@ -2,6 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Mic, Square } from "lucide-react";
 import { api } from "@/lib/api";
+import { DeepgramMicrophone } from "./deepgram-microphone";
+import type { SpeechDraft } from "./deepgram-results";
 
 type Chunk = { id: string; file: File; offset: number; duration: number };
 export function Microphone({
@@ -9,16 +11,19 @@ export function Microphone({
   startedAt,
   onChange,
   onUploaded,
+  onDraft,
 }: {
   sessionId: string;
   startedAt: string;
   onChange: (busy: boolean) => void;
   onUploaded: () => Promise<void>;
+  onDraft?: (draft: SpeechDraft) => void;
 }) {
   const [recording, setRecording] = useState(false);
   const [count, setCount] = useState(0);
   const [error, setError] = useState("");
   const [configured, setConfigured] = useState(false);
+  const [provider, setProvider] = useState("");
   const [starting, setStarting] = useState(false);
   const stream = useRef<MediaStream | null>(null);
   const recorder = useRef<MediaRecorder | null>(null);
@@ -29,8 +34,11 @@ export function Microphone({
   const mounted = useRef(true);
   useEffect(() => {
     mounted.current = true;
-    api<{ transcription_configured: boolean }>("health")
-      .then((v) => setConfigured(v.transcription_configured))
+    api<{ transcription_configured: boolean; transcription_provider?: string }>("health")
+      .then((v) => {
+        setConfigured(v.transcription_configured);
+        setProvider(v.transcription_provider || "");
+      })
       .catch(() => {});
     return () => {
       mounted.current = false;
@@ -157,6 +165,16 @@ export function Microphone({
       setStarting(false);
     }
   }
+  if (provider === "deepgram" && configured)
+    return (
+      <DeepgramMicrophone
+        sessionId={sessionId}
+        startedAt={startedAt}
+        onChange={onChange}
+        onUploaded={onUploaded}
+        onDraft={onDraft}
+      />
+    );
   return (
     <section className="live-mic" aria-label="Rekaman kelas">
       <div className="mic-control-row">
