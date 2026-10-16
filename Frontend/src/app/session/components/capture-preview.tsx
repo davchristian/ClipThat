@@ -29,7 +29,7 @@ export function CapturePreview({
           <h2>Preview capture</h2>
           <p>
             {item
-              ? `${seconds(item.time)}–${seconds(item.end || item.time)} · 90 detik terakhir`
+              ? `${seconds(item.time)}–${seconds(item.end || item.time)}`
               : "Menyiapkan cuplikan…"}
           </p>
         </div>

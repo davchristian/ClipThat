@@ -1,0 +1,696 @@
+{
+  "totals": {
+    "total": 110,
+    "pass": 105,
+    "fail": 5
+  },
+  "groups": {
+    "Backend / PGlite / provider mock": {
+      "total": 55,
+      "pass": 55,
+      "fail": 0
+    },
+    "Demo E2E (suite existing)": {
+      "total": 24,
+      "pass": 23,
+      "fail": 1
+    },
+    "Live E2E (Supabase fixture)": {
+      "total": 14,
+      "pass": 11,
+      "fail": 3
+    },
+    "Audit tambahan demo/UI": {
+      "total": 9,
+      "pass": 9,
+      "fail": 0
+    },
+    "Audit tambahan live": {
+      "total": 3,
+      "pass": 2,
+      "fail": 1
+    },
+    "Gemini asli / data sintetis": {
+      "total": 5,
+      "pass": 5,
+      "fail": 0
+    }
+  },
+  "cases": [
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "manual calendar export preserves Jakarta time in UTC, escapes text and excludes drafts/done events",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "Supabase configuration accepts project and local URLs and rejects invalid values",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "invalid Supabase URL yields a safe configuration error instead of an SDK exception",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "live proxy with invalid Supabase URL allows auth pages and redirects protected pages",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "important class announcements automatically reach only course students without duplicates",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "student cannot create or start a session, or escalate role",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "join is idempotent, owner starts session, transcript retry does not duplicate",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "shared questions contain no author, votes stay unique and private",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "private notes and saved copies are hidden from teacher and other students",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "ending enqueues once, jobs have exclusive leases and class result enqueues private reviews",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "archive hides sources but keeps personal saved copies; restoration reopens class",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "AI quotas are per-user and cannot be bypassed with arbitrary actions",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "private photos and archived shared materials obey storage policies",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "calendar secrets stay server-only and unconfirmed agenda never leaves the app",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "Google onboarding chooses a role only once; notification preferences are private",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "course codes are generated automatically, join idempotently and keep courses isolated",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "continuous speech crosses 15-second rows using word timestamps even before finalization",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "Deepgram requests only a short-lived token with the server key",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "Deepgram failures are actionable without exposing provider responses",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "streaming results distinguish drafts and finals and retain session offsets",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "calendar credentials reject tampering and another user/provider",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "OAuth state binds the callback to its initiating user, provider, nonce and expiry",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "calendar payload preserves Jakarta deadline as UTC and does not invite attendees",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "Outlook create retries use stable transaction ID, and updating/deleting use stored event ID",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "Google retries an existing deterministic event without creating a duplicate",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "new account boot drops previous account's private content and keeps agenda drafts unconfirmed",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "automatic agenda stays saved after personal edits, duplicate announcements and reordered drafts",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "graph merging keeps edges valid and combines explicitly identical subbab titles",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "confirming one announcement keeps other drafts from the same transcript segment",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "notes hide source UUID citations while preserving material and formulas",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "off-topic speech can complete without inventing study notes or changing transcript",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "relative announcements use the class date in Jakarta even when processing later",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "class extraction receives date context and accepts schedule-only speech without study notes",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "lesson generation omits nested provider array caps but validates output limits locally",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "transcript timestamps display whole seconds without floating-point overflow",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "90 seconds are seconds; clamp early class and include overlapping speech",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "capture preview signature rejects tampering, other users and expiration",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "Gemini uses requested 2.5 model and rejects malformed provider JSON",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "Whisper preserves segment offsets and sends complete multipart file",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "mutations reject cross-origin requests and oversized/invalid bodies",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "signup failures distinguish email restrictions, rate limits, and password rules",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "service and configuration failures do not blame the submitted password",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "unknown and existing-account failures keep a generic message without provider data",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "live text extends its 15-second row immediately and starts the next interval",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "uploaded speech appears once while draft awaits acknowledgement",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "Gemini microphone chunks include audio bytes and retain session timestamps",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "silent audio produces no transcript segments",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "dedicated Transcribe model uses Interactions and measured chunk timestamps",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "dedicated speech silence is empty and malformed or incomplete responses are rejected",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "dedicated speech maps browser MP4 audio to M4A and preserves provider errors",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "Gemini rejects invalid timestamps and malformed output before persistence",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "quota failures stay retryable and do not switch to a paid provider",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "Gemini errors distinguish depleted credits, model access, and temporary quotas",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "provider configuration supports Gemini and explicitly selected Whisper",
+      "status": "PASS"
+    },
+    {
+      "group": "Backend / PGlite / provider mock",
+      "title": "invalid audio and chunk duration are rejected without contacting Gemini",
+      "status": "PASS"
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "processing notes leave transcript and questions accessible",
+      "file": "app.spec.ts:3",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "course cards keep their size with one, two or four courses",
+      "file": "app.spec.ts:23",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "course shows schedule, overall summary, nearest agenda and past class sources",
+      "file": "app.spec.ts:59",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "completed classes retain transcript history and allow private review and lecturer answers",
+      "file": "app.spec.ts:130",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "sidebar wheel stays separate and compact role options leave the name visible",
+      "file": "app.spec.ts:169",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "sidebar expands on hover and folds on leave without shifting the page",
+      "file": "app.spec.ts:232",
+      "status": "FAIL",
+      "error": "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: 216\nReceived: 76\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate"
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "capture previews and discards without saving, then saves only after confirmation",
+      "file": "app.spec.ts:277",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "compact questions support anonymous posting, voting and reload on mobile",
+      "file": "app.spec.ts:328",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "unconfirmed class agenda stays off the calendar after class ends",
+      "file": "app.spec.ts:381",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "agenda supports date selection, quick creation, edit, completion, export and delete",
+      "file": "app.spec.ts:409",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "lecturer marks spoken answers, updates map, ends class, archives, restores and creates a session",
+      "file": "app.spec.ts:451",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "main views work without browser errors or horizontal overflow",
+      "file": "app.spec.ts:513",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "home shows its course and reminder bento without desktop scrolling",
+      "file": "app.spec.ts:550",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "home notification modal tracks handled items without adding a sidebar item",
+      "file": "app.spec.ts:589",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "live heading clock and page padding stay consistent across main views",
+      "file": "app.spec.ts:640",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "photo upload validates timestamp and persists in the saved collection",
+      "file": "app.spec.ts:741",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "personal item in a course opens beside its source lesson",
+      "file": "app.spec.ts:764",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "a private bookmark remains available when its lesson is archived",
+      "file": "app.spec.ts:774",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "profile is reachable from the sidebar and demo reset remains available",
+      "file": "app.spec.ts:789",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "login and registration remain readable on phone, tablet and desktop",
+      "file": "app.spec.ts:808",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "graph stays static while topic details work on desktop and phone",
+      "file": "app.spec.ts:828",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "save current desktop and mobile design previews",
+      "file": "app.spec.ts:891",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "focus mode uses native fullscreen and restores the classroom at 1440px",
+      "file": "focus-mode.spec.ts:4",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Demo E2E (suite existing)",
+      "title": "focus mode uses native fullscreen and restores the classroom at 390px",
+      "file": "focus-mode.spec.ts:4",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Live E2E (Supabase fixture)",
+      "title": "live email login uses Supabase and rejects invalid credentials without opening the dashboard",
+      "file": "live.spec.ts:18",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Live E2E (Supabase fixture)",
+      "title": "live capture discard makes no save request; confirmation uses the real signed-token save route",
+      "file": "live.spec.ts:32",
+      "status": "FAIL",
+      "error": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('button', { name: 'Tersimpan (1)' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByRole('button', { name: 'Tersimpan (1)' }) with timeout 5000ms\n  - waiting for getByRole('button', { name: 'Tersimpan (1)' })\n"
+    },
+    {
+      "group": "Live E2E (Supabase fixture)",
+      "title": "live question and private note persist while calendar integrations are retired",
+      "file": "live.spec.ts:82",
+      "status": "FAIL",
+      "error": "Test timeout of 45000ms exceeded."
+    },
+    {
+      "group": "Live E2E (Supabase fixture)",
+      "title": "profile opens from sidebar and logs out at 1440px as student",
+      "file": "live.spec.ts:111",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Live E2E (Supabase fixture)",
+      "title": "profile opens from sidebar and logs out at 390px as student",
+      "file": "live.spec.ts:111",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Live E2E (Supabase fixture)",
+      "title": "profile opens from sidebar and logs out at 390px as lecturer",
+      "file": "live.spec.ts:111",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Live E2E (Supabase fixture)",
+      "title": "retired calendar endpoints do not exchange tokens and the worker runs only study jobs",
+      "file": "live.spec.ts:150",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Live E2E (Supabase fixture)",
+      "title": "live lecturer creates the first course and session; student requests cannot run the worker",
+      "file": "live.spec.ts:172",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Live E2E (Supabase fixture)",
+      "title": "course code is generated and students join only from Course at 1440px",
+      "file": "live.spec.ts:219",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Live E2E (Supabase fixture)",
+      "title": "course code is generated and students join only from Course at 390px",
+      "file": "live.spec.ts:219",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Live E2E (Supabase fixture)",
+      "title": "generated class graph links to its transcript and agenda confirmation survives reload",
+      "file": "live.spec.ts:249",
+      "status": "FAIL",
+      "error": "Error: expect(locator).toBeVisible() failed\n\nLocator: locator('.agenda-draft:visible').filter({ hasText: 'Latihan matriks' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" locator('.agenda-draft:visible').filter({ hasText: 'Latihan matriks' }) with timeout 5000ms\n  - waiting for locator('.agenda-draft:visible').filter({ hasText: 'Latihan matriks' })\n"
+    },
+    {
+      "group": "Live E2E (Supabase fixture)",
+      "title": "Deepgram auto-records and ending waits for final transcript and failed-save retry",
+      "file": "live.spec.ts:301",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Live E2E (Supabase fixture)",
+      "title": "lecturer recording stays compact and fractional transcript timestamps do not overlap at 1440px",
+      "file": "live.spec.ts:382",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Live E2E (Supabase fixture)",
+      "title": "lecturer recording stays compact and fractional transcript timestamps do not overlap at 390px",
+      "file": "live.spec.ts:382",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Audit tambahan demo/UI",
+      "title": "QA inventory and profile course grid: student 390px",
+      "file": "qa-audit.spec.ts:8",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Audit tambahan demo/UI",
+      "title": "QA inventory and profile course grid: student 1440px",
+      "file": "qa-audit.spec.ts:8",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Audit tambahan demo/UI",
+      "title": "QA inventory and profile course grid: lecturer 390px",
+      "file": "qa-audit.spec.ts:8",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Audit tambahan demo/UI",
+      "title": "QA inventory and profile course grid: lecturer 1440px",
+      "file": "qa-audit.spec.ts:8",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Audit tambahan demo/UI",
+      "title": "QA question grows for wrapped text, shrinks on clear and has no anonymous timestamp metadata",
+      "file": "qa-audit.spec.ts:92",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Audit tambahan demo/UI",
+      "title": "QA auth required fields, email format and password visibility",
+      "file": "qa-audit.spec.ts:113",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Audit tambahan demo/UI",
+      "title": "QA invalid session and corrupt demo storage recover without a page crash",
+      "file": "qa-audit.spec.ts:131",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Audit tambahan demo/UI",
+      "title": "QA global search filters classes, handles no results, navigates and closes with Escape",
+      "file": "qa-audit.spec.ts:141",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Audit tambahan demo/UI",
+      "title": "QA diagnose retained route clocks and keyboard sidebar focus",
+      "file": "qa-audit.spec.ts:162",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Audit tambahan live",
+      "title": "QA live capture persists through the current Notes UI and retains preview on a save error",
+      "file": "qa-live-audit.spec.ts:14",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Audit tambahan live",
+      "title": "QA generated agenda draft remains reachable for the student to complete",
+      "file": "qa-live-audit.spec.ts:56",
+      "status": "FAIL",
+      "error": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByText('Latihan matriks', { exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByText('Latihan matriks', { exact: true }) with timeout 5000ms\n  - waiting for getByText('Latihan matriks', { exact: true })\n"
+    },
+    {
+      "group": "Audit tambahan live",
+      "title": "QA private note saves and survives reload with fresh content",
+      "file": "qa-live-audit.spec.ts:66",
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "group": "Gemini asli / data sintetis",
+      "title": "mixed_material_quiz_offtopic",
+      "status": "PASS",
+      "expected": "notes include matrices, exclude holiday; quiz 2026-10-20"
+    },
+    {
+      "group": "Gemini asli / data sintetis",
+      "title": "offtopic_only",
+      "status": "PASS",
+      "expected": "notes and graph and agenda empty"
+    },
+    {
+      "group": "Gemini asli / data sintetis",
+      "title": "unclear_date",
+      "status": "PASS",
+      "expected": "no dated agenda"
+    },
+    {
+      "group": "Gemini asli / data sintetis",
+      "title": "revised_schedule",
+      "status": "PASS",
+      "expected": "one quiz on 2026-10-21 at 09:00 Jakarta"
+    },
+    {
+      "group": "Gemini asli / data sintetis",
+      "title": "historical_hypothetical",
+      "status": "PASS",
+      "expected": "no agenda"
+    }
+  ]
+}

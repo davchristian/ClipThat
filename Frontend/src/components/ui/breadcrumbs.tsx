@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ChevronRight, House } from "lucide-react";
+import { PageClock } from "./page-clock";
 
 export function Breadcrumbs({ items }: { items: { label: string; href?: string }[] }) {
   return (
@@ -32,6 +33,7 @@ export function Breadcrumbs({ items }: { items: { label: string; href?: string }
           </li>
         ))}
       </ol>
+      <PageClock />
     </nav>
   );
 }

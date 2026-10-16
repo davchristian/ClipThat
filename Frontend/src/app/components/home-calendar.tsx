@@ -10,7 +10,7 @@ export type HomeCalendarEvent = {
   id: string;
   date: string;
   title: string;
-  kind: "Kuis" | "Tugas" | "Belajar" | "Kelas";
+  kind: "Kuis" | "Tugas" | "Presentasi" | "Ujian" | "Belajar" | "Kelas";
   courseName: string;
   href: string;
 };
@@ -25,7 +25,11 @@ function isoDay(date: Date) {
 }
 
 function kindClass(kind: HomeCalendarEvent["kind"]) {
-  return kind === "Kuis" ? "quiz" : kind === "Tugas" ? "assignment" : "study";
+  return kind === "Kuis" || kind === "Ujian"
+    ? "quiz"
+    : kind === "Tugas" || kind === "Presentasi"
+      ? "assignment"
+      : "study";
 }
 
 export function HomeCalendar({

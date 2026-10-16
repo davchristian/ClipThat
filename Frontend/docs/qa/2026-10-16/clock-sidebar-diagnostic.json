@@ -1,0 +1,20 @@
+{
+  "clocks": [
+    {
+      "width": 1440,
+      "total": 1,
+      "visible": 1
+    },
+    {
+      "width": 390,
+      "total": 2,
+      "visible": 1
+    }
+  ],
+  "focused": {
+    "tag": "A",
+    "outer": "<a class=\"sidebar-profile-avatar\" aria-label=\"Buka profil Nadia Putri\" href=\"/profile\"><span class=\"avatar\">NP</span></a>",
+    "sidebar": true
+  },
+  "sidebarWidth": 216
+}

@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Check, MessageCircle, Send, ThumbsUp, UserRound } from "lucide-react";
+import { Check, MessageCircle, Send, ThumbsUp } from "lucide-react";
 import { useApp } from "@/state/app-provider";
 import { Modal } from "@/components/ui";
+import { AutoTextarea } from "@/components/ui/auto-textarea";
 import { seconds } from "@/lib/format";
 import type { Question } from "@/lib/types";
 export function QuestionsPanel({ sessionId, draft = "" }: { sessionId: string; draft?: string }) {
@@ -51,7 +52,7 @@ export function QuestionsPanel({ sessionId, draft = "" }: { sessionId: string; d
             }
           }}
         >
-          <textarea
+          <AutoTextarea
             aria-label="Pertanyaan anonim"
             placeholder="Tanya tanpa nama…"
             value={question}
@@ -62,9 +63,6 @@ export function QuestionsPanel({ sessionId, draft = "" }: { sessionId: string; d
             required
           />
           <div className="ask-form-footer">
-            <span>
-              <UserRound size={14} /> Anonim
-            </span>
             <button
               className="button primary small"
               disabled={pending || question.trim().length < 3}
@@ -103,9 +101,9 @@ export function QuestionsPanel({ sessionId, draft = "" }: { sessionId: string; d
               </button>
               <div className="question-body">
                 <p>{q.text}</p>
-                <small>
-                  {q.oral ? "Dijawab di kelas" : q.answer ? "Dijawab dosen" : "Anonim"} · {q.time}
-                </small>
+                {(q.oral || q.answer) && (
+                  <small>{q.oral ? "Dijawab di kelas" : "Dijawab dosen"}</small>
+                )}
                 {q.answer && (
                   <div className="answer">
                     <strong>Jawaban dosen</strong>
@@ -178,7 +176,7 @@ export function QuestionsPanel({ sessionId, draft = "" }: { sessionId: string; d
           <p>{answering?.text}</p>
           <label>
             Jawaban dosen
-            <textarea
+            <AutoTextarea
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
               maxLength={5000}

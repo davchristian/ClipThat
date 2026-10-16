@@ -8,7 +8,6 @@ import { personalRoute } from "./routes/personal";
 import { questionRoute } from "./routes/questions";
 import { filesRoute } from "./routes/files";
 import { z } from "zod";
-import { integrationsRoute } from "./routes/integrations";
 import { transcriptionConfigured, transcriptionProvider } from "./transcription";
 import { supabaseConfigError } from "../lib/supabase-config";
 
@@ -43,7 +42,7 @@ export async function dispatch(request: Request, path: string[]) {
         db.rpc("list_my_questions"),
       ]);
       return json({
-        profile: checked(profile),
+        profile: { ...checked(profile), ...(user.email ? { email: user.email } : {}) },
         courses: checked(courses),
         sessions: checked(sessions),
         saved: checked(saved),
@@ -61,7 +60,34 @@ export async function dispatch(request: Request, path: string[]) {
       checked(await db.rpc("handle_notifications", { identifiers: input.ids }));
       return json({ saved: true });
     }
-    if (path[0] === "integrations") return await integrationsRoute(request, path, db, user.id);
+    if (path[0] === "integrations")
+      throw new ApiError(
+        410,
+        "manual_calendar_export",
+        "Unduh kalender (.ics) dari halaman Agenda lalu impor ke kalender pilihanmu.",
+      );
+    if (
+      path[0] === "courses" &&
+      path[1] === "join" &&
+      path.length === 2 &&
+      request.method === "POST"
+    ) {
+      const input = await body(
+        request,
+        z
+          .object({
+            code: z
+              .string()
+              .trim()
+              .toUpperCase()
+              .regex(/^[A-Z0-9]{10}$/),
+          })
+          .strict(),
+      );
+      if (!checked(await db.rpc("consume_limit", { action: "join" })))
+        throw new ApiError(429, "rate_limited", "Terlalu banyak permintaan. Tunggu satu menit.");
+      return json({ id: checked(await db.rpc("join_course", { code: input.code })) });
+    }
     if (path[0] === "courses" && path.length === 1) {
       if (request.method === "GET")
         return json(checked(await db.from("courses").select("*").order("created_at").limit(500)));

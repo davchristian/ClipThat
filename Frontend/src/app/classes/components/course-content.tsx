@@ -3,6 +3,7 @@ import { liveMode } from "@/lib/app-mode";
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Archive, ArrowRight, Bookmark, Clock3, RotateCcw, UserRound } from "lucide-react";
 import { demoNow } from "@/data";
 import { useContent } from "@/data/use-content";
@@ -12,11 +13,16 @@ import { Breadcrumbs, CourseIcon, Empty, Modal, PageHeading, SectionTitle } from
 import { SavedDetail } from "@/components/saved-detail";
 import { CourseSessionCard } from "./course-session-card";
 import { CourseOverview } from "./course-overview";
+import { SessionEntry } from "./session-entry";
+import { CourseEntry } from "./course-entry";
+import { CourseCode } from "./course-code";
+import { CourseJoin } from "./course-join";
 
 export function CoursesView({ courseId }: { courseId?: string }) {
   const { courses } = useContent();
   const { data, update, notify, pending } = useApp();
   const lecturer = data.role === "lecturer";
+  const router = useRouter();
   const [archive, setArchive] = useState<Lesson | null>(null);
   const [showArchive, setShowArchive] = useState(false);
   const [selectedSaved, setSelectedSaved] = useState<string | null>(null);
@@ -74,6 +80,20 @@ export function CoursesView({ courseId }: { courseId?: string }) {
       />
       <PageHeading
         title={course?.name || "Course"}
+        action={
+          lecturer ? (
+            course ? (
+              <div className="course-heading-actions">
+                <CourseCode code={course.joinCode} />
+                <SessionEntry key={course.id} courseId={course.id} />
+              </div>
+            ) : (
+              <CourseEntry />
+            )
+          ) : !course ? (
+            <CourseJoin />
+          ) : undefined
+        }
       />
       {!course && (
         <div className="course-grid">
@@ -125,6 +145,19 @@ export function CoursesView({ courseId }: { courseId?: string }) {
                       data.questions.filter((item) => item.sessionId === lesson.id).length
                     }
                     lecturer={lecturer}
+                    pending={pending}
+                    onStart={async () => {
+                      const ok = await update((d) => ({
+                        ...d,
+                        lessons: d.lessons.map((l) =>
+                          l.id === lesson.id ? { ...l, status: "live" } : l,
+                        ),
+                      }));
+                      if (ok) {
+                        notify("Kelas dimulai.");
+                        router.push(`/session/${lesson.id}?tab=transcript&record=1`);
+                      }
+                    }}
                     onArchive={() => setArchive(lesson)}
                     key={lesson.id}
                   />

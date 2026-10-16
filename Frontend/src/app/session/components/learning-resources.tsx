@@ -154,7 +154,6 @@ export function MaterialsPanel({
               <FileText size={22} />
               <span>
                 <strong>{m.name}</strong>
-                <small>Materi dosen</small>
               </span>
               {liveMode ? (
                 <button

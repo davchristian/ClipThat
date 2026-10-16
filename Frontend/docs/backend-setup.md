@@ -19,7 +19,9 @@ Buka http://localhost:3000. Default adalah demo. Login/register pada demo hanya 
 2. Buka SQL Editor. Jalankan migration berikut **sesuai urutan**, satu kali per migration:
    - `ClipThat/supabase/migrations/202610100001_initial.sql`
    - `ClipThat/supabase/migrations/202610140001_frontend_integration.sql`
-3. Jika proyek sudah menjalankan migration pertama, cukup jalankan migration kedua. Migration kedua menambah kolom dan fitur tanpa mereset data. Alternatif dari root `ClipThat`: `supabase link`, lalu `supabase db push`.
+   - `ClipThat/supabase/migrations/202610160002_course_join_codes.sql`
+   - `ClipThat/supabase/migrations/202610160003_automatic_class_agenda.sql`
+3. Jalankan hanya migration yang belum diterapkan. Migration ketiga menambahkan kode gabung otomatis untuk course baru dan course yang sudah ada, serta fungsi gabung course. Migration keempat menyimpan pengumuman kuis, presentasi, deadline tugas, dan ujian bertanggal jelas ke agenda mahasiswa anggota course secara otomatis ketika hasil kelas selesai diproses. Tanggal relatif memakai tanggal kelas dan zona Asia/Jakarta; tanggal ambigu tetap menjadi draf. Jika jam tidak disebut, tanggal disimpan dengan jam 00:00. Catatan hanya merangkum materi; obrolan di luar materi tetap tersedia dalam transkrip. Alternatif dari root `ClipThat`: `supabase link`, lalu `supabase db push`.
 4. Buka **Connect** untuk Project URL dan publishable key (`sb_publishable_...`). Buka **Settings > API Keys** untuk secret key server (`sb_secret_...`). Secret key server menggunakan `SUPABASE_SECRET_KEY`; nama lama `SUPABASE_SERVICE_ROLE_KEY` masih didukung sebagai fallback.
 5. Di **Authentication > URL Configuration**, isi Site URL `http://localhost:3000` dan allowlist redirect `http://localhost:3000/auth/callback`.
 6. Biarkan konfirmasi email aktif. Buat akun melalui aplikasi setelah migration selesai agar profil dan hak akses terbentuk.
@@ -65,16 +67,13 @@ GEMINI_TRANSCRIPTION_MODEL=gemini-3.5-transcribe
 TRANSCRIPTION_PROVIDER=gemini
 CAPTURE_SIGNING_SECRET=SECRET_ACAK_PERTAMA
 JOB_RUNNER_SECRET=SECRET_ACAK_KEDUA
-INTEGRATION_ENCRYPTION_KEY=SECRET_HEX_ACAK_KETIGA
 ```
 
-Buat tiga secret **berbeda**, dengan menjalankan perintah berikut tiga kali:
+Buat dua secret **berbeda**, dengan menjalankan perintah berikut dua kali:
 
 ```powershell
 node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('hex'))"
 ```
-
-`INTEGRATION_ENCRYPTION_KEY` harus 64 karakter hex. Simpan key ini agar token kalender yang sudah terenkripsi tetap bisa dibaca. Jika menggantinya, pengguna perlu menghubungkan ulang kalender.
 
 Restart server setelah mengubah environment. Buka **APP_URL persis**; jangan mencampur `localhost` dan `127.0.0.1`, karena origin diperiksa pada permintaan yang mengubah data. Untuk produksi gunakan satu domain HTTPS dan tambahkan domain tersebut ke allowlist Supabase serta redirect OAuth.
 
@@ -108,49 +107,14 @@ Jika Gemini menolak request:
 
 Status konfigurasi `/api/v1/health` tidak memeriksa saldo atau kuota. Perubahan API key/model membutuhkan restart server. [Billing Gemini](https://ai.google.dev/gemini-api/docs/billing), [harga dan Free tier](https://ai.google.dev/gemini-api/docs/pricing).
 
-## 5. Kalender: ClipThat ke layanan tujuan
+## 5. Kalender: unduh .ics
 
-Sinkronisasi saat ini **satu arah**. Hanya agenda yang sudah dikonfirmasi mahasiswa yang dikirim. Mengubah/menghapus agenda di ClipThat memperbarui/menghapus salinan agenda milik ClipThat di tujuan; perubahan langsung di layanan tujuan belum ditarik kembali. Aplikasi tidak mengundang peserta atau mengirim email.
-
-Token disimpan terenkripsi di schema private. Callback mengikat nonce, pengguna, provider, dan kedaluwarsa; Outlook/Google memakai PKCE. Status pada UI tidak pernah mengirim token. Antrean Postgres menyimpan pekerjaan, menangani retry, dan mempertahankan perubahan yang datang saat sinkronisasi sedang berlangsung.
-
-### Microsoft Outlook
-
-1. Di Microsoft Entra, buat app registration. Pilih akun organisasi dan akun Microsoft pribadi jika keduanya dibutuhkan. Registrasi memerlukan tenant dan izin yang sesuai.
-2. Tambahkan platform **Web** dengan callback `http://localhost:3000/api/integrations/outlook/callback`.
-3. Tambahkan delegated permissions `Calendars.ReadWrite`, `openid`, `profile`, dan `offline_access`.
-4. Buat client secret untuk development; salin **Value**, bukan Secret ID. Catat tanggal kedaluwarsa.
-5. Isi environment:
-
-```dotenv
-MICROSOFT_CLIENT_ID=APPLICATION_CLIENT_ID
-MICROSOFT_CLIENT_SECRET=SECRET_VALUE
-MICROSOFT_TENANT_ID=common
-```
-
-6. Restart aplikasi. Mahasiswa membuka **Pengaturan > Microsoft Outlook > Hubungkan**, login, menyetujui izin, lalu **Pilih tujuan**. Kalender yang ditawarkan dibatasi pada kalender yang bisa ditulis akun itu. Akun kampus bisa memerlukan persetujuan admin.
-
-Panduan: [registrasi](https://learn.microsoft.com/en-us/graph/auth-register-app-v2), [OAuth](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow).
-
-### Google Calendar
-
-1. Aktifkan Google Calendar API pada proyek Google Cloud.
-2. Buat OAuth web client dengan callback `http://localhost:3000/api/integrations/google/callback`. Client yang sama dengan Google Sign-In bisa digunakan jika kedua callback didaftarkan, tetapi izin kalender diminta melalui alur koneksi terpisah.
-3. Isi `GOOGLE_CALENDAR_CLIENT_ID` dan `GOOGLE_CALENDAR_CLIENT_SECRET`.
-4. Siapkan Audience/test users dan verifikasi OAuth sesuai kebutuhan akun Google. Lalu hubungkan dari Pengaturan dan pilih kalender yang dapat ditulis.
-
-Panduan: [OAuth web server](https://developers.google.com/identity/protocols/oauth2/web-server).
-
-### Notion
-
-1. Buat public OAuth integration Notion dengan read/insert/update content, lalu daftarkan callback `http://localhost:3000/api/integrations/notion/callback`.
-2. Isi `NOTION_CLIENT_ID` dan `NOTION_CLIENT_SECRET`.
-3. Siapkan database/data source dengan properti persis: **Name** (title), **Date** (date), **ClipThatID** (rich text). ClipThatID dipakai untuk menemukan salinan yang sama saat request diulang.
-4. Hubungkan melalui Pengaturan, pilih halaman/database yang boleh diakses saat persetujuan Notion, lalu pilih tujuan di ClipThat.
-
-Adapter menggunakan Notion API version `2025-09-03` dan data sources. Tujuan yang struktur kolomnya tidak cocok ditolak sebelum sinkronisasi.
-
-Panduan: [Notion authorization](https://developers.notion.com/guides/get-started/authorization).
+Di halaman Agenda, klik **Unduh kalender (.ics)**. File hanya berisi agenda yang sudah dikonfirmasi dan belum selesai.
+Impor file tersebut menggunakan fitur impor kalender di Outlook atau Google Calendar. Tidak ada koneksi akun atau sinkronisasi otomatis.
+Jika agenda berubah, unduh ulang dan kelola pembaruan di aplikasi kalender tujuan.
+API key kalender, registrasi aplikasi Microsoft, dan OAuth Google Calendar tidak diperlukan.
+Google Sign-In untuk login ClipThat tetap opsional dan terpisah dari ekspor kalender.
+Halaman akun sekarang **Profil**, dibuka dengan menekan nama/avatar di sidebar. **Keluar** tersedia di halaman tersebut.
 
 ## 6. Jalankan pemrosesan dan uji akun asli
 
@@ -166,6 +130,11 @@ Terminal kedua, saat ada pekerjaan siap diproses:
 npm.cmd run jobs:run
 ```
 
+Untuk pengembangan lokal, jalankan `npm.cmd run jobs:watch` pada terminal kedua
+dan biarkan tetap terbuka. Runner akan mengecek setiap 5 detik ketika antrean
+kosong, termasuk menunggu waktu retry. `Ctrl+C` menghentikan pemantauan.
+`npm.cmd run dev` sendiri hanya menjalankan aplikasi, bukan job runner.
+
 Runner memproses pekerjaan yang siap saat perintah dijalankan, lalu keluar. Pesan
 "Tidak ada pekerjaan yang siap diproses saat ini" juga bisa berarti job menunggu
 jadwal retry (2, 4, 8, lalu 16 menit setelah kegagalan). Jalankan ulang setelah
@@ -173,13 +142,13 @@ waktu tersebut. Jika muncul `retry_scheduled` atau `failed`, alasan aman dari
 server sekarang dicetak bersama kode error; API key dan isi transkrip tidak dicetak.
 Setelah lima kegagalan, dosen dapat memilih **Coba proses lagi** pada pertemuan.
 
-1. Register dosen, konfirmasi email, login, buat mata kuliah dan sesi. Mulai kelas dan bagikan kodenya.
+1. Register dosen, konfirmasi email, login, buat course, lalu bagikan kode course. Buka detail course dan pilih Mulai kelas.
 2. Dengan browser/profil lain, register mahasiswa dan gabung melalui kode.
 3. Buat transkrip. Coba bookmark, preview capture, buang, lalu preview baru dan simpan. Buang/reload preview tidak menyimpan data; konfirmasi simpan memakai token bertanda tangan dengan masa berlaku 15 menit.
 4. Ajukan pertanyaan anonim dan dukung sekali. Dosen bisa menjawab lisan atau tertulis, termasuk setelah kelas.
-5. Hentikan rekaman dan tunggu upload selesai sebelum mengakhiri kelas. Jalankan job runner untuk catatan/graph/review. Dosen tetap dapat mengoreksi graph setelah kelas; koreksi tidak ditimpa oleh retry.
+5. Klik Akhiri kelas; aplikasi menghentikan rekaman dan menunggu upload selesai. Jalankan job runner untuk catatan/graph/review. Dosen tetap dapat mengoreksi graph setelah kelas; koreksi tidak ditimpa oleh retry.
 6. Buka Agenda mahasiswa. Usulan kelas tetap draf sampai ditinjau, tanggal dipastikan, dan dikonfirmasi. Pastikan draf tidak muncul di kalender luar.
-7. Hubungkan kalender, pilih tujuan, jalankan job runner. Ubah agenda dan ulangi runner. Uji hapus agenda serta retry. Memutus koneksi menghentikan sinkronisasi; event yang sudah ada di tujuan dipertahankan.
+7. Unduh .ics dari Agenda dan impor sendiri ke kalender tujuan. Hanya agenda terkonfirmasi yang diekspor; impor bukan sinkronisasi otomatis.
 8. Pastikan dosen tidak bisa melihat catatan pribadi mahasiswa dan akun kedua tidak bisa membaca simpanan akun pertama.
 
 ## 7. Cloudflare
@@ -189,7 +158,7 @@ Aplikasi memakai Next.js Node runtime dan OpenNext. Route API tidak memakai edge
 1. Ganti placeholder domain dan konfigurasi publik pada `wrangler.jsonc` / `wrangler.jobs.jsonc`.
 2. Isi mode live dan environment publik proyek produksi pada environment build. Supabase public keys serta mode dibaca saat build.
 3. Login dengan `npx.cmd wrangler login`.
-4. Gunakan `npx.cmd wrangler secret put NAMA_VARIABEL` untuk setiap secret: `SUPABASE_SECRET_KEY`, `GEMINI_API_KEY`, `CAPTURE_SIGNING_SECRET`, `JOB_RUNNER_SECRET`, `INTEGRATION_ENCRYPTION_KEY`, serta client ID/secret provider kalender yang diaktifkan dan key transkripsi opsional. Jangan menaruh secret pada `vars` atau Git.
+4. Gunakan `npx.cmd wrangler secret put NAMA_VARIABEL` untuk setiap secret: `SUPABASE_SECRET_KEY`, `GEMINI_API_KEY`, `CAPTURE_SIGNING_SECRET`, `JOB_RUNNER_SECRET`, dan key transkripsi yang dipakai. Tidak perlu secret provider kalender. Jangan menaruh secret pada `vars` atau Git.
 5. Jalankan `npm.cmd run cf:preview` sebelum `npm.cmd run cf:deploy`.
 6. Pasang `JOB_RUNNER_SECRET` yang sama pada scheduler dengan `npx.cmd wrangler secret put JOB_RUNNER_SECRET --config wrangler.jobs.jsonc`, lalu `npm.cmd run cf:deploy:jobs`.
 7. Daftarkan callback HTTPS produksi pada Supabase/Google/Microsoft/Notion dan uji dua akun nyata.

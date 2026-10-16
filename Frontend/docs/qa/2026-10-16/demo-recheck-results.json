@@ -1,0 +1,232 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--config",
+      "playwright.audit.config.ts",
+      "tests/app.spec.ts",
+      "-g",
+      "sidebar expands on hover|live heading clock",
+      "--reporter=list,json"
+    ],
+    "configFile": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\playwright.audit.config.ts",
+    "rootDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/test-results/audit",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "app.spec.ts",
+          "focus-mode.spec.ts",
+          "qa-audit.spec.ts"
+        ],
+        "timeout": 25000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev -- --port 3197",
+      "url": "http://127.0.0.1:3197",
+      "reuseExistingServer": true,
+      "timeout": 90000,
+      "env": {
+        "NEXT_PUBLIC_APP_MODE": "demo",
+        "CLIPTHAT_DIST_DIR": ".next-qa-demo",
+        "GEMINI_API_KEY": "",
+        "OPENAI_API_KEY": "",
+        "DEEPGRAM_API_KEY": ""
+      }
+    }
+  },
+  "suites": [
+    {
+      "title": "app.spec.ts",
+      "file": "app.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "sidebar expands on hover and folds on leave without shifting the page",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 8031,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m216\u001b[39m\nReceived: \u001b[31m76\u001b[39m\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m216\u001b[39m\nReceived: \u001b[31m76\u001b[39m\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\app.spec.ts:263:71",
+                    "location": {
+                      "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\app.spec.ts",
+                      "column": 71,
+                      "line": 263
+                    },
+                    "snippet": "  261 |   await page.locator(\"#main-content\").focus();\n  262 |   await page.keyboard.press(\"Shift+Tab\");\n> 263 |   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(216);\n      |                                                                       ^\n  264 |   expect(await logo.boundingBox()).toEqual(logoPosition);\n  265 |   await page.locator(\"#main-content\").focus();\n  266 |   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(76);"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\app.spec.ts",
+                        "column": 71,
+                        "line": 263
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m216\u001b[39m\nReceived: \u001b[31m76\u001b[39m\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate\n\n  261 |   await page.locator(\"#main-content\").focus();\n  262 |   await page.keyboard.press(\"Shift+Tab\");\n> 263 |   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(216);\n      |                                                                       ^\n  264 |   expect(await logo.boundingBox()).toEqual(logoPosition);\n  265 |   await page.locator(\"#main-content\").focus();\n  266 |   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(76);\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\app.spec.ts:263:71"
+                    },
+                    {
+                      "message": "Error: apiRequestContext._wrapApiCall: ENOENT: no such file or directory, copyfile 'C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\.playwright-artifacts-0\\traces\\c31ff144dc4fee3acd0a-615a5c073bbe85e5d8fc-recording1.network' -> 'C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\.playwright-artifacts-0\\traces\\c31ff144dc4fee3acd0a-615a5c073bbe85e5d8fc-recording1-pwnetcopy-1.network'"
+                    },
+                    {
+                      "message": "Error: browserContext._wrapApiCall: ENOENT: no such file or directory, open 'C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\.playwright-artifacts-0\\traces\\c31ff144dc4fee3acd0a-615a5c073bbe85e5d8fc.trace'"
+                    },
+                    {
+                      "message": "Error: ENOENT: no such file or directory, open 'C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\.playwright-artifacts-0\\aedec643e23942ecb97cacff70d031fe.zip'"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:49:54.174Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\app-sidebar-expands-on-hov-bb04a-e-without-shifting-the-page\\test-failed-1.png"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\app.spec.ts",
+                    "column": 71,
+                    "line": 263
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-615a5c073bbe85e5d8fc",
+          "file": "app.spec.ts",
+          "line": 232,
+          "column": 5
+        },
+        {
+          "title": "live heading clock and page padding stay consistent across main views",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 8565,
+                  "error": {
+                    "message": "Error: browserContext.close: ENOENT: no such file or directory, open 'C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\.playwright-artifacts-1\\traces\\c31ff144dc4fee3acd0a-86a02354d2123ab0b8a5.trace'",
+                    "stack": "Error: browserContext.close: ENOENT: no such file or directory, open 'C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\.playwright-artifacts-1\\traces\\c31ff144dc4fee3acd0a-86a02354d2123ab0b8a5.trace'"
+                  },
+                  "errors": [
+                    {
+                      "message": "Error: browserContext.close: ENOENT: no such file or directory, open 'C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\.playwright-artifacts-1\\traces\\c31ff144dc4fee3acd0a-86a02354d2123ab0b8a5.trace'"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:50:03.511Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\app-live-heading-clock-and-867ad-onsistent-across-main-views\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\app-live-heading-clock-and-867ad-onsistent-across-main-views\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\app-live-heading-clock-and-867ad-onsistent-across-main-views\\trace.zip"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-86a02354d2123ab0b8a5",
+          "file": "app.spec.ts",
+          "line": 640,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-16T12:49:52.916Z",
+    "duration": 20089.727,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

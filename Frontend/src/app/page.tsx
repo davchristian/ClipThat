@@ -54,9 +54,7 @@ export default function Home() {
               : "Selamat datang, Davin!"
         }
       />
-      <p className="page-intro">
-        {lecturer ? "Siap lanjut mengajar hari ini?" : "Mau lanjut belajar apa hari ini?"}
-      </p>
+      {!lecturer && <p className="page-intro">Mau lanjut belajar apa hari ini?</p>}
       <NotificationStrip
         notifications={notifications}
         handledIds={data.handledNotifications || []}
@@ -64,15 +62,7 @@ export default function Home() {
 
       <div className="home-columns">
         <section>
-          <SectionTitle
-            action={
-              <Link className="text-button" href="/classes">
-                Semua course <ArrowRight size={14} />
-              </Link>
-            }
-          >
-            Course
-          </SectionTitle>
+          <SectionTitle>Course</SectionTitle>
           <div className="home-course-list">
             {visibleCourses.map((course) => (
               <CourseCard

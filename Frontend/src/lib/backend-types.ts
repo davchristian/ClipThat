@@ -1,9 +1,10 @@
-export type Profile = { id: string; name: string; role: "student" | "lecturer" };
+export type Profile = { id: string; name: string; role: "student" | "lecturer"; email?: string };
 export type BackendCourse = {
   id: string;
   name: string;
   code: string;
   owner_id: string;
+  join_code?: string;
   teacher_name?: string;
   days?: string;
   schedule_time?: string;
@@ -54,12 +55,20 @@ export type BackendSaved = {
 export type BackendAgenda = {
   course_id?: string | null;
   reminder?: boolean;
-  source?: { source_id: string; quote: string; draft_key?: string } | null;
+  source?: {
+    source_id: string;
+    quote: string;
+    draft_key?: string;
+    automatic?: boolean;
+    announcement_title?: string;
+    announcement_kind?: string;
+    announcement_due_at?: string;
+  } | null;
 
   id: string;
   title: string;
   due_at: string;
-  kind: "Tugas" | "Kuis" | "Belajar";
+  kind: "Tugas" | "Kuis" | "Presentasi" | "Ujian" | "Belajar";
   confirmed: boolean;
   done: boolean;
   session_id: string | null;
@@ -71,6 +80,7 @@ export type BackendGraph = {
     description: string;
     topics?: string[];
     source_ids: string[];
+    sections?: { title: string; source_ids: string[] }[];
   }[];
   edges: { from: string; to: string; relation: string }[];
 };

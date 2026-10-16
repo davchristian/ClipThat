@@ -4,6 +4,7 @@ import { Bookmark, Camera, CircleHelp, MessageCircle, ScanLine, LoaderCircle } f
 import { seconds } from "@/lib/format";
 import type { SavedItem, Segment } from "@/lib/types";
 import type { SpeechDraft } from "@/features/live/deepgram-results";
+import { transcriptRows } from "@/features/live/transcript-rows";
 
 export function TranscriptPanel({
   segments,
@@ -35,6 +36,7 @@ export function TranscriptPanel({
   speechDraft?: SpeechDraft;
 }) {
   const photos = saved.filter((item) => item.type === "photo");
+  const rows = transcriptRows(segments, lecturer ? speechDraft : null);
   const photoSegment = (time: number) =>
     segments.reduce(
       (nearest, segment) =>
@@ -50,29 +52,35 @@ export function TranscriptPanel({
         {!segments.length && !speechDraft && (
           <p className="empty-transcript">Transkrip akan muncul saat dosen mulai merekam.</p>
         )}
-        {segments.map((segment) => {
-          const marked = saved.some((s) => s.type === "bookmark" && s.time === segment.time);
+        {rows.map((segment) => {
+          const source = segments.find((item) => item.id === segment.id) ?? segment;
+          const marked = saved.some(
+            (s) => s.type === "bookmark" && Math.floor(s.time / 15) * 15 === segment.time,
+          );
           return (
             <article
-              key={segment.id}
-              id={`segment-${segment.id}`}
+              key={segment.time}
+              aria-label={segment.pending ? "Transkrip langsung" : undefined}
               className={`transcript-segment ${!lecturer && marked ? "marked" : ""} ${previewRange && segment.time < previewRange.end && (segment.end ?? segment.time + 45) > previewRange.start ? "capture-highlight" : ""}`}
             >
               <time>{seconds(segment.time)}</time>
               <div className="transcript-entry">
+                {segment.sourceIds.map((id) => (
+                  <span key={id} id={`segment-${id}`} />
+                ))}
                 <p>{segment.text}</p>
                 {!lecturer && !readOnly && (
                   <button
                     className="text-button confusion-marker"
                     aria-label={`Bingung pada ${seconds(segment.time)}`}
-                    onClick={() => bookmark(segment, "Bingung")}
+                    onClick={() => bookmark(source, "Bingung")}
                   >
                     <CircleHelp size={13} /> Bingung
                   </button>
                 )}
                 {!lecturer &&
                   photos
-                    .filter((photo) => photoSegment(photo.time) === segment.id)
+                    .filter((photo) => segment.sourceIds.includes(photoSegment(photo.time)))
                     .map((photo) => (
                       <button
                         className="transcript-photo"
@@ -94,7 +102,7 @@ export function TranscriptPanel({
                   aria-label={`${marked ? "Hapus penanda" : "Simpan bagian"} ${seconds(segment.time)}`}
                   title={marked ? "Hapus penanda" : "Simpan untuk review"}
                   aria-pressed={marked}
-                  onClick={() => bookmark(segment)}
+                  onClick={() => bookmark(source)}
                 >
                   <Bookmark size={18} fill={marked ? "currentColor" : "none"} />
                 </button>
@@ -110,15 +118,6 @@ export function TranscriptPanel({
             </article>
           );
         })}
-        {lecturer && speechDraft && (
-          <article className="transcript-segment transcript-draft" aria-label="Transkrip langsung">
-            <time>{seconds(speechDraft.time)}</time>
-            <div className="transcript-entry">
-              <p>{speechDraft.text}</p>
-              <small>Langsung · menunggu hasil tersimpan</small>
-            </div>
-          </article>
-        )}
       </div>
       {!lecturer && !readOnly && (
         <div className="capture-bar">
@@ -131,7 +130,6 @@ export function TranscriptPanel({
               {captureLoading ? <LoaderCircle size={17} /> : <ScanLine size={17} />}
               Capture 90 detik
             </button>
-            <small>Lihat preview sebelum menyimpan</small>
           </div>
           <button className="button secondary" onClick={onAsk}>
             <MessageCircle size={16} />

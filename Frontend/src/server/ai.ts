@@ -1,4 +1,6 @@
 import { z, type ZodType } from "zod";
+import { cleanNoteText } from "../lib/note-text";
+import { lessonDateContext } from "./lesson-dates";
 import { required, setting } from "./config";
 import { ApiError } from "./http";
 import { captureSchema, lessonResultSchema, reviewSchema } from "./schemas";
@@ -136,12 +138,26 @@ export async function createLessonResult(session: unknown, segments: SourceSegme
   if (!segments.length) return { notes: [], graph: { nodes: [], edges: [] }, agenda: [] };
   const result = await gemini(
     lessonResultSchema,
-    "Buat notes seluruh materi (buang obrolan di luar materi), graph subbab dengan nodes/edges, dan agenda pengumuman kelas sebagai DRAF. Untuk setiap node graph, isi topics dengan 1–4 nama konsep atau metode yang disebut dalam sumber node, bukan kalimat penjelasan. Kosongkan topics jika tidak ada materi spesifik yang jelas; jangan menambahkan materi baru. description tetap berisi penjelasan untuk panel detail. Semua uraian wajib memakai source_ids. due_at hanya tanggal ISO dengan offset jika disebut jelas dan tidak ambigu, selain itu null. quote harus kutipan persis dari segmen source_id. Jangan mengubah draf menjadi agenda tersimpan.",
-    { session, segments },
+    "Setiap node graph mewakili satu BAB utama, bukan satu subbab kecil. Gabungkan subbab yang berada dalam satu bab. description adalah rangkuman Gemini yang utuh untuk seluruh bab, berdasarkan semua sumber relevan. sections berisi judul subbab dan source_ids untuk tautan langsung ke pembahasan; jangan menaruh rangkuman subbab berulang di description. topics berisi nama subbab singkat. Pengumuman penting tanpa tanggal tetap WAJIB masuk agenda dengan due_at null, jangan hilangkan kegiatannya. " +
+      "Buat notes ringkas berisi HANYA materi pelajaran dan contoh/analogi yang membantu menjelaskan materi, serta graph bab dengan nodes/edges. Abaikan cerita pribadi, candaan, perkenalan, percakapan uji dan obrolan yang tidak berkaitan dengan materi; jangan masukkan itu ke notes, graph, atau judul Ringkasan percakapan. Jika tidak ada materi pelajaran, kembalikan notes: [] dan graph kosong; transkrip asli tetap disimpan terpisah. Ekstrak agenda pengumuman penting dosen walaupun disampaikan di tengah materi: hanya Kuis, Presentasi, Tugas (deadline pengumpulan), dan Ujian. Jangan buat agenda dari cerita masa lalu, contoh hipotetis, candaan, saran belajar, atau jadwal yang dibatalkan. Untuk revisi jadwal yang sama, gunakan pengumuman terakhir yang tegas. Satu kegiatan cukup satu agenda. Gunakan date_context sebagai acuan tanggal kelas dalam Asia/Jakarta, BUKAN tanggal saat pemrosesan. 'Minggu depan hari Selasa' memakai date_context.next_week.Selasa; 'Selasa depan' memakai next_occurrence.Selasa; 'besok' memakai tomorrow; 'lusa' memakai day_after_tomorrow. due_at berupa ISO dengan offset +07:00 jika tanggal dapat ditentukan jelas. Jika jam tidak disebut, gunakan 00:00:00 sebagai penanda tanggal saja. Jika tanggal ambigu/tidak disebut atau date_context tidak tersedia untuk tanggal relatif, due_at null; jangan menebak. quote wajib kutipan persis dari segmen source_id yang mendukung kegiatan dan jadwalnya. Untuk setiap node graph, isi topics dengan 1–4 nama konsep atau metode yang disebut dalam sumber node, bukan kalimat penjelasan. description berisi penjelasan untuk panel detail. Sumber uraian wajib disimpan pada field source_ids, bukan ditulis di teks.",
+    {
+      session,
+      date_context: lessonDateContext(session),
+      segments,
+      formatting:
+        "Simpan ID sumber hanya pada field source_ids. Jangan tulis UUID atau sitasi ID dalam title, body, atau description.",
+    },
   );
   const allowed = new Set(segments.map((s) => s.id));
-  result.notes.forEach((n) => assertReferences(n.source_ids, allowed));
-  result.graph.nodes.forEach((n) => assertReferences(n.source_ids, allowed));
+  result.notes.forEach((n) => {
+    assertReferences(n.source_ids, allowed);
+    n.body = cleanNoteText(n.body);
+  });
+  result.graph.nodes.forEach((n) => {
+    assertReferences(n.source_ids, allowed);
+    n.description = cleanNoteText(n.description);
+    n.sections?.forEach((section) => assertReferences(section.source_ids, allowed));
+  });
   for (const draft of result.agenda) {
     const source = segments.find((s) => s.id === draft.source_id);
     if (!source || !draft.quote || !source.text.includes(draft.quote))
@@ -159,11 +175,20 @@ export async function createReview(
   if (!segments.length) return { sections: [], previous: [] };
   const result = await gemini(
     reviewSchema,
-    "Buat panduan review berdasarkan materi kelas dan bagian pribadi yang ditandai. Boleh merekomendasikan pertemuan SEBELUMNYA yang berkaitan dari daftar previous; jangan mengarang pertemuan mendatang. sections wajib memakai source_ids dari segments. Jika marks kosong, gunakan konsep inti kelas.",
-    { segments, marks, previous },
+    "Buat panduan review HANYA berdasarkan materi pelajaran dan bagian pribadi yang ditandai yang relevan dengan materi. Abaikan cerita pribadi, candaan, perkenalan, percakapan uji, pengumuman jadwal dan obrolan di luar materi. Jika tidak ada materi, sections dan previous boleh kosong. Boleh merekomendasikan pertemuan SEBELUMNYA yang berkaitan dari daftar previous; jangan mengarang pertemuan mendatang. sections wajib memakai source_ids dari segments. Jika marks kosong, gunakan konsep inti kelas.",
+    {
+      segments,
+      marks,
+      previous,
+      formatting:
+        "Simpan ID sumber hanya pada field source_ids. Jangan tulis UUID atau sitasi ID dalam title atau body.",
+    },
   );
   const allowed = new Set(segments.map((s) => s.id));
-  result.sections.forEach((n) => assertReferences(n.source_ids, allowed));
+  result.sections.forEach((n) => {
+    assertReferences(n.source_ids, allowed);
+    n.body = cleanNoteText(n.body);
+  });
   if (result.previous.some((p) => !previous.some((s) => s.id === p.session_id)))
     throw new ApiError(502, "invalid_ai_source", "Pertemuan rujukan tidak valid.");
   return result;

@@ -48,6 +48,21 @@ before(async () => {
       "utf8",
     ),
   );
+  await db.exec(
+    readFileSync(
+      new URL("../../../supabase/migrations/202610160002_course_join_codes.sql", import.meta.url),
+      "utf8",
+    ),
+  );
+  await db.exec(
+    readFileSync(
+      new URL(
+        "../../../supabase/migrations/202610160003_automatic_class_agenda.sql",
+        import.meta.url,
+      ),
+      "utf8",
+    ),
+  );
   for (const [id, role] of [
     [teacher, "lecturer"],
     [student, "student"],
@@ -75,6 +90,97 @@ before(async () => {
   ).rows[0].id;
 });
 after(() => db.close());
+test("important class announcements automatically reach only course students without duplicates", async () => {
+  await db.exec("begin");
+  try {
+    const cid = (
+      await db.query<{ id: string }>(
+        "insert into courses(owner_id,name) values($1,'Agenda test course') returning id",
+        [teacher],
+      )
+    ).rows[0].id;
+    await db.query("insert into course_members(course_id,user_id) values($1,$2)", [cid, student]);
+    const sid = (
+      await db.query<{ id: string }>(
+        "insert into sessions(course_id,title,starts_at) values($1,'Materi matriks','2026-10-16T09:00:00+07:00') returning id",
+        [cid],
+      )
+    ).rows[0].id;
+    const quote = "Minggu depan hari Selasa ada kuis, presentasi, deadline tugas dan ujian.";
+    const source = (
+      await db.query<{ id: string }>(
+        "insert into transcript_segments(session_id,start_seconds,end_seconds,text,chunk_id,segment_index) values($1,0,15,$2,gen_random_uuid(),0) returning id",
+        [sid, quote],
+      )
+    ).rows[0].id;
+    const draft = {
+      title: "Kuis matriks",
+      kind: "Kuis",
+      due_at: "2026-10-20T00:00:00+07:00",
+      source_id: source,
+      quote,
+    };
+    const drafts = [
+      draft,
+      draft,
+      { ...draft, title: "Presentasi matriks", kind: "Presentasi" },
+      { ...draft, title: "Deadline tugas", kind: "Tugas" },
+      { ...draft, title: "Ujian matriks", kind: "Ujian" },
+      { ...draft, title: "Tanggal belum jelas", due_at: null },
+      { ...draft, title: "Kutipan palsu", quote: "Besok libur." },
+      { ...draft, title: "Tanggal rusak", due_at: "not-a-date" },
+      { ...draft, title: "Cerita masa lalu", due_at: "2026-10-01T00:00:00+07:00" },
+      { ...draft, title: "Saran belajar", kind: "Belajar" },
+    ];
+    await db.query(
+      "insert into session_results(session_id,notes,graph,agenda_drafts) values($1,'[]','{\"nodes\":[],\"edges\":[]}',$2)",
+      [sid, JSON.stringify(drafts)],
+    );
+    const mine = await asUser(student, () =>
+      db.query<{ confirmed: boolean; kind: string }>(
+        "select confirmed,kind from agenda where session_id=$1",
+        [sid],
+      ),
+    );
+    assert.equal(mine.rows.length, 4);
+    assert.ok(mine.rows.every((a) => a.confirmed));
+    assert.deepEqual(mine.rows.map((a) => a.kind).sort(), ["Kuis", "Presentasi", "Tugas", "Ujian"]);
+    for (const uid of [other, teacher])
+      assert.equal(
+        (await asUser(uid, () => db.query("select id from agenda where session_id=$1", [sid]))).rows
+          .length,
+        0,
+      );
+    await asUser(student, () =>
+      db.query("update agenda set title='Judul pribadi' where session_id=$1 and kind='Kuis'", [
+        sid,
+      ]),
+    );
+    await db.query("update session_results set agenda_drafts=$2 where session_id=$1", [
+      sid,
+      JSON.stringify(drafts),
+    ]);
+    assert.equal(
+      (await db.query("select id from agenda where session_id=$1", [sid])).rows.length,
+      4,
+    );
+    assert.equal(
+      (await db.query("select id from agenda where session_id=$1 and title='Judul pribadi'", [sid]))
+        .rows.length,
+      1,
+    );
+    assert.equal(
+      (
+        await db.query<{ text: string }>("select text from transcript_segments where id=$1", [
+          source,
+        ])
+      ).rows[0].text,
+      quote,
+    );
+  } finally {
+    await db.exec("rollback");
+  }
+});
 test("student cannot create or start a session, or escalate role", async () => {
   await assert.rejects(
     asUser(student, () =>
@@ -404,5 +510,72 @@ test("Google onboarding chooses a role only once; notification preferences are p
       )
     ).rows[0].handled_notifications,
     ["notice-1"],
+  );
+});
+
+test("course codes are generated automatically, join idempotently and keep courses isolated", async () => {
+  const target = (
+    await asUser(teacher, () =>
+      db.query<{ id: string; join_code: string }>(
+        "insert into courses(owner_id,name) values($1,'New course') returning id,join_code",
+        [teacher],
+      ),
+    )
+  ).rows[0];
+  assert.match(target.join_code, /^[A-Z0-9]{10}$/);
+  const oldCode = (
+    await asUser(teacher, () =>
+      db.query<{ join_code: string }>("select join_code from courses where id=$1", [course]),
+    )
+  ).rows[0].join_code;
+  assert.match(oldCode, /^[A-Z0-9]{10}$/);
+  assert.notEqual(target.join_code, oldCode);
+  await assert.rejects(
+    asUser(teacher, () => db.query("select join_course($1)", [target.join_code])),
+  );
+  await assert.rejects(asUser(other, () => db.query("select join_course('INVALID000')")));
+  assert.equal(
+    (await asUser(other, () => db.query("select id from courses where id=$1", [target.id]))).rows
+      .length,
+    0,
+  );
+  for (let i = 0; i < 2; i++) {
+    const joined = (
+      await asUser(other, () =>
+        db.query<{ id: string }>("select join_course($1) as id", [
+          " " + target.join_code.toLowerCase() + " ",
+        ]),
+      )
+    ).rows[0].id;
+    assert.equal(joined, target.id);
+  }
+  assert.equal(
+    (
+      await asUser(other, () =>
+        db.query("select * from course_members where course_id=$1", [target.id]),
+      )
+    ).rows.length,
+    1,
+  );
+  assert.equal(
+    (await asUser(other, () => db.query("select id from courses where id=$1", [target.id]))).rows
+      .length,
+    1,
+  );
+  assert.equal(
+    (await asUser(other, () => db.query("select id from courses where id=$1", [course]))).rows
+      .length,
+    0,
+  );
+  await asUser(teacher, () =>
+    db.query(
+      "insert into sessions(course_id,title,starts_at) values($1,'First lesson',now()),($1,'Second lesson',now())",
+      [target.id],
+    ),
+  );
+  assert.equal(
+    (await asUser(other, () => db.query("select id from sessions where course_id=$1", [target.id])))
+      .rows.length,
+    2,
   );
 });

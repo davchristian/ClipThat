@@ -1,0 +1,36 @@
+﻿{
+    "backend":  {
+                    "passed":  55,
+                    "failed":  0
+                },
+    "note":  "Demo: 32 passed in full run, one layout matrix passed on a separate recheck after timeout adjustment.",
+    "real_ai":  {
+                    "total":  1,
+                    "passed":  0
+                },
+    "demo_full_run":  {
+                          "startTime":  "2026-10-16T13:34:10.440Z",
+                          "duration":  173352.876,
+                          "expected":  32,
+                          "skipped":  0,
+                          "unexpected":  1,
+                          "flaky":  0
+                      },
+    "unique_cases_with_passing_evidence":  113,
+    "live":  {
+                 "startTime":  "2026-10-16T13:34:10.360Z",
+                 "duration":  126727.927,
+                 "expected":  19,
+                 "skipped":  0,
+                 "unexpected":  0,
+                 "flaky":  0
+             },
+    "demo_layout_recheck":  {
+                                "startTime":  "2026-10-16T13:37:10.565Z",
+                                "duration":  13609.879,
+                                "expected":  1,
+                                "skipped":  0,
+                                "unexpected":  0,
+                                "flaky":  0
+                            }
+}

@@ -1,0 +1,137 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--config",
+      "playwright.audit.config.ts",
+      "tests/app.spec.ts",
+      "-g",
+      "main views work",
+      "--output",
+      "test-results/fixes-layout-verified",
+      "--reporter=list,json"
+    ],
+    "configFile": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\playwright.audit.config.ts",
+    "rootDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/test-results/fixes-layout-verified",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "app.spec.ts",
+          "focus-mode.spec.ts",
+          "qa-audit.spec.ts"
+        ],
+        "timeout": 25000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev -- --port 3197",
+      "url": "http://127.0.0.1:3197",
+      "reuseExistingServer": true,
+      "timeout": 90000,
+      "env": {
+        "NEXT_PUBLIC_APP_MODE": "demo",
+        "CLIPTHAT_DIST_DIR": ".next-qa-demo",
+        "GEMINI_API_KEY": "",
+        "OPENAI_API_KEY": "",
+        "DEEPGRAM_API_KEY": ""
+      }
+    }
+  },
+  "suites": [
+    {
+      "title": "app.spec.ts",
+      "file": "app.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "main views work without browser errors or horizontal overflow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11467,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T13:37:11.321Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-279aacc80059f83c5351",
+          "file": "app.spec.ts",
+          "line": 516,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-16T13:37:10.565Z",
+    "duration": 13609.879,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

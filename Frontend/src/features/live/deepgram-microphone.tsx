@@ -11,12 +11,18 @@ export function DeepgramMicrophone({
   onChange,
   onUploaded,
   onDraft,
+  autoStart = false,
+  stopRequested = false,
+  onStopped,
 }: {
   sessionId: string;
   startedAt: string;
   onChange: (busy: boolean) => void;
   onUploaded: () => Promise<void>;
   onDraft?: (draft: SpeechDraft) => void;
+  autoStart?: boolean;
+  stopRequested?: boolean;
+  onStopped?: () => void;
 }) {
   const [phase, setPhase] = useState<"idle" | "connecting" | "recording" | "finishing">("idle");
   const [pending, setPending] = useState(0);
@@ -26,7 +32,7 @@ export function DeepgramMicrophone({
   const stream = useRef<MediaStream | null>(null);
   const unsaved = useRef<SpeechSegment[]>([]);
   const batches = useRef<Batch[]>([]);
-  const interim = useRef<SpeechSegment | null>(null);
+  const interim = useRef<SpeechSegment[]>([]);
   const saving = useRef(false);
   const failed = useRef(false);
   const mounted = useRef(true);
@@ -35,17 +41,37 @@ export function DeepgramMicrophone({
   callbacks.current = { onUploaded, onDraft };
   const interval = useRef<ReturnType<typeof setInterval> | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoStarted = useRef(false);
+  const startingInFlight = useRef(false);
+  const stopNotified = useRef(false);
+  useEffect(() => {
+    if (autoStart && !autoStarted.current) {
+      autoStarted.current = true;
+      void start();
+    }
+  }, [autoStart]);
+  useEffect(() => {
+    if (!stopRequested) {
+      stopNotified.current = false;
+      return;
+    }
+    if (phase === "recording") stop();
+    if (phase === "idle" && pending === 0 && !startingInFlight.current && !stopNotified.current) {
+      stopNotified.current = true;
+      onStopped?.();
+    }
+  }, [stopRequested, phase, pending, onStopped]);
   function publish() {
     if (!mounted.current) return;
-    const segments = [
-      ...batches.current.flatMap((b) => b.segments),
-      ...unsaved.current,
-      ...(interim.current ? [interim.current] : []),
-    ];
     setPending(batches.current.length + (unsaved.current.length ? 1 : 0));
+    const segments = [
+      ...batches.current.flatMap((batch) => batch.segments),
+      ...unsaved.current,
+      ...interim.current,
+    ];
     callbacks.current.onDraft?.(
       segments.length
-        ? { time: segments[0].start, text: segments.map((s) => s.text).join(" ") }
+        ? { time: segments[0].start, text: segments.map((s) => s.text).join(" "), segments }
         : null,
     );
   }
@@ -138,6 +164,7 @@ export function DeepgramMicrophone({
     };
   }, []);
   async function start() {
+    startingInFlight.current = true;
     setPhase("connecting");
     setError("");
     finishing.current = false;
@@ -209,9 +236,9 @@ export function DeepgramMicrophone({
           const result = deepgramResult(value, offset);
           if (!result) return;
           if (result.final) {
-            unsaved.current.push(result.segment);
-            interim.current = null;
-          } else interim.current = result.segment;
+            unsaved.current.push(...(result.parts ?? [result.segment]));
+            interim.current = [];
+          } else interim.current = result.parts ?? [result.segment];
           publish();
         } catch {
           setError("Pesan transkrip Deepgram tidak valid.");
@@ -230,7 +257,7 @@ export function DeepgramMicrophone({
         if (closeTimer.current) clearTimeout(closeTimer.current);
         if (r.state === "recording") r.stop();
         stream.current?.getTracks().forEach((t) => t.stop());
-        interim.current = null;
+        interim.current = [];
         setPhase("idle");
         publish();
         if (!failed.current) void persist();
@@ -255,7 +282,7 @@ export function DeepgramMicrophone({
       };
       r.start(250);
       setPhase("recording");
-      // Persist finals in batches to stay within the existing server rate limit.
+      // Persist original source segments; the view groups them into 15-second rows.
       interval.current = setInterval(() => {
         if (!failed.current) void persist();
       }, 5000);
@@ -266,6 +293,8 @@ export function DeepgramMicrophone({
         setPhase("idle");
         setError(e instanceof Error ? e.message : "Tidak bisa memulai Deepgram.");
       }
+    } finally {
+      startingInFlight.current = false;
     }
   }
   return (
@@ -274,7 +303,10 @@ export function DeepgramMicrophone({
         <button
           className="button secondary"
           disabled={
-            phase === "connecting" || phase === "finishing" || (phase === "idle" && pending > 0)
+            stopRequested ||
+            phase === "connecting" ||
+            phase === "finishing" ||
+            (phase === "idle" && pending > 0)
           }
           onClick={phase === "recording" ? stop : start}
         >
@@ -285,16 +317,14 @@ export function DeepgramMicrophone({
               ? "Menghubungkan…"
               : phase === "finishing"
                 ? "Menyelesaikan…"
-                : "Rekam suara dosen"}
+                : "Rekam"}
         </button>
         <span className="mic-status" role="status">
-          {phase === "recording"
-            ? "Transkripsi langsung · Deepgram"
-            : phase === "finishing"
-              ? "Menunggu hasil akhir…"
-              : pending
-                ? "Menyimpan transkrip…"
-                : "Siap merekam · Deepgram"}
+          {phase === "finishing"
+            ? "Menunggu hasil akhir…"
+            : phase !== "recording" && pending
+              ? "Menyimpan transkrip…"
+              : null}
         </span>
       </div>
       {error && (

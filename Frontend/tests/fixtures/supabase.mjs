@@ -16,13 +16,22 @@ const session = {
   archived_at: null,
   processing_error: null,
 };
-const course = { id: courseId, owner_id: teacher, name: "Aljabar Linear", code: "IF2123" };
+const course = {
+  id: courseId,
+  owner_id: teacher,
+  name: "Aljabar Linear",
+  code: "IF2123",
+  join_code: "COURSE2026",
+};
 let saved = [];
+const initialSession = structuredClone(session);
+const initialCourse = structuredClone(course);
 let questions = [];
 let agenda = [];
 const notes = {};
 let result = null;
 let empty = false;
+let hasSession = true;
 function token(id) {
   return (
     Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url") +
@@ -82,12 +91,18 @@ const server = createServer(async (req, res) => {
   }
   if (url.pathname === "/health") return send({ ok: true });
   if (url.pathname === "/reset") {
+    for (const key of Object.keys(notes)) delete notes[key];
+    for (const key of Object.keys(session)) delete session[key];
+    for (const key of Object.keys(course)) delete course[key];
+    Object.assign(session, initialSession);
+    Object.assign(course, initialCourse);
     saved = [];
     questions = [];
     agenda = [];
     result = null;
     session.started_at = new Date(Date.now() - 1110000).toISOString();
     empty = url.searchParams.has("empty");
+    hasSession = !empty;
     session.status = "live";
     session.ended_at = null;
     if (url.searchParams.has("processed")) {
@@ -167,10 +182,11 @@ const server = createServer(async (req, res) => {
   }
   if (table === "sessions") {
     if (req.method === "POST") {
+      hasSession = true;
       Object.assign(session, body, { status: "upcoming" });
       return send(session, 201);
     }
-    return send(object ? session : empty ? [] : [session]);
+    return send(object ? session : empty || !hasSession ? [] : [session]);
   }
   if (table === "transcript_segments") return send(transcript);
   if (table === "materials") return send([]);
@@ -261,7 +277,13 @@ const server = createServer(async (req, res) => {
   }
   if (table === "rpc/confusion_summary") return send([]);
   if (table === "rpc/consume_limit") return send(true);
+  if (table === "rpc/claim_job") return send(null);
   if (table === "rpc/join_session") return send(sessionId);
+  if (table === "rpc/join_course") {
+    if (id !== student) return send({ code: "42501", message: "Denied" }, 403);
+    if (body.code !== "COURSE2026") return send({ code: "P0002", message: "Not found" }, 404);
+    return send(courseId);
+  }
   if (table === "rpc/session_action") {
     session.status = body.action === "end" ? "processing" : "live";
     if (body.action === "end") session.ended_at = new Date().toISOString();

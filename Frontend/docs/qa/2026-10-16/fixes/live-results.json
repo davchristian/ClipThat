@@ -1,0 +1,713 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--config",
+      "playwright.audit-live.config.ts",
+      "--output",
+      "test-results/fixes-live",
+      "--reporter=list,json"
+    ],
+    "configFile": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\playwright.audit-live.config.ts",
+    "rootDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/test-results/fixes-live",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "live.spec.ts",
+          "qa-live-audit.spec.ts"
+        ],
+        "timeout": 45000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "live.spec.ts",
+      "file": "live.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "live email login uses Supabase and rejects invalid credentials without opening the dashboard",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5382,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T13:24:09.263Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b37044e47a10d94689f2-bc4748cefdedab414f02",
+          "file": "live.spec.ts",
+          "line": 18,
+          "column": 5
+        },
+        {
+          "title": "live capture discard makes no save request; confirmation uses the real signed-token save route",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5208,
+                  "error": {
+                    "message": "Error: locator.click: Error: strict mode violation: getByRole('button', { name: 'Transkrip', exact: true }) resolved to 2 elements:\n    1) <button class=\"\">Transkrip</button> aka getByLabel('Bagian kelas').getByRole('button', { name: 'Transkrip' })\n    2) <button class=\"text-button\">…</button> aka locator('section').getByRole('button', { name: 'Transkrip' })\n\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Transkrip', exact: true })\u001b[22m\n",
+                    "stack": "Error: locator.click: Error: strict mode violation: getByRole('button', { name: 'Transkrip', exact: true }) resolved to 2 elements:\n    1) <button class=\"\">Transkrip</button> aka getByLabel('Bagian kelas').getByRole('button', { name: 'Transkrip' })\n    2) <button class=\"text-button\">…</button> aka locator('section').getByRole('button', { name: 'Transkrip' })\n\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Transkrip', exact: true })\u001b[22m\n\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\live.spec.ts:73:70",
+                    "location": {
+                      "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\live.spec.ts",
+                      "column": 70,
+                      "line": 73
+                    },
+                    "snippet": "  71 |   await page.reload();\n  72 |   await expect(page.locator(\".saved-preview\").filter({ hasText: \"Capture\" })).toBeVisible();\n> 73 |   await page.getByRole(\"button\", { name: \"Transkrip\", exact: true }).click();\n     |                                                                      ^\n  74 |   await page.setViewportSize({ width: 390, height: 844 });\n  75 |   await page.getByRole(\"button\", { name: \"Capture 90 detik\" }).click();\n  76 |   await expect(preview).toBeInViewport();"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\live.spec.ts",
+                        "column": 70,
+                        "line": 73
+                      },
+                      "message": "Error: locator.click: Error: strict mode violation: getByRole('button', { name: 'Transkrip', exact: true }) resolved to 2 elements:\n    1) <button class=\"\">Transkrip</button> aka getByLabel('Bagian kelas').getByRole('button', { name: 'Transkrip' })\n    2) <button class=\"text-button\">…</button> aka locator('section').getByRole('button', { name: 'Transkrip' })\n\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Transkrip', exact: true })\u001b[22m\n\n\n  71 |   await page.reload();\n  72 |   await expect(page.locator(\".saved-preview\").filter({ hasText: \"Capture\" })).toBeVisible();\n> 73 |   await page.getByRole(\"button\", { name: \"Transkrip\", exact: true }).click();\n     |                                                                      ^\n  74 |   await page.setViewportSize({ width: 390, height: 844 });\n  75 |   await page.getByRole(\"button\", { name: \"Capture 90 detik\" }).click();\n  76 |   await expect(preview).toBeInViewport();\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\live.spec.ts:73:70"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T13:24:15.395Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\fixes-live\\live-live-capture-discard--6b4a3-eal-signed-token-save-route\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\fixes-live\\live-live-capture-discard--6b4a3-eal-signed-token-save-route\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\fixes-live\\live-live-capture-discard--6b4a3-eal-signed-token-save-route\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\live.spec.ts",
+                    "column": 70,
+                    "line": 73
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "b37044e47a10d94689f2-c9d50772aa509033df31",
+          "file": "live.spec.ts",
+          "line": 32,
+          "column": 5
+        },
+        {
+          "title": "live question and private note persist while calendar integrations are retired",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8043,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T13:24:39.532Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b37044e47a10d94689f2-14067efef5caa08f71d4",
+          "file": "live.spec.ts",
+          "line": 84,
+          "column": 5
+        },
+        {
+          "title": "profile opens from sidebar and logs out at 1440px as student",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3008,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T13:24:48.026Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b37044e47a10d94689f2-4c6608c6d9c56cfbaa52",
+          "file": "live.spec.ts",
+          "line": 113,
+          "column": 7
+        },
+        {
+          "title": "profile opens from sidebar and logs out at 390px as student",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2543,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T13:24:51.052Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b37044e47a10d94689f2-6ec19e5bd692b6e77c07",
+          "file": "live.spec.ts",
+          "line": 113,
+          "column": 7
+        },
+        {
+          "title": "profile opens from sidebar and logs out at 390px as lecturer",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3229,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T13:24:53.612Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b37044e47a10d94689f2-7829670f783a0e3748cd",
+          "file": "live.spec.ts",
+          "line": 113,
+          "column": 7
+        },
+        {
+          "title": "retired calendar endpoints do not exchange tokens and the worker runs only study jobs",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2552,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T13:24:56.860Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b37044e47a10d94689f2-cb3a4b6032c4a6eb2e69",
+          "file": "live.spec.ts",
+          "line": 152,
+          "column": 5
+        },
+        {
+          "title": "live lecturer creates the first course and session; student requests cannot run the worker",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5209,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T13:24:59.428Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b37044e47a10d94689f2-90ce618c1318671b0b30",
+          "file": "live.spec.ts",
+          "line": 174,
+          "column": 5
+        },
+        {
+          "title": "course code is generated and students join only from Course at 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3683,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T13:25:04.648Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b37044e47a10d94689f2-7f51f227ca99bf229bf7",
+          "file": "live.spec.ts",
+          "line": 221,
+          "column": 7
+        },
+        {
+          "title": "course code is generated and students join only from Course at 390px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3728,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T13:25:08.344Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b37044e47a10d94689f2-4ddcdd0509d9b2b35003",
+          "file": "live.spec.ts",
+          "line": 221,
+          "column": 7
+        },
+        {
+          "title": "generated class graph links to its transcript and agenda confirmation survives reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5244,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T13:25:12.083Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b37044e47a10d94689f2-a58b76efe11f6ccee9dc",
+          "file": "live.spec.ts",
+          "line": 251,
+          "column": 5
+        },
+        {
+          "title": "Deepgram auto-records and ending waits for final transcript and failed-save retry",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3580,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T13:25:17.339Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b37044e47a10d94689f2-a64d3b5bec72120fafed",
+          "file": "live.spec.ts",
+          "line": 304,
+          "column": 5
+        },
+        {
+          "title": "lecturer recording stays compact and fractional transcript timestamps do not overlap at 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2481,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T13:25:20.929Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b37044e47a10d94689f2-7d1670e87081a402c11a",
+          "file": "live.spec.ts",
+          "line": 385,
+          "column": 7
+        },
+        {
+          "title": "lecturer recording stays compact and fractional transcript timestamps do not overlap at 390px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2420,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T13:25:23.421Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b37044e47a10d94689f2-647a25ea6fcc99ba255e",
+          "file": "live.spec.ts",
+          "line": 385,
+          "column": 7
+        }
+      ]
+    },
+    {
+      "title": "qa-live-audit.spec.ts",
+      "file": "qa-live-audit.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "QA live capture persists through the current Notes UI and retains preview on a save error",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3997,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T13:25:25.860Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "0aa0d1d44c353ec37f81-9162761e7bbf2bbc920b",
+          "file": "qa-live-audit.spec.ts",
+          "line": 14,
+          "column": 5
+        },
+        {
+          "title": "QA generated agenda draft remains reachable for the student to complete",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1395,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T13:25:29.870Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "0aa0d1d44c353ec37f81-6aaad85fb122a21b7dd6",
+          "file": "qa-live-audit.spec.ts",
+          "line": 56,
+          "column": 5
+        },
+        {
+          "title": "QA private note saves and survives reload with fresh content",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2199,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T13:25:31.275Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "0aa0d1d44c353ec37f81-ce81a01490ae01ecffc9",
+          "file": "qa-live-audit.spec.ts",
+          "line": 66,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-16T13:23:57.733Z",
+    "duration": 912577.9859999999,
+    "expected": 16,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

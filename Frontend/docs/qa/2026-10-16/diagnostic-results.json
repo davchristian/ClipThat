@@ -1,0 +1,250 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--config",
+      "playwright.audit.config.ts",
+      "tests/qa-audit.spec.ts",
+      "-g",
+      "QA global search|QA diagnose",
+      "--output",
+      "test-results/qa-diagnostics",
+      "--reporter=list,json"
+    ],
+    "configFile": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\playwright.audit.config.ts",
+    "rootDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/test-results/qa-diagnostics",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "app.spec.ts",
+          "focus-mode.spec.ts",
+          "qa-audit.spec.ts"
+        ],
+        "timeout": 25000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev -- --port 3197",
+      "url": "http://127.0.0.1:3197",
+      "reuseExistingServer": true,
+      "timeout": 90000,
+      "env": {
+        "NEXT_PUBLIC_APP_MODE": "demo",
+        "CLIPTHAT_DIST_DIR": ".next-qa-demo",
+        "GEMINI_API_KEY": "",
+        "OPENAI_API_KEY": "",
+        "DEEPGRAM_API_KEY": ""
+      }
+    }
+  },
+  "suites": [
+    {
+      "title": "qa-audit.spec.ts",
+      "file": "qa-audit.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "QA global search filters classes, handles no results, navigates and closes with Escape",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 898,
+                  "error": {
+                    "message": "Error: locator.fill: Error: strict mode violation: getByLabel('Cari kelas atau topik') resolved to 2 elements:\n    1) <button class=\"icon-button\" aria-label=\"Cari kelas atau topik\">…</button> aka locator('header').getByLabel('Cari kelas atau topik')\n    2) <input value=\"\" autofocus=\"\" placeholder=\"Kelas atau topik…\" aria-label=\"Cari kelas atau topik\"/> aka getByRole('textbox', { name: 'Cari kelas atau topik' })\n\nCall log:\n\u001b[2m  - waiting for getByLabel('Cari kelas atau topik')\u001b[22m\n",
+                    "stack": "Error: locator.fill: Error: strict mode violation: getByLabel('Cari kelas atau topik') resolved to 2 elements:\n    1) <button class=\"icon-button\" aria-label=\"Cari kelas atau topik\">…</button> aka locator('header').getByLabel('Cari kelas atau topik')\n    2) <input value=\"\" autofocus=\"\" placeholder=\"Kelas atau topik…\" aria-label=\"Cari kelas atau topik\"/> aka getByRole('textbox', { name: 'Cari kelas atau topik' })\n\nCall log:\n\u001b[2m  - waiting for getByLabel('Cari kelas atau topik')\u001b[22m\n\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-audit.spec.ts:93:50",
+                    "location": {
+                      "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-audit.spec.ts",
+                      "column": 50,
+                      "line": 93
+                    },
+                    "snippet": "  91 |   const dialog = page.getByRole(\"dialog\", { name: \"Cari kelas\" });\n  92 |   await expect(dialog).toBeVisible();\n> 93 |   await page.getByLabel(\"Cari kelas atau topik\").fill(\"no-matching-course-qa\");\n     |                                                  ^\n  94 |   await expect(dialog).toContainText(\"Tidak ditemukan.\");\n  95 |   await page.getByLabel(\"Cari kelas atau topik\").fill(\"Transformasi linear\");\n  96 |   await dialog.getByRole(\"link\").first().click();"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-audit.spec.ts",
+                        "column": 50,
+                        "line": 93
+                      },
+                      "message": "Error: locator.fill: Error: strict mode violation: getByLabel('Cari kelas atau topik') resolved to 2 elements:\n    1) <button class=\"icon-button\" aria-label=\"Cari kelas atau topik\">…</button> aka locator('header').getByLabel('Cari kelas atau topik')\n    2) <input value=\"\" autofocus=\"\" placeholder=\"Kelas atau topik…\" aria-label=\"Cari kelas atau topik\"/> aka getByRole('textbox', { name: 'Cari kelas atau topik' })\n\nCall log:\n\u001b[2m  - waiting for getByLabel('Cari kelas atau topik')\u001b[22m\n\n\n  91 |   const dialog = page.getByRole(\"dialog\", { name: \"Cari kelas\" });\n  92 |   await expect(dialog).toBeVisible();\n> 93 |   await page.getByLabel(\"Cari kelas atau topik\").fill(\"no-matching-course-qa\");\n     |                                                  ^\n  94 |   await expect(dialog).toContainText(\"Tidak ditemukan.\");\n  95 |   await page.getByLabel(\"Cari kelas atau topik\").fill(\"Transformasi linear\");\n  96 |   await dialog.getByRole(\"link\").first().click();\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-audit.spec.ts:93:50"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:55:30.327Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\qa-diagnostics\\qa-audit-QA-global-search--9d78c-ates-and-closes-with-Escape\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\qa-diagnostics\\qa-audit-QA-global-search--9d78c-ates-and-closes-with-Escape\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\qa-diagnostics\\qa-audit-QA-global-search--9d78c-ates-and-closes-with-Escape\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-audit.spec.ts",
+                    "column": 50,
+                    "line": 93
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "cd92235559c60de271e7-8e905d0f230cb3986238",
+          "file": "qa-audit.spec.ts",
+          "line": 88,
+          "column": 5
+        },
+        {
+          "title": "QA diagnose retained route clocks and keyboard sidebar focus",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 902,
+                  "error": {
+                    "message": "Error: page.evaluate: TypeError: Cannot set properties of null (setting 'role')\n    at eval (eval at evaluate (:311:30), <anonymous>:3:16)\n    at UtilityScript.evaluate (<anonymous>:313:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+                    "stack": "Error: page.evaluate: TypeError: Cannot set properties of null (setting 'role')\n    at eval (eval at evaluate (:311:30), <anonymous>:3:16)\n    at UtilityScript.evaluate (<anonymous>:313:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at eval (eval at evaluate (:311:30), <anonymous>:3:16)\n    at UtilityScript.evaluate (<anonymous>:313:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-audit.spec.ts:108:14",
+                    "location": {
+                      "file": "eval at evaluate (:311:30), <anonymous>",
+                      "column": 16,
+                      "line": 3
+                    }
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "eval at evaluate (:311:30), <anonymous>",
+                        "column": 16,
+                        "line": 3
+                      },
+                      "message": "Error: page.evaluate: TypeError: Cannot set properties of null (setting 'role')\n    at eval (eval at evaluate (:311:30), <anonymous>:3:16)\n    at UtilityScript.evaluate (<anonymous>:313:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at eval (eval at evaluate (:311:30), <anonymous>:3:16)\n    at UtilityScript.evaluate (<anonymous>:313:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-audit.spec.ts:108:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:55:32.314Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\qa-diagnostics\\qa-audit-QA-diagnose-retai-897f8--and-keyboard-sidebar-focus\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\qa-diagnostics\\qa-audit-QA-diagnose-retai-897f8--and-keyboard-sidebar-focus\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\qa-diagnostics\\qa-audit-QA-diagnose-retai-897f8--and-keyboard-sidebar-focus\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "eval at evaluate (:311:30), <anonymous>",
+                    "column": 16,
+                    "line": 3
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "cd92235559c60de271e7-bf3bb629615c2ee0bd8c",
+          "file": "qa-audit.spec.ts",
+          "line": 105,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-16T12:55:29.700Z",
+    "duration": 4261.573,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

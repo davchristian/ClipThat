@@ -36,6 +36,7 @@ export default defineConfig({
         SUPABASE_SERVICE_ROLE_KEY: "",
         CLIPTHAT_DIST_DIR: ".next-live-integration",
         APP_URL: "http://127.0.0.1:3188",
+        JOB_RUNNER_SECRET: "local-fixture-job-secret",
         CAPTURE_SIGNING_SECRET: "test-signing-secret-".repeat(4),
         GEMINI_API_KEY: "",
         OPENAI_API_KEY: "",

@@ -124,6 +124,59 @@ test("new account boot drops previous account's private content and keeps agenda
   assert.equal(state.agenda[0].confirmed, false);
   assert.equal(state.agenda[0].date, "");
 });
+test("automatic agenda stays saved after personal edits, duplicate announcements and reordered drafts", () => {
+  const due = "2026-10-20T00:00:00+07:00";
+  const first = {
+    title: "Kuis matriks",
+    kind: "Kuis" as const,
+    due_at: due,
+    source_id: "source",
+    quote: "Selasa ada kuis",
+  };
+  const boot: Boot = {
+    profile: { id: "student", name: "Student", role: "student" },
+    courses: [],
+    sessions: [],
+    saved: [],
+    agenda: [
+      {
+        id: "saved",
+        title: "Judul pribadi",
+        due_at: due,
+        kind: "Kuis",
+        confirmed: true,
+        done: true,
+        session_id: "session",
+        source: {
+          source_id: first.source_id,
+          quote: first.quote,
+          draft_key: "session:0",
+          automatic: true,
+          announcement_title: first.title,
+          announcement_kind: first.kind,
+          announcement_due_at: due,
+        },
+      },
+    ],
+    results: [
+      {
+        session_id: "session",
+        notes: [],
+        graph: { nodes: [], edges: [] },
+        agenda_drafts: [
+          { ...first, title: "Ujian belum pasti", kind: "Ujian", due_at: null },
+          first,
+          first,
+        ],
+      },
+    ],
+  };
+  const state = fromBoot(boot, emptyLiveState);
+  assert.equal(state.agenda.length, 2);
+  assert.equal(state.agenda.find((a) => a.isDraft)?.title, "Ujian belum pasti");
+  assert.equal(state.agenda.find((a) => a.confirmed)?.title, "Judul pribadi");
+});
+
 test("graph merging keeps edges valid and combines explicitly identical subbab titles", () => {
   const lesson = {
     id: "a",
@@ -148,6 +201,11 @@ test("graph merging keeps edges valid and combines explicitly identical subbab t
     { sessionId: "b", graph: second },
   ]);
   assert.equal(graph.nodes.length, 3);
+  const matrix = graph.nodes.find((node) => node.title === "Matriks")!;
+  assert.deepEqual(
+    matrix.sections?.map((section) => section.sessionId),
+    ["a", "b"],
+  );
   assert.equal(graph.edges.length, 2);
   assert.ok(
     graph.edges.every(

@@ -1,0 +1,72 @@
+﻿ M .env.example
+ M docs/backend-setup.md
+ M docs/screenshots/login-mobile.png
+ M docs/screenshots/questions-mobile.png
+ M docs/screenshots/questions.png
+ M docs/screenshots/register-mobile.png
+ M next-env.d.ts
+ M package.json
+ M playwright.live.config.ts
+ M scripts/run-jobs.ts
+ M src/app/agenda/components/agenda-editor.tsx
+ M src/app/agenda/components/calendar-export.ts
+ M src/app/agenda/page.tsx
+ M src/app/api/integrations/[provider]/callback/route.ts
+ M src/app/api/internal/jobs/route.ts
+ M src/app/classes/components/course-content.tsx
+ M src/app/classes/components/course-materials.tsx
+ M src/app/classes/components/course-session-card.tsx
+ M src/app/classes/components/session-entry.tsx
+ M src/app/classes/course.css
+ M src/app/components/home-calendar.tsx
+ M src/app/components/sidebar.css
+ M src/app/components/sidebar.tsx
+ M src/app/page.tsx
+ M src/app/session/components/classroom.tsx
+ M src/app/session/components/notes-panel.tsx
+ M src/app/session/components/questions-panel.tsx
+ M src/app/session/components/transcript-panel.tsx
+ M src/app/session/questions.css
+ M src/app/settings/page.tsx
+ D src/app/settings/settings.css
+ M src/components/ui/breadcrumbs.tsx
+ M src/components/ui/headings.tsx
+ M src/data/mock/courses.ts
+ M src/features/auth/auth-screen.tsx
+ D src/features/integrations/integration-settings.tsx
+ M src/features/live/deepgram-microphone.tsx
+ M src/features/live/deepgram-results.ts
+ M src/features/live/microphone.tsx
+ M src/lib/backend-types.ts
+ M src/lib/types.ts
+ M src/server/ai.ts
+ M src/server/router.ts
+ M src/server/schemas.ts
+ M src/state/live-data.ts
+ M src/styles/globals.css
+ M src/styles/layout.css
+ M src/styles/learning.css
+ M src/styles/responsive.css
+ M tests/app.spec.ts
+ M tests/backend/database.test.ts
+ M tests/backend/deepgram.test.ts
+ M tests/backend/integrations.test.ts
+ M tests/backend/services.test.ts
+ M tests/fixtures/supabase.mjs
+ M tests/live.spec.ts
+?? docs/classroom-flow.md
+?? docs/qa/
+?? scripts/check-services.ts
+?? src/app/classes/components/course-code.tsx
+?? src/app/classes/components/course-entry.tsx
+?? src/app/classes/components/course-join.tsx
+?? src/app/profile/
+?? src/components/ui/auto-textarea.tsx
+?? src/features/live/transcript-rows.ts
+?? src/lib/note-text.ts
+?? src/server/lesson-dates.ts
+?? tests/backend/calendar-export.test.ts
+?? tests/backend/note-text.test.ts
+?? tests/backend/transcript-rows.test.ts
+?? ../supabase/migrations/202610160002_course_join_codes.sql
+?? ../supabase/migrations/202610160003_automatic_class_agenda.sql

@@ -28,23 +28,6 @@ export function AuthScreen({
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [confirmation, setConfirmation] = useState(false);
-  async function google() {
-    if (setupError) return;
-    if (!liveMode) {
-      setError("Google Sign-In tersedia setelah mode live dan provider Google diaktifkan.");
-      return;
-    }
-    setBusy(true);
-    setError("");
-    try {
-      const result = await api<{ url: string }>("auth/google", "POST", {});
-      window.location.assign(result.url);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Google belum dapat dihubungkan.");
-      setBusy(false);
-    }
-  }
-
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (setupError) return;
@@ -126,17 +109,6 @@ export function AuthScreen({
               {setupError}
             </p>
           )}
-          <button
-            type="button"
-            className="button secondary auth-google"
-            disabled={busy || !!setupError}
-            onClick={() => void google()}
-          >
-            <span aria-hidden="true">G</span> Lanjutkan dengan Google
-          </button>
-          <div className="auth-divider">
-            <span>atau dengan email</span>
-          </div>
           <form className="auth-form" onSubmit={submit} onChange={() => setError("")}>
             {confirmation && <p role="status">Cek emailmu untuk mengonfirmasi akun, lalu masuk.</p>}
             {register && (

@@ -24,7 +24,7 @@
   margin-bottom: 32px;
 }
 .sidebar-profile-avatar {
-  display: none;
+  flex-shrink: 0;
 }
 .brand-link {
   display: block;
@@ -97,6 +97,7 @@
   gap: 9px;
   padding: 16px 2px 0;
   margin-top: 0;
+  border-top: 1px solid var(--line);
 }
 .avatar {
   height: 33px;
@@ -114,6 +115,8 @@
   font-weight: 600;
   display: block;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .profile-info {
   min-width: 0;
@@ -208,7 +211,8 @@
   }
   .sidebar:not(:hover):not(:has(:focus-visible)) .brand-name,
   .sidebar:not(:hover):not(:has(:focus-visible)) .nav-item > span,
-  .sidebar:not(:hover):not(:has(:focus-visible)) .profile {
+  .sidebar:not(:hover):not(:has(:focus-visible)) .profile-info,
+  .sidebar:not(:hover):not(:has(:focus-visible)) .demo-badge {
     display: none;
   }
   .sidebar:not(:hover):not(:has(:focus-visible)) .brand-symbol {
@@ -219,11 +223,8 @@
     padding: 0;
     gap: 0;
   }
-  .sidebar:not(:hover):not(:has(:focus-visible)) .sidebar-profile-avatar {
-    display: grid;
-    place-items: center;
-    width: 100%;
-    padding-top: 16px;
-    border-top: 1px solid var(--line);
+  .sidebar:not(:hover):not(:has(:focus-visible)) .profile {
+    justify-content: center;
+    padding-inline: 0;
   }
 }

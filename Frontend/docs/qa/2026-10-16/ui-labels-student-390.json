@@ -1,0 +1,132 @@
+{
+  "role": "student",
+  "width": 390,
+  "inventory": [
+    {
+      "path": "/",
+      "labels": [
+        {
+          "text": "Mau lanjut belajar apa hari ini?",
+          "className": "page-intro",
+          "fontSize": "14px"
+        },
+        {
+          "text": "Belum diatasi",
+          "className": "",
+          "fontSize": "12px"
+        }
+      ]
+    },
+    {
+      "path": "/profile",
+      "labels": [
+        {
+          "text": "IF2123 · Dr. Nadia Putri",
+          "className": "",
+          "fontSize": "14px"
+        },
+        {
+          "text": "IF2110 · Dr. Bima Pratama",
+          "className": "",
+          "fontSize": "14px"
+        },
+        {
+          "text": "IF2220 · Dr. Laras Utami",
+          "className": "",
+          "fontSize": "14px"
+        },
+        {
+          "text": "IF2240 · Dr. Arif Rahman",
+          "className": "",
+          "fontSize": "14px"
+        }
+      ]
+    },
+    {
+      "path": "/classes",
+      "labels": []
+    },
+    {
+      "path": "/classes/aljabar",
+      "labels": [
+        {
+          "text": "15 Oktober · 09.00",
+          "className": "",
+          "fontSize": "14px"
+        }
+      ]
+    },
+    {
+      "path": "/classes/aljabar/materials",
+      "labels": []
+    },
+    {
+      "path": "/session/linear-05?tab=questions",
+      "labels": [
+        {
+          "text": "Pertemuan 5 · 5 OktLive",
+          "className": "session-meta",
+          "fontSize": "12px"
+        },
+        {
+          "text": "Kalau basisnya berubah, matriks transformasinya ikut berubah juga?",
+          "className": "",
+          "fontSize": "14px"
+        },
+        {
+          "text": "Apa bedanya kernel dengan vektor nol?",
+          "className": "",
+          "fontSize": "14px"
+        },
+        {
+          "text": "Dijawab di kelas",
+          "className": "",
+          "fontSize": "12px"
+        }
+      ]
+    },
+    {
+      "path": "/session/basis-04?tab=notes",
+      "labels": [
+        {
+          "text": "Pertemuan 4 · 1 Okt",
+          "className": "session-meta",
+          "fontSize": "12px"
+        },
+        {
+          "text": "Sebuah himpunan bebas linear jika tidak ada vektor di dalamnya yang dapat ditulis sebagai kombinasi vektor lainnya.",
+          "className": "",
+          "fontSize": "14px"
+        },
+        {
+          "text": "Basis adalah himpunan vektor yang bebas linear dan membangun seluruh ruang. Setiap vektor memiliki koordinat unik terhadap basis itu.",
+          "className": "",
+          "fontSize": "14px"
+        },
+        {
+          "text": "Dimensi menyatakan banyaknya vektor dalam sebuah basis. Semua basis untuk ruang yang sama memiliki jumlah vektor yang sama.",
+          "className": "",
+          "fontSize": "14px"
+        },
+        {
+          "text": "18:00",
+          "className": "",
+          "fontSize": "12px"
+        }
+      ]
+    },
+    {
+      "path": "/agenda",
+      "labels": []
+    },
+    {
+      "path": "/login",
+      "labels": []
+    },
+    {
+      "path": "/register",
+      "labels": []
+    }
+  ],
+  "errors": []
+}

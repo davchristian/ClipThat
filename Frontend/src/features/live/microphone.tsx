@@ -12,12 +12,18 @@ export function Microphone({
   onChange,
   onUploaded,
   onDraft,
+  autoStart = false,
+  stopRequested = false,
+  onStopped,
 }: {
   sessionId: string;
   startedAt: string;
   onChange: (busy: boolean) => void;
   onUploaded: () => Promise<void>;
   onDraft?: (draft: SpeechDraft) => void;
+  autoStart?: boolean;
+  stopRequested?: boolean;
+  onStopped?: () => void;
 }) {
   const [recording, setRecording] = useState(false);
   const [count, setCount] = useState(0);
@@ -32,6 +38,33 @@ export function Microphone({
   const queue = useRef<Chunk[]>([]);
   const draining = useRef(false);
   const mounted = useRef(true);
+  const autoStarted = useRef(false);
+  const startingInFlight = useRef(false);
+  const stopNotified = useRef(false);
+  useEffect(() => {
+    if (configured && provider !== "deepgram" && autoStart && !autoStarted.current) {
+      autoStarted.current = true;
+      void start();
+    }
+  }, [configured, provider, autoStart]);
+  useEffect(() => {
+    if (!stopRequested) {
+      stopNotified.current = false;
+      return;
+    }
+    if (provider === "deepgram") return;
+    if (recording) stop();
+    if (
+      !recording &&
+      !starting &&
+      count === 0 &&
+      !startingInFlight.current &&
+      !stopNotified.current
+    ) {
+      stopNotified.current = true;
+      onStopped?.();
+    }
+  }, [stopRequested, recording, starting, count, provider, onStopped]);
   useEffect(() => {
     mounted.current = true;
     api<{ transcription_configured: boolean; transcription_provider?: string }>("health")
@@ -49,8 +82,8 @@ export function Microphone({
     };
   }, []);
   useEffect(() => {
-    onChange(recording || count > 0 || starting);
-  }, [recording, count, starting, onChange]);
+    if (provider !== "deepgram") onChange(recording || count > 0 || starting);
+  }, [recording, count, starting, onChange, provider]);
   useEffect(() => {
     if (!recording && !count && !starting) return;
     const warn = (e: BeforeUnloadEvent) => {
@@ -149,6 +182,7 @@ export function Microphone({
     }, 15000);
   }
   async function start() {
+    startingInFlight.current = true;
     setStarting(true);
     try {
       if (!window.MediaRecorder || !navigator.mediaDevices?.getUserMedia)
@@ -162,6 +196,7 @@ export function Microphone({
       stop();
       setError(e instanceof Error ? e.message : "Mikrofon tidak bisa digunakan.");
     } finally {
+      startingInFlight.current = false;
       setStarting(false);
     }
   }
@@ -173,6 +208,9 @@ export function Microphone({
         onChange={onChange}
         onUploaded={onUploaded}
         onDraft={onDraft}
+        autoStart={autoStart}
+        stopRequested={stopRequested}
+        onStopped={onStopped}
       />
     );
   return (
@@ -180,20 +218,18 @@ export function Microphone({
       <div className="mic-control-row">
         <button
           className="button secondary"
-          disabled={!configured || starting || (!recording && count > 0)}
+          disabled={stopRequested || !configured || starting || (!recording && count > 0)}
           onClick={recording ? stop : start}
         >
           {recording ? <Square size={16} /> : <Mic size={16} />}{" "}
-          {starting ? "Menyiapkan…" : recording ? "Hentikan rekaman" : "Rekam suara dosen"}
+          {starting ? "Menyiapkan…" : recording ? "Hentikan rekaman" : "Rekam"}
         </button>
         <span className="mic-status" role="status">
           {!configured
             ? "Transkripsi belum aktif"
-            : count
+            : !recording && count
               ? `Memproses ${count} potongan…`
-              : recording
-                ? "Merekam · diperbarui tiap 15 detik"
-                : "Siap merekam"}
+              : null}
         </span>
       </div>
       {error && (

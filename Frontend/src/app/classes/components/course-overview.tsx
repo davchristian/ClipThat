@@ -55,7 +55,7 @@ export function CourseOverview({
                       <span>{topic}</span>
                     </span>
                   ))}
-                  {topics.length > 3 && <small>+{topics.length - 3} konsep</small>}
+                  {topics.length > 3 && <small>+{topics.length - 3} materi lainnya</small>}
                   {active && (
                     <span className="course-map-current">
                       <ArrowRight size={13} aria-hidden="true" />

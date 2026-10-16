@@ -12,6 +12,7 @@ export type Course = {
   days: string;
   scheduleTime: string;
   ownerId?: string;
+  joinCode?: string;
 };
 
 export type Lesson = {
@@ -65,19 +66,27 @@ export type Agenda = {
   date: string;
   time: string;
   courseId: string;
-  kind: "Tugas" | "Kuis" | "Belajar";
+  kind: "Tugas" | "Kuis" | "Presentasi" | "Ujian" | "Belajar";
   confirmed: boolean;
   done: boolean;
   reminder: boolean;
   source?: string;
   sourceSessionId?: string;
-  sourceData?: { source_id: string; quote: string; draft_key?: string };
+  sourceData?: {
+    source_id: string;
+    quote: string;
+    draft_key?: string;
+    automatic?: boolean;
+    announcement_title?: string;
+    announcement_kind?: string;
+    announcement_due_at?: string;
+  };
   isDraft?: boolean;
 };
 
 export type DemoState = {
   role: Role;
-  profile?: { id: string; name: string; role: Role };
+  profile?: { id: string; name: string; role: Role; email?: string };
   courses?: Course[];
   transcripts?: Record<string, Segment[]>;
   generatedNotes?: Record<string, StudyNote[]>;
@@ -112,6 +121,7 @@ export type ConceptNode = {
   description: string;
   topics?: string[];
   source_ids: string[];
+  sections?: { title: string; source_ids: string[]; sessionId?: string }[];
   sessionId?: string;
   group?: string;
 };

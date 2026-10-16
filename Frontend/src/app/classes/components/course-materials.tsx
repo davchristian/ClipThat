@@ -1,14 +1,12 @@
 "use client";
 import { liveMode } from "@/lib/app-mode";
-
 import Link from "next/link";
+
 import { useRouter } from "next/navigation";
 import { GraphExplorer } from "@/features/graph/graph-explorer";
 import { graphForLesson, mergeGraphs } from "@/features/graph/graph-data";
-import { ArrowRight } from "lucide-react";
 import { useContent } from "@/data/use-content";
 import { Breadcrumbs, Empty, PageHeading, SectionTitle } from "@/components/ui";
-import { dateLabel } from "@/lib/format";
 import { useApp } from "@/state/app-provider";
 
 export function CourseMaterials({ courseId }: { courseId: string }) {
@@ -60,7 +58,7 @@ export function CourseMaterials({ courseId }: { courseId: string }) {
                   ),
                 })),
               )}
-              onSource={(id, source) => {
+              onSource={(id, source, sourceSession) => {
                 const node = mergeGraphs(
                   completed.map((lesson) => ({
                     sessionId: lesson.id,
@@ -71,33 +69,12 @@ export function CourseMaterials({ courseId }: { courseId: string }) {
                     ),
                   })),
                 ).nodes.find((n) => n.id === id);
-                if (node?.sessionId)
+                if (sourceSession || node?.sessionId)
                   router.push(
-                    `/session/${node.sessionId}?tab=transcript${source ? `#segment-${source}` : ""}`,
+                    `/session/${sourceSession || node?.sessionId}?tab=transcript${source ? `&source=${encodeURIComponent(source)}#segment-${source}` : ""}`,
                   );
               }}
             />
-          </section>
-          <section className="course-materials-summary panel">
-            <SectionTitle>Rangkuman materi</SectionTitle>
-            {completed.map((lesson) => (
-              <section className="course-summary-lesson" key={lesson.id}>
-                <span className="eyebrow">
-                  Pertemuan {lesson.number} · {dateLabel(lesson.date, true)}
-                </span>
-                <h3>{lesson.title}</h3>
-                {notesForLesson(lesson).map((note) => (
-                  <div className="course-summary-note" key={note.title}>
-                    <h4>{note.title}</h4>
-                    <p>{note.body}</p>
-                    {note.formula && <div className="formula">{note.formula}</div>}
-                  </div>
-                ))}
-                <Link href={`/session/${lesson.id}?tab=notes`} className="text-button">
-                  Buka rangkuman kelas <ArrowRight size={15} />
-                </Link>
-              </section>
-            ))}
           </section>
         </>
       ) : (

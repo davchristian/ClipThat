@@ -8,6 +8,34 @@ afterEach(() => {
   delete process.env.DEEPGRAM_API_KEY;
   delete process.env.TRANSCRIPTION_PROVIDER;
 });
+
+test("continuous speech crosses 15-second rows using word timestamps even before finalization", () => {
+  const result = deepgramResult(
+    {
+      type: "Results",
+      start: 14,
+      duration: 3,
+      is_final: false,
+      channel: {
+        alternatives: [
+          {
+            transcript: "Satu dua.",
+            words: [
+              { start: 14, end: 14.5, word: "satu", punctuated_word: "Satu" },
+              { start: 15, end: 16, word: "dua", punctuated_word: "dua." },
+            ],
+          },
+        ],
+      },
+    },
+    0,
+  );
+  assert.deepEqual(result?.parts, [
+    { start: 14, end: 14.5, text: "Satu" },
+    { start: 15, end: 16, text: "dua." },
+  ]);
+  assert.equal(result?.final, false);
+});
 test("Deepgram requests only a short-lived token with the server key", async () => {
   process.env.DEEPGRAM_API_KEY = "server-test-only";
   process.env.TRANSCRIPTION_PROVIDER = "deepgram";

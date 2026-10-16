@@ -20,7 +20,8 @@
   background: transparent;
   font-size: var(--font-body);
   line-height: 1.6;
-  resize: vertical;
+  resize: none;
+  overflow-y: hidden;
 }
 .questions-panel .ask-form textarea:focus-visible {
   outline: 0;
@@ -32,7 +33,7 @@
 .ask-form-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
 }
 .ask-form-footer > span {

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
-import { CalendarDays, Check, ChevronUp, GraduationCap, House, Settings2 } from "lucide-react";
+import { CalendarDays, Check, ChevronUp, GraduationCap, House } from "lucide-react";
 import { Logo } from "@/components/ui";
 import { useApp } from "@/state/app-provider";
 import type { Role } from "@/lib/types";
@@ -63,26 +63,37 @@ export function Sidebar({ mobile }: { mobile: boolean }) {
           })}
       </nav>
       <div className="sidebar-bottom">
-        <Link
-          className={`nav-item ${pathname === "/settings" ? "active" : ""}`}
-          href="/settings"
-          aria-label="Pengaturan"
-          title="Pengaturan"
-        >
-          <Settings2 size={19} strokeWidth={1.7} />
-          <span>Pengaturan</span>
-        </Link>
-        <div className="sidebar-profile-avatar" aria-hidden="true">
-          <span className="avatar">{initials}</span>
-        </div>
-        <div className="profile">
-          <span className="avatar">{initials}</span>
-          <div className="profile-info">
-            <strong>{name}</strong>
-            {liveMode ? <small>{lecturer ? "Dosen" : "Mahasiswa"}</small> : <RoleSwitcher />}
+        {liveMode ? (
+          <Link
+            href="/profile"
+            className="profile sidebar-profile-avatar"
+            aria-label={`Buka profil ${name}`}
+            aria-current={pathname === "/profile" ? "page" : undefined}
+          >
+            <span className="avatar">{initials}</span>
+            <div className="profile-info">
+              <strong>{name}</strong>
+              <small>{lecturer ? "Dosen" : "Mahasiswa"}</small>
+            </div>
+          </Link>
+        ) : (
+          <div className="profile">
+            <Link
+              href="/profile"
+              className="sidebar-profile-avatar"
+              aria-label={`Buka profil ${name}`}
+            >
+              <span className="avatar">{initials}</span>
+            </Link>
+            <div className="profile-info">
+              <Link href="/profile">
+                <strong>{name}</strong>
+              </Link>
+              <RoleSwitcher />
+            </div>
+            <span className="demo-badge">Demo</span>
           </div>
-          {!liveMode && <span className="demo-badge">Demo</span>}
-        </div>
+        )}
       </div>
     </aside>
   );

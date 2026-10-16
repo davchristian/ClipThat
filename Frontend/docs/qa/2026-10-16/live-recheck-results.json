@@ -1,0 +1,353 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--config",
+      "playwright.audit-live.config.ts",
+      "--output",
+      "test-results/qa-live-final",
+      "--reporter=list,json",
+      "-g",
+      "live capture discard|generated class graph|QA live|QA generated"
+    ],
+    "configFile": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\playwright.audit-live.config.ts",
+    "rootDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/test-results/qa-live-final",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "live.spec.ts",
+          "qa-live-audit.spec.ts"
+        ],
+        "timeout": 45000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "live.spec.ts",
+      "file": "live.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "live capture discard makes no save request; confirmation uses the real signed-token save route",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 8893,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('button', { name: 'Tersimpan (1)' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('button', { name: 'Tersimpan (1)' }) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: 'Tersimpan (1)' })\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('button', { name: 'Tersimpan (1)' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('button', { name: 'Tersimpan (1)' }) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: 'Tersimpan (1)' })\u001b[22m\n\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\live.spec.ts:68:69",
+                    "location": {
+                      "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\live.spec.ts",
+                      "column": 69,
+                      "line": 68
+                    },
+                    "snippet": "  66 |   await page.getByRole(\"button\", { name: \"Capture 90 detik\" }).click();\n  67 |   await preview.getByRole(\"button\", { name: \"Simpan capture\" }).click();\n> 68 |   await expect(page.getByRole(\"button\", { name: \"Tersimpan (1)\" })).toBeVisible();\n     |                                                                     ^\n  69 |   expect(writes).toBe(1);\n  70 |   await page.reload();\n  71 |   await expect(page.getByRole(\"button\", { name: \"Tersimpan (1)\" })).toBeVisible();"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\live.spec.ts",
+                        "column": 69,
+                        "line": 68
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('button', { name: 'Tersimpan (1)' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('button', { name: 'Tersimpan (1)' }) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: 'Tersimpan (1)' })\u001b[22m\n\n\n  66 |   await page.getByRole(\"button\", { name: \"Capture 90 detik\" }).click();\n  67 |   await preview.getByRole(\"button\", { name: \"Simpan capture\" }).click();\n> 68 |   await expect(page.getByRole(\"button\", { name: \"Tersimpan (1)\" })).toBeVisible();\n     |                                                                     ^\n  69 |   expect(writes).toBe(1);\n  70 |   await page.reload();\n  71 |   await expect(page.getByRole(\"button\", { name: \"Tersimpan (1)\" })).toBeVisible();\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\live.spec.ts:68:69"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:53:23.214Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\qa-live-final\\live-live-capture-discard--6b4a3-eal-signed-token-save-route\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\qa-live-final\\live-live-capture-discard--6b4a3-eal-signed-token-save-route\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\qa-live-final\\live-live-capture-discard--6b4a3-eal-signed-token-save-route\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\live.spec.ts",
+                    "column": 69,
+                    "line": 68
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "b37044e47a10d94689f2-c9d50772aa509033df31",
+          "file": "live.spec.ts",
+          "line": 32,
+          "column": 5
+        },
+        {
+          "title": "generated class graph links to its transcript and agenda confirmation survives reload",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 8738,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.agenda-draft:visible').filter({ hasText: 'Latihan matriks' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('.agenda-draft:visible').filter({ hasText: 'Latihan matriks' }) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.agenda-draft:visible').filter({ hasText: 'Latihan matriks' })\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.agenda-draft:visible').filter({ hasText: 'Latihan matriks' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('.agenda-draft:visible').filter({ hasText: 'Latihan matriks' }) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.agenda-draft:visible').filter({ hasText: 'Latihan matriks' })\u001b[22m\n\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\live.spec.ts:268:23",
+                    "location": {
+                      "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\live.spec.ts",
+                      "column": 23,
+                      "line": 268
+                    },
+                    "snippet": "  266 |   await page.goto(\"/agenda\");\n  267 |   const draft = page.locator(\".agenda-draft:visible\").filter({ hasText: \"Latihan matriks\" });\n> 268 |   await expect(draft).toBeVisible();\n      |                       ^\n  269 |   await draft.getByRole(\"button\", { name: \"Tinjau\" }).click();\n  270 |   await page.getByRole(\"button\", { name: \"Konfirmasi agenda\", exact: true }).click();\n  271 |   await expect(draft).toHaveCount(0);"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\live.spec.ts",
+                        "column": 23,
+                        "line": 268
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.agenda-draft:visible').filter({ hasText: 'Latihan matriks' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('.agenda-draft:visible').filter({ hasText: 'Latihan matriks' }) with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.agenda-draft:visible').filter({ hasText: 'Latihan matriks' })\u001b[22m\n\n\n  266 |   await page.goto(\"/agenda\");\n  267 |   const draft = page.locator(\".agenda-draft:visible\").filter({ hasText: \"Latihan matriks\" });\n> 268 |   await expect(draft).toBeVisible();\n      |                       ^\n  269 |   await draft.getByRole(\"button\", { name: \"Tinjau\" }).click();\n  270 |   await page.getByRole(\"button\", { name: \"Konfirmasi agenda\", exact: true }).click();\n  271 |   await expect(draft).toHaveCount(0);\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\live.spec.ts:268:23"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:53:33.669Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\qa-live-final\\live-generated-class-graph-faba9-onfirmation-survives-reload\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\qa-live-final\\live-generated-class-graph-faba9-onfirmation-survives-reload\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\qa-live-final\\live-generated-class-graph-faba9-onfirmation-survives-reload\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\live.spec.ts",
+                    "column": 23,
+                    "line": 268
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "b37044e47a10d94689f2-a58b76efe11f6ccee9dc",
+          "file": "live.spec.ts",
+          "line": 249,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "qa-live-audit.spec.ts",
+      "file": "qa-live-audit.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "QA live capture persists through the current Notes UI and retains preview on a save error",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8788,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:53:44.929Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "0aa0d1d44c353ec37f81-9162761e7bbf2bbc920b",
+          "file": "qa-live-audit.spec.ts",
+          "line": 14,
+          "column": 5
+        },
+        {
+          "title": "QA generated agenda draft remains reachable for the student to complete",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 7141,
+                  "error": {
+                    "message": "TypeError: Cannot read properties of undefined (reading 'agenda_drafts')",
+                    "stack": "TypeError: Cannot read properties of undefined (reading 'agenda_drafts')\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-live-audit.spec.ts:48:26",
+                    "location": {
+                      "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-live-audit.spec.ts",
+                      "column": 26,
+                      "line": 48
+                    },
+                    "snippet": "  46 |   await page.goto(\"/agenda\");\n  47 |   const boot = (await (await page.request.get(\"/api/v1/boot\")).json()).data;\n> 48 |   expect(boot.results[0].agenda_drafts).toHaveLength(1);\n     |                          ^\n  49 |   await expect(page.getByText(\"Latihan matriks\", { exact: true })).toBeVisible();\n  50 | });\n  51 |"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-live-audit.spec.ts",
+                        "column": 26,
+                        "line": 48
+                      },
+                      "message": "TypeError: Cannot read properties of undefined (reading 'agenda_drafts')\n\n  46 |   await page.goto(\"/agenda\");\n  47 |   const boot = (await (await page.request.get(\"/api/v1/boot\")).json()).data;\n> 48 |   expect(boot.results[0].agenda_drafts).toHaveLength(1);\n     |                          ^\n  49 |   await expect(page.getByText(\"Latihan matriks\", { exact: true })).toBeVisible();\n  50 | });\n  51 |\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-live-audit.spec.ts:48:26"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:53:54.046Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\qa-live-final\\qa-live-audit-QA-generated-e14cb-for-the-student-to-complete\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\qa-live-final\\qa-live-audit-QA-generated-e14cb-for-the-student-to-complete\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\qa-live-final\\qa-live-audit-QA-generated-e14cb-for-the-student-to-complete\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-live-audit.spec.ts",
+                    "column": 26,
+                    "line": 48
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "0aa0d1d44c353ec37f81-6aaad85fb122a21b7dd6",
+          "file": "qa-live-audit.spec.ts",
+          "line": 44,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-16T12:53:22.700Z",
+    "duration": 40259.193999999996,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 3,
+    "flaky": 0
+  }
+}

@@ -1,0 +1,104 @@
+[
+  {
+    "name": "mixed_material_quiz_offtopic",
+    "expected": "notes include matrices, exclude holiday; quiz 2026-10-20",
+    "pass": true,
+    "result": {
+      "notes": [
+        {
+          "title": "Matriks Identitas",
+          "body": "Matriks identitas adalah matriks yang memiliki angka satu pada diagonal utama dan nol pada posisi lainnya.",
+          "source_ids": [
+            "00000000-0000-4000-8000-000000000001"
+          ]
+        }
+      ],
+      "graph": {
+        "nodes": [
+          {
+            "id": "node-1",
+            "title": "Matriks Identitas",
+            "description": "Matriks khusus dengan angka satu pada diagonal utama dan nol pada posisi lainnya.",
+            "topics": [
+              "Matriks Identitas",
+              "Diagonal Utama"
+            ],
+            "source_ids": [
+              "00000000-0000-4000-8000-000000000001"
+            ]
+          }
+        ],
+        "edges": []
+      },
+      "agenda": [
+        {
+          "title": "Kuis Matriks",
+          "kind": "Kuis",
+          "due_at": "2026-10-20T00:00:00+07:00",
+          "source_id": "00000000-0000-4000-8000-000000000002",
+          "quote": "Minggu depan hari Selasa ada kuis matriks."
+        }
+      ]
+    }
+  },
+  {
+    "name": "offtopic_only",
+    "expected": "notes and graph and agenda empty",
+    "pass": true,
+    "result": {
+      "notes": [],
+      "graph": {
+        "nodes": [],
+        "edges": []
+      },
+      "agenda": []
+    }
+  },
+  {
+    "name": "unclear_date",
+    "expected": "no dated agenda",
+    "pass": true,
+    "result": {
+      "notes": [],
+      "graph": {
+        "nodes": [],
+        "edges": []
+      },
+      "agenda": []
+    }
+  },
+  {
+    "name": "revised_schedule",
+    "expected": "one quiz on 2026-10-21 at 09:00 Jakarta",
+    "pass": true,
+    "result": {
+      "notes": [],
+      "graph": {
+        "nodes": [],
+        "edges": []
+      },
+      "agenda": [
+        {
+          "title": "Kuis Matriks",
+          "kind": "Kuis",
+          "due_at": "2026-10-21T09:00:00+07:00",
+          "source_id": "00000000-0000-4000-8000-000000000002",
+          "quote": "Saya revisi, kuis matriks bukan Selasa. Kuis matriks dipindah ke hari Rabu minggu depan pukul sembilan pagi."
+        }
+      ]
+    }
+  },
+  {
+    "name": "historical_hypothetical",
+    "expected": "no agenda",
+    "pass": true,
+    "result": {
+      "notes": [],
+      "graph": {
+        "nodes": [],
+        "edges": []
+      },
+      "agenda": []
+    }
+  }
+]

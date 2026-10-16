@@ -13,6 +13,8 @@
     "test:backend": "tsx --test tests/backend/*.test.ts",
     "test:live": "playwright test --config playwright.live.config.ts",
     "jobs:run": "tsx scripts/run-jobs.ts",
+    "jobs:watch": "tsx scripts/run-jobs.ts --watch",
+    "setup:check": "tsx scripts/check-services.ts",
     "cf:build": "opennextjs-cloudflare build",
     "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",

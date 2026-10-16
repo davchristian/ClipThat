@@ -1,0 +1,418 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--config",
+      "playwright.audit.config.ts",
+      "tests/qa-audit.spec.ts",
+      "--reporter=list,json"
+    ],
+    "configFile": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\playwright.audit.config.ts",
+    "rootDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/test-results/audit",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "app.spec.ts",
+          "focus-mode.spec.ts",
+          "qa-audit.spec.ts"
+        ],
+        "timeout": 25000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev -- --port 3197",
+      "url": "http://127.0.0.1:3197",
+      "reuseExistingServer": true,
+      "timeout": 90000,
+      "env": {
+        "NEXT_PUBLIC_APP_MODE": "demo",
+        "CLIPTHAT_DIST_DIR": ".next-qa-demo",
+        "GEMINI_API_KEY": "",
+        "OPENAI_API_KEY": "",
+        "DEEPGRAM_API_KEY": ""
+      }
+    }
+  },
+  "suites": [
+    {
+      "title": "qa-audit.spec.ts",
+      "file": "qa-audit.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "QA inventory and profile course grid: student 390px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8344,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:49:18.612Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cd92235559c60de271e7-c15155a3ebe719d155cb",
+          "file": "qa-audit.spec.ts",
+          "line": 8,
+          "column": 9
+        },
+        {
+          "title": "QA inventory and profile course grid: student 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7070,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:49:27.516Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cd92235559c60de271e7-5aa338fcbbde90f4293d",
+          "file": "qa-audit.spec.ts",
+          "line": 8,
+          "column": 9
+        },
+        {
+          "title": "QA inventory and profile course grid: lecturer 390px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6494,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:49:34.596Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cd92235559c60de271e7-bc00eff7092f82861c93",
+          "file": "qa-audit.spec.ts",
+          "line": 8,
+          "column": 9
+        },
+        {
+          "title": "QA inventory and profile course grid: lecturer 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7526,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:49:41.106Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cd92235559c60de271e7-753a7677bc5b2436fd13",
+          "file": "qa-audit.spec.ts",
+          "line": 8,
+          "column": 9
+        },
+        {
+          "title": "QA question grows for wrapped text, shrinks on clear and has no anonymous timestamp metadata",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 6283,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.question-card').first().locator('small')\nExpected substring: not \u001b[32m\"Anonim\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"not toContainText\" locator('.question-card').first().locator('small') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.question-card').first().locator('small')\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.question-card').first().locator('small')\nExpected substring: not \u001b[32m\"Anonim\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"not toContainText\" locator('.question-card').first().locator('small') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.question-card').first().locator('small')\u001b[22m\n\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-audit.spec.ts:60:45",
+                    "location": {
+                      "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-audit.spec.ts",
+                      "column": 45,
+                      "line": 60
+                    },
+                    "snippet": "  58 |   for (const card of await page.locator(\".question-card\").all()) {\n  59 |     await expect(card).not.toContainText(\"Posisi rekaman\");\n> 60 |     await expect(card.locator(\"small\")).not.toContainText(\"Anonim\");\n     |                                             ^\n  61 |   }\n  62 | });\n  63 |"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-audit.spec.ts",
+                        "column": 45,
+                        "line": 60
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.question-card').first().locator('small')\nExpected substring: not \u001b[32m\"Anonim\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"not toContainText\" locator('.question-card').first().locator('small') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.question-card').first().locator('small')\u001b[22m\n\n\n  58 |   for (const card of await page.locator(\".question-card\").all()) {\n  59 |     await expect(card).not.toContainText(\"Posisi rekaman\");\n> 60 |     await expect(card.locator(\"small\")).not.toContainText(\"Anonim\");\n     |                                             ^\n  61 |   }\n  62 | });\n  63 |\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-audit.spec.ts:60:45"
+                    },
+                    {
+                      "message": "Error: apiRequestContext._wrapApiCall: ENOENT: no such file or directory, copyfile 'C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\.playwright-artifacts-0\\traces\\cd92235559c60de271e7-18cb839496184c1bd54f-recording9.network' -> 'C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\.playwright-artifacts-0\\traces\\cd92235559c60de271e7-18cb839496184c1bd54f-recording9-pwnetcopy-1.network'"
+                    },
+                    {
+                      "message": "Error: browserContext._wrapApiCall: ENOENT: no such file or directory, open 'C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\.playwright-artifacts-0\\traces\\cd92235559c60de271e7-18cb839496184c1bd54f-recording8.trace'"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:49:48.640Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\qa-audit-QA-question-grows-3e707-nonymous-timestamp-metadata\\test-failed-1.png"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\qa-audit-QA-question-grows-3e707-nonymous-timestamp-metadata\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-audit.spec.ts",
+                    "column": 45,
+                    "line": 60
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "cd92235559c60de271e7-18cb839496184c1bd54f",
+          "file": "qa-audit.spec.ts",
+          "line": 47,
+          "column": 5
+        },
+        {
+          "title": "QA auth required fields, email format and password visibility",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1197,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:49:57.113Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "cd92235559c60de271e7-f490afe255c76ee7465b",
+          "file": "qa-audit.spec.ts",
+          "line": 64,
+          "column": 5
+        },
+        {
+          "title": "QA invalid session and corrupt demo storage recover without a page crash",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5951,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('h1').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('h1').first() with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1').first()\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('h1').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('h1').first() with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1').first()\u001b[22m\n\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-audit.spec.ts:83:44",
+                    "location": {
+                      "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-audit.spec.ts",
+                      "column": 44,
+                      "line": 83
+                    },
+                    "snippet": "  81 |   await page.addInitScript(() => localStorage.setItem(\"clipthat-frontend-v1\", \"{not-json\"));\n  82 |   await page.goto(\"/session/does-not-exist\");\n> 83 |   await expect(page.locator(\"h1\").first()).toBeVisible();\n     |                                            ^\n  84 |   await page.goto(\"/\");\n  85 |   await expect(page.getByRole(\"heading\", { name: /Selamat datang/ })).toBeVisible();\n  86 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-audit.spec.ts",
+                        "column": 44,
+                        "line": 83
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('h1').first()\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" locator('h1').first() with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1').first()\u001b[22m\n\n\n  81 |   await page.addInitScript(() => localStorage.setItem(\"clipthat-frontend-v1\", \"{not-json\"));\n  82 |   await page.goto(\"/session/does-not-exist\");\n> 83 |   await expect(page.locator(\"h1\").first()).toBeVisible();\n     |                                            ^\n  84 |   await page.goto(\"/\");\n  85 |   await expect(page.getByRole(\"heading\", { name: /Selamat datang/ })).toBeVisible();\n  86 | });\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-audit.spec.ts:83:44"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:49:58.916Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\qa-audit-QA-invalid-sessio-03d13-ecover-without-a-page-crash\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\qa-audit-QA-invalid-sessio-03d13-ecover-without-a-page-crash\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\qa-audit-QA-invalid-sessio-03d13-ecover-without-a-page-crash\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\qa-audit.spec.ts",
+                    "column": 44,
+                    "line": 83
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "cd92235559c60de271e7-d271df5ab627a689afd9",
+          "file": "qa-audit.spec.ts",
+          "line": 80,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-16T12:49:17.842Z",
+    "duration": 52955.683000000005,
+    "expected": 5,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

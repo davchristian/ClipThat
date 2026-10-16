@@ -87,9 +87,6 @@ export function PhotoDialog({
             placeholder={seconds(elapsed)}
             required
           />
-          <span className="field-hint">
-            Terisi otomatis dari waktu kelas. Kamu bisa menyesuaikannya.
-          </span>
         </label>
         {error && (
           <p role="alert" className="field-error">

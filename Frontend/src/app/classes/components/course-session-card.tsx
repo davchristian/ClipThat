@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Archive, ArrowRight, Bookmark, FileText, MessageCircle } from "lucide-react";
+import { Archive, ArrowRight, Bookmark, FileText, MessageCircle, Play } from "lucide-react";
 import { ActionMenu } from "@/components/ui";
 import { dateLabel } from "@/lib/format";
 import type { Lesson, SavedItem } from "@/lib/types";
@@ -10,12 +10,16 @@ export function CourseSessionCard({
   lecturer,
   questionCount,
   onArchive,
+  onStart,
+  pending,
 }: {
   lesson: Lesson;
   personal: SavedItem[];
   lecturer: boolean;
   questionCount: number;
   onArchive: () => void;
+  onStart?: () => void;
+  pending?: boolean;
 }) {
   return (
     <article className={`course-session-card ${lesson.status === "live" ? "is-live" : ""}`}>
@@ -62,6 +66,12 @@ export function CourseSessionCard({
         </div>
       )}
       <div className="course-session-actions">
+        {lecturer && lesson.status === "upcoming" && onStart && (
+          <button className="button primary small" disabled={pending} onClick={onStart}>
+            <Play size={14} />
+            Mulai kelas
+          </button>
+        )}
         <Link
           className="text-button"
           href={`/session/${lesson.id}?tab=${lesson.status === "done" ? "notes" : "transcript"}`}

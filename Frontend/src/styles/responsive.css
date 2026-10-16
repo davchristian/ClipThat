@@ -359,17 +359,6 @@
     gap: 8px;
     font-size: var(--font-caption);
   }
-  .integration-row {
-    gap: 10px;
-  }
-  .integration-row .button {
-    font-size: var(--font-caption);
-    padding: 8px;
-  }
-  .integration-logo {
-    width: 30px;
-    height: 31px;
-  }
 }
 @media (min-width: 851px) {
   .calendar-grid td {

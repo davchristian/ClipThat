@@ -40,6 +40,10 @@ export const graphSchema = z
           description: z.string().max(3000),
           topics: z.array(z.string().trim().min(1).max(60)).max(4).optional(),
           source_ids: z.array(uuid).max(50),
+          sections: z
+            .array(z.object({ title: shortText, source_ids: z.array(uuid).min(1).max(50) }))
+            .max(20)
+            .optional(),
         }),
       )
       .max(40),
@@ -67,7 +71,7 @@ export const noteSchema = z.object({
 });
 export const agendaDraftSchema = z.object({
   title: shortText,
-  kind: z.enum(["Tugas", "Kuis", "Belajar"]),
+  kind: z.enum(["Tugas", "Kuis", "Presentasi", "Ujian"]),
   due_at: z.string().nullable(),
   source_id: uuid,
   quote: z.string().max(3000),
@@ -101,7 +105,7 @@ export const agendaInput = z
   .object({
     title: shortText,
     due_at: z.iso.datetime({ offset: true }),
-    kind: z.enum(["Tugas", "Kuis", "Belajar"]),
+    kind: z.enum(["Tugas", "Kuis", "Presentasi", "Ujian", "Belajar"]),
     confirmed: z.boolean().default(false),
     done: z.boolean().default(false),
     reminder: z.boolean().default(true),

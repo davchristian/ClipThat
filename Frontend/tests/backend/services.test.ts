@@ -1,13 +1,103 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { captureWindow, gemini, whisper } from "../../src/server/ai";
+import { captureWindow, createLessonResult, gemini, whisper } from "../../src/server/ai";
 import { captureSchema, lessonResultSchema } from "../../src/server/schemas";
 import { signCapture, verifyCapture } from "../../src/server/capture-token";
 import { sameOrigin, body } from "../../src/server/http";
 import { z } from "zod";
 import { seconds } from "../../src/lib/format";
+import { lessonDateContext } from "../../src/server/lesson-dates";
 
 const user = "00000000-0000-4000-8000-000000000001";
+test("off-topic speech can complete without inventing study notes or changing transcript", async () => {
+  process.env.GEMINI_API_KEY = "test-only";
+  const original = globalThis.fetch;
+  globalThis.fetch = async () =>
+    Response.json({
+      candidates: [
+        {
+          content: {
+            parts: [
+              { text: JSON.stringify({ notes: [], graph: { nodes: [], edges: [] }, agenda: [] }) },
+            ],
+          },
+        },
+      ],
+    });
+  try {
+    const segments = [
+      { id: user, start_seconds: 0, end_seconds: 2, text: "Kemarin saya liburan." },
+    ];
+    const originalSegments = structuredClone(segments);
+    assert.deepEqual((await createLessonResult({}, segments)).notes, []);
+    assert.deepEqual(segments, originalSegments);
+    assert.deepEqual((await createLessonResult({}, [])).notes, []);
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
+test("relative announcements use the class date in Jakarta even when processing later", () => {
+  const context = lessonDateContext({ starts_at: "2026-10-16T02:00:00Z" })!;
+  assert.equal(context.class_date, "2026-10-16");
+  assert.equal(context.next_week.Selasa, "2026-10-20");
+  assert.equal(context.next_occurrence.Selasa, "2026-10-20");
+  assert.equal(context.tomorrow, "2026-10-17");
+  const sunday = lessonDateContext({ starts_at: "2026-10-18T02:00:00Z" })!;
+  assert.equal(sunday.next_week.Senin, "2026-10-19");
+  const tuesday = lessonDateContext({ starts_at: "2026-10-20T02:00:00Z" })!;
+  assert.equal(tuesday.next_week.Selasa, "2026-10-27");
+  assert.equal(tuesday.next_occurrence.Selasa, "2026-10-27");
+  assert.equal(lessonDateContext({ starts_at: "2026-10-16T18:00:00Z" })!.class_date, "2026-10-17");
+  assert.equal(lessonDateContext({}), null);
+});
+test("class extraction receives date context and accepts schedule-only speech without study notes", async () => {
+  process.env.GEMINI_API_KEY = "test-only";
+  const original = globalThis.fetch;
+  const text = "Minggu depan hari Selasa ada kuis.";
+  globalThis.fetch = async (_, init) => {
+    const request = JSON.parse(String(init?.body));
+    const input = JSON.parse(request.contents[0].parts[0].text);
+    assert.equal(input.date_context.next_week.Selasa, "2026-10-20");
+    assert.match(request.systemInstruction.parts[0].text, /HANYA materi pelajaran/);
+    assert.match(request.systemInstruction.parts[0].text, /cerita masa lalu/);
+    return Response.json({
+      candidates: [
+        {
+          content: {
+            parts: [
+              {
+                text: JSON.stringify({
+                  notes: [],
+                  graph: { nodes: [], edges: [] },
+                  agenda: [
+                    {
+                      title: "Kuis matriks",
+                      kind: "Kuis",
+                      due_at: "2026-10-20T00:00:00+07:00",
+                      source_id: user,
+                      quote: text,
+                    },
+                  ],
+                }),
+              },
+            ],
+          },
+        },
+      ],
+    });
+  };
+  try {
+    const result = await createLessonResult({ starts_at: "2026-10-16T09:00:00+07:00" }, [
+      { id: user, start_seconds: 60, end_seconds: 65, text },
+    ]);
+    assert.deepEqual(result.notes, []);
+    assert.equal(result.agenda[0].due_at, "2026-10-20T00:00:00+07:00");
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
 test("lesson generation omits nested provider array caps but validates output limits locally", async () => {
   process.env.GEMINI_API_KEY = "test-only";
   const note = { title: "Matriks", body: "Baris dan kolom", source_ids: [user] };

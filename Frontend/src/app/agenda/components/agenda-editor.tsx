@@ -24,17 +24,19 @@ export function AgendaEditor({
   const { courses } = useContent();
   const { update, notify, pending } = useApp();
   const [form, setForm] = useState<Agenda>(
-    item || {
-      id: crypto.randomUUID(),
-      title: "",
-      date,
-      time: demoTime,
-      courseId: courses[0]?.id || "",
-      kind: "Belajar",
-      confirmed: true,
-      done: false,
-      reminder: true,
-    },
+    item
+      ? { ...item, date: item.date || date, time: item.time || demoTime }
+      : {
+          id: crypto.randomUUID(),
+          title: "",
+          date,
+          time: demoTime,
+          courseId: courses[0]?.id || "",
+          kind: "Belajar",
+          confirmed: true,
+          done: false,
+          reminder: true,
+        },
   );
   function field<K extends keyof Agenda>(key: K, value: Agenda[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -123,7 +125,7 @@ export function AgendaEditor({
                 value={form.kind}
                 onChange={(e) => field("kind", e.target.value as Agenda["kind"])}
               >
-                {["Belajar", "Tugas", "Kuis"].map((k) => (
+                {["Belajar", "Tugas", "Kuis", "Presentasi", "Ujian"].map((k) => (
                   <option key={k}>{k}</option>
                 ))}
               </select>

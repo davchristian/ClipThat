@@ -261,7 +261,13 @@ export async function sessionRoute(request: Request, path: string[], db: Db, use
   if (resource === "graph" && method === "PUT") {
     const graph = await body(request, graphSchema);
     const sources = new Set((await readTranscript(db, id)).map((s) => s.id));
-    if (graph.nodes.some((n) => n.source_ids.some((s) => !sources.has(s))))
+    if (
+      graph.nodes.some(
+        (n) =>
+          n.source_ids.some((s) => !sources.has(s)) ||
+          n.sections?.some((section) => section.source_ids.some((s) => !sources.has(s))),
+      )
+    )
       throw new ApiError(422, "invalid_source", "Sumber graph tidak tersedia pada sesi ini.");
     checked(await db.rpc("correct_graph", { sid: id, content: graph }));
     return json({ saved: true });

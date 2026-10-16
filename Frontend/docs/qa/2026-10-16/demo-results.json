@@ -1,0 +1,1001 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--config",
+      "playwright.audit.config.ts",
+      "--reporter=list,json"
+    ],
+    "configFile": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\playwright.audit.config.ts",
+    "rootDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/test-results/audit",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/davin/OneDrive/Documents/VS code/ClipThat/Frontend/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "app.spec.ts",
+          "focus-mode.spec.ts",
+          "qa-audit.spec.ts"
+        ],
+        "timeout": 25000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev -- --port 3197",
+      "url": "http://127.0.0.1:3197",
+      "timeout": 90000,
+      "env": {
+        "NEXT_PUBLIC_APP_MODE": "demo",
+        "CLIPTHAT_DIST_DIR": ".next-qa-demo",
+        "GEMINI_API_KEY": "",
+        "OPENAI_API_KEY": "",
+        "DEEPGRAM_API_KEY": ""
+      }
+    }
+  },
+  "suites": [
+    {
+      "title": "app.spec.ts",
+      "file": "app.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "processing notes leave transcript and questions accessible",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4135,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:44:42.728Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-da19117dc234945d81da",
+          "file": "app.spec.ts",
+          "line": 3,
+          "column": 5
+        },
+        {
+          "title": "course cards keep their size with one, two or four courses",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1602,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:44:47.881Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-d012d714a186e92ed7de",
+          "file": "app.spec.ts",
+          "line": 23,
+          "column": 5
+        },
+        {
+          "title": "course shows schedule, overall summary, nearest agenda and past class sources",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7297,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:44:49.493Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-86d579a8dbbb90e604b4",
+          "file": "app.spec.ts",
+          "line": 59,
+          "column": 5
+        },
+        {
+          "title": "completed classes retain transcript history and allow private review and lecturer answers",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3346,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:44:56.799Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-f27bde68ae549b1371d9",
+          "file": "app.spec.ts",
+          "line": 130,
+          "column": 5
+        },
+        {
+          "title": "sidebar wheel stays separate and compact role options leave the name visible",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14485,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:45:00.156Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-90ff8746c9fd0389144c",
+          "file": "app.spec.ts",
+          "line": 169,
+          "column": 5
+        },
+        {
+          "title": "sidebar expands on hover and folds on leave without shifting the page",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 17336,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m216\u001b[39m\nReceived: \u001b[31m76\u001b[39m\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m216\u001b[39m\nReceived: \u001b[31m76\u001b[39m\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\app.spec.ts:263:71",
+                    "location": {
+                      "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\app.spec.ts",
+                      "column": 71,
+                      "line": 263
+                    },
+                    "snippet": "  261 |   await page.locator(\"#main-content\").focus();\n  262 |   await page.keyboard.press(\"Shift+Tab\");\n> 263 |   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(216);\n      |                                                                       ^\n  264 |   expect(await logo.boundingBox()).toEqual(logoPosition);\n  265 |   await page.locator(\"#main-content\").focus();\n  266 |   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(76);"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\app.spec.ts",
+                        "column": 71,
+                        "line": 263
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m216\u001b[39m\nReceived: \u001b[31m76\u001b[39m\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate\n\n  261 |   await page.locator(\"#main-content\").focus();\n  262 |   await page.keyboard.press(\"Shift+Tab\");\n> 263 |   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(216);\n      |                                                                       ^\n  264 |   expect(await logo.boundingBox()).toEqual(logoPosition);\n  265 |   await page.locator(\"#main-content\").focus();\n  266 |   await expect.poll(async () => (await sidebar.boundingBox())!.width).toBe(76);\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\app.spec.ts:263:71"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:45:14.703Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\app-sidebar-expands-on-hov-bb04a-e-without-shifting-the-page\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\app-sidebar-expands-on-hov-bb04a-e-without-shifting-the-page\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\app-sidebar-expands-on-hov-bb04a-e-without-shifting-the-page\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\app.spec.ts",
+                    "column": 71,
+                    "line": 263
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-615a5c073bbe85e5d8fc",
+          "file": "app.spec.ts",
+          "line": 232,
+          "column": 5
+        },
+        {
+          "title": "capture previews and discards without saving, then saves only after confirmation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7784,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:45:52.132Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-141270af9ac293fc69a4",
+          "file": "app.spec.ts",
+          "line": 277,
+          "column": 5
+        },
+        {
+          "title": "compact questions support anonymous posting, voting and reload on mobile",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1958,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:46:00.721Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-bd8a40b26df707828572",
+          "file": "app.spec.ts",
+          "line": 328,
+          "column": 5
+        },
+        {
+          "title": "unconfirmed class agenda stays off the calendar after class ends",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4062,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:46:02.699Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-7245403590539149a4b8",
+          "file": "app.spec.ts",
+          "line": 381,
+          "column": 5
+        },
+        {
+          "title": "agenda supports date selection, quick creation, edit, completion, export and delete",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2399,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:46:06.771Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-7750100872df10458870",
+          "file": "app.spec.ts",
+          "line": 409,
+          "column": 5
+        },
+        {
+          "title": "lecturer marks spoken answers, updates map, ends class, archives, restores and creates a session",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6564,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:46:09.180Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-dcc584098a12a4bd9988",
+          "file": "app.spec.ts",
+          "line": 451,
+          "column": 5
+        },
+        {
+          "title": "main views work without browser errors or horizontal overflow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 10039,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:46:15.755Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-279aacc80059f83c5351",
+          "file": "app.spec.ts",
+          "line": 513,
+          "column": 5
+        },
+        {
+          "title": "home shows its course and reminder bento without desktop scrolling",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2170,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:46:25.807Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-5077b4898cad0e2eb822",
+          "file": "app.spec.ts",
+          "line": 550,
+          "column": 5
+        },
+        {
+          "title": "home notification modal tracks handled items without adding a sidebar item",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2164,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:46:27.989Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-2cf8b49f60eb315b8a40",
+          "file": "app.spec.ts",
+          "line": 589,
+          "column": 5
+        },
+        {
+          "title": "live heading clock and page padding stay consistent across main views",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 7173,
+                  "error": {
+                    "message": "Error: locator.boundingBox: Error: strict mode violation: getByLabel('Waktu saat ini') resolved to 2 elements:\n    1) <div class=\"page-clock\" aria-label=\"Waktu saat ini\">…</div> aka getByRole('navigation', { name: 'Breadcrumb' }).getByLabel('Waktu saat ini')\n    2) <div class=\"page-clock\" aria-label=\"Waktu saat ini\">…</div> aka locator('div').filter({ hasText: 'HomeCourseAljabar LinearAljabar LinearRangkuman materi1 pertemuanBebas' }).getByLabel('Waktu saat ini')\n\nCall log:\n\u001b[2m  - waiting for getByLabel('Waktu saat ini')\u001b[22m\n",
+                    "stack": "Error: locator.boundingBox: Error: strict mode violation: getByLabel('Waktu saat ini') resolved to 2 elements:\n    1) <div class=\"page-clock\" aria-label=\"Waktu saat ini\">…</div> aka getByRole('navigation', { name: 'Breadcrumb' }).getByLabel('Waktu saat ini')\n    2) <div class=\"page-clock\" aria-label=\"Waktu saat ini\">…</div> aka locator('div').filter({ hasText: 'HomeCourseAljabar LinearAljabar LinearRangkuman materi1 pertemuanBebas' }).getByLabel('Waktu saat ini')\n\nCall log:\n\u001b[2m  - waiting for getByLabel('Waktu saat ini')\u001b[22m\n\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\app.spec.ts:724:35",
+                    "location": {
+                      "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\app.spec.ts",
+                      "column": 35,
+                      "line": 724
+                    },
+                    "snippet": "  722 |     const button = heading.getByRole(\"button\", { name: \"Lanjutkan kelas\", exact: true });\n  723 |     await expect(button).toBeVisible();\n> 724 |     const clockBox = (await clock.boundingBox())!;\n      |                                   ^\n  725 |     const buttonBox = (await button.boundingBox())!;\n  726 |     const titleBox = (await heading.locator(\"h1\").boundingBox())!;\n  727 |     if (width > 620) {"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\app.spec.ts",
+                        "column": 35,
+                        "line": 724
+                      },
+                      "message": "Error: locator.boundingBox: Error: strict mode violation: getByLabel('Waktu saat ini') resolved to 2 elements:\n    1) <div class=\"page-clock\" aria-label=\"Waktu saat ini\">…</div> aka getByRole('navigation', { name: 'Breadcrumb' }).getByLabel('Waktu saat ini')\n    2) <div class=\"page-clock\" aria-label=\"Waktu saat ini\">…</div> aka locator('div').filter({ hasText: 'HomeCourseAljabar LinearAljabar LinearRangkuman materi1 pertemuanBebas' }).getByLabel('Waktu saat ini')\n\nCall log:\n\u001b[2m  - waiting for getByLabel('Waktu saat ini')\u001b[22m\n\n\n  722 |     const button = heading.getByRole(\"button\", { name: \"Lanjutkan kelas\", exact: true });\n  723 |     await expect(button).toBeVisible();\n> 724 |     const clockBox = (await clock.boundingBox())!;\n      |                                   ^\n  725 |     const buttonBox = (await button.boundingBox())!;\n  726 |     const titleBox = (await heading.locator(\"h1\").boundingBox())!;\n  727 |     if (width > 620) {\n    at C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\app.spec.ts:724:35"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:46:30.164Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\app-live-heading-clock-and-867ad-onsistent-across-main-views\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\app-live-heading-clock-and-867ad-onsistent-across-main-views\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\test-results\\audit\\app-live-heading-clock-and-867ad-onsistent-across-main-views\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\davin\\OneDrive\\Documents\\VS code\\ClipThat\\Frontend\\tests\\app.spec.ts",
+                    "column": 35,
+                    "line": 724
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-86a02354d2123ab0b8a5",
+          "file": "app.spec.ts",
+          "line": 640,
+          "column": 5
+        },
+        {
+          "title": "photo upload validates timestamp and persists in the saved collection",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1936,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:46:38.883Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-8c199faa18447d4bdadd",
+          "file": "app.spec.ts",
+          "line": 741,
+          "column": 5
+        },
+        {
+          "title": "personal item in a course opens beside its source lesson",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1526,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:46:41.391Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-7e8ca7576b1db48a77b0",
+          "file": "app.spec.ts",
+          "line": 764,
+          "column": 5
+        },
+        {
+          "title": "a private bookmark remains available when its lesson is archived",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1687,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:46:42.934Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-c6bdbab77879470ff0fb",
+          "file": "app.spec.ts",
+          "line": 774,
+          "column": 5
+        },
+        {
+          "title": "profile is reachable from the sidebar and demo reset remains available",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2609,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:46:44.636Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-484fa1f3ad47734fdd6e",
+          "file": "app.spec.ts",
+          "line": 789,
+          "column": 5
+        },
+        {
+          "title": "login and registration remain readable on phone, tablet and desktop",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2704,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:46:47.260Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-e7ac10c3408873927121",
+          "file": "app.spec.ts",
+          "line": 808,
+          "column": 5
+        },
+        {
+          "title": "graph stays static while topic details work on desktop and phone",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2788,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:46:49.979Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-d1b76ee321452d2d68e6",
+          "file": "app.spec.ts",
+          "line": 828,
+          "column": 5
+        },
+        {
+          "title": "save current desktop and mobile design previews",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4775,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:46:52.780Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c31ff144dc4fee3acd0a-380c8d3eda612696ad0e",
+          "file": "app.spec.ts",
+          "line": 891,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "focus-mode.spec.ts",
+      "file": "focus-mode.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "focus mode uses native fullscreen and restores the classroom at 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1272,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:46:57.574Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2cdeb8e374f8e04dc850-6e51f73ec069b60a53f0",
+          "file": "focus-mode.spec.ts",
+          "line": 4,
+          "column": 7
+        },
+        {
+          "title": "focus mode uses native fullscreen and restores the classroom at 390px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 25000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1260,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-16T12:46:58.856Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2cdeb8e374f8e04dc850-7d49a773cba7db5b2d9c",
+          "file": "focus-mode.spec.ts",
+          "line": 4,
+          "column": 7
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-16T12:44:29.986Z",
+    "duration": 1472526.1509999998,
+    "expected": 22,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

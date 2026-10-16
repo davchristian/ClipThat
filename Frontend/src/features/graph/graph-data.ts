@@ -13,6 +13,7 @@ export function graphForLesson(
     source_ids: n.source_ids || [],
     sessionId: lesson.id,
     group: String(lesson.number),
+    sections: [{ title: "Buka pembahasan", source_ids: n.source_ids || [], sessionId: lesson.id }],
   }));
   return {
     nodes,
@@ -26,12 +27,23 @@ export function mergeGraphs(graphs: { sessionId: string; graph: ConceptGraph }[]
   for (const { sessionId, graph } of graphs) {
     const ids = new Map<string, string>();
     for (const node of graph.nodes) {
+      const sections = (
+        node.sections?.length
+          ? node.sections
+          : [{ title: "Buka pembahasan", source_ids: node.source_ids }]
+      ).map((section) => ({ ...section, sessionId: section.sessionId || sessionId }));
       const key = node.title.trim().toLocaleLowerCase("id-ID");
       let id = canonical.get(key);
       if (!id) {
         id = `${sessionId}:${node.id}`;
         canonical.set(key, id);
-        nodes.push({ ...node, id, sessionId, group: sessionId });
+        nodes.push({ ...node, sections, id, sessionId, group: sessionId });
+      } else {
+        const existing = nodes.find((n) => n.id === id)!;
+        existing.source_ids = [...new Set([...existing.source_ids, ...node.source_ids])];
+        if (node.description && !existing.description.includes(node.description))
+          existing.description += `\n\n${node.description}`;
+        existing.sections = [...(existing.sections || []), ...sections];
       }
       ids.set(node.id, id);
     }

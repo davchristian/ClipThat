@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowRight, LoaderCircle, Maximize, Minimize, Play, Square } from "lucide-react";
-import { Breadcrumbs, Empty, Modal } from "@/components/ui";
+import { Breadcrumbs, Empty } from "@/components/ui";
+import { HeadingMeta } from "@/components/ui/headings";
 import { dateLabel } from "@/lib/format";
 import { SavedDetail } from "@/components/saved-detail";
 import { useSession } from "./use-session";
@@ -16,7 +17,6 @@ import { CapturePreview } from "./capture-preview";
 import { Microphone } from "@/features/live/microphone";
 import { liveMode } from "@/lib/app-mode";
 import { PhotoDialog } from "./photo-dialog";
-import { PageClock } from "@/components/ui/page-clock";
 import type { SpeechDraft } from "@/features/live/deepgram-results";
 
 const primaryTabs = [
@@ -35,12 +35,32 @@ export function SessionView({ id }: { id: string }) {
   const { ready, lesson, lecturer, course, saved, update, notify } = session;
   const [detail, setDetail] = useState<string | null>(savedQuery);
   const [photo, setPhoto] = useState(false);
-  const [end, setEnd] = useState(false);
+  const [stopRequested, setStopRequested] = useState(false);
+  const [autoRecord, setAutoRecord] = useState(searchParams.get("record") === "1");
+  const ending = useRef(false);
   const [recordingBusy, setRecordingBusy] = useState(false);
   const [speechDraft, setSpeechDraft] = useState<SpeechDraft>(null);
   const [questionDraft, setQuestionDraft] = useState("");
   const classroomRef = useRef<HTMLDivElement>(null);
   const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("record") !== "1") return;
+    const params = new URLSearchParams(window.location.search);
+    params.delete("record");
+    window.history.replaceState(null, "", `?${params}`);
+  }, [searchParams]);
+  async function finishClass() {
+    if (ending.current) return;
+    ending.current = true;
+    const ok = await update((d) => ({
+      ...d,
+      lessons: d.lessons.map((l) => (l.id === id ? { ...l, status: "processing" } : l)),
+    }));
+    if (ok) window.history.replaceState(null, "", "?tab=notes");
+    setStopRequested(false);
+    ending.current = false;
+  }
 
   useEffect(() => {
     const syncFullscreen = () => setFocused(document.fullscreenElement === classroomRef.current);
@@ -118,61 +138,61 @@ export function SessionView({ id }: { id: string }) {
             )}
           </p>
         </div>
-        <div className="session-actions">
-          {lecturer && lesson.status === "failed" && (
-            <button
-              className="button secondary"
-              disabled={session.pending}
-              onClick={() =>
-                void update((d) => ({
-                  ...d,
-                  lessons: d.lessons.map((l) => (l.id === id ? { ...l, status: "processing" } : l)),
-                }))
-              }
-            >
-              Coba proses lagi
-            </button>
-          )}
-          {lecturer && live && lesson.code && (
-            <button
-              className="button secondary small"
-              onClick={() => {
-                void navigator.clipboard
-                  .writeText(lesson.code!)
-                  .then(() => notify("Kode kelas disalin."));
-              }}
-            >
-              Kode: {lesson.code}
-            </button>
-          )}
-          {lecturer && live && (
-            <button
-              className="button secondary small"
-              disabled={recordingBusy || session.pending}
-              onClick={() => setEnd(true)}
-            >
-              <Square size={13} />
-              Akhiri
-            </button>
-          )}
-          {lecturer && upcoming && (
-            <button
-              className="button primary"
-              disabled={session.pending}
-              onClick={async () => {
-                const ok = await update((d) => ({
-                  ...d,
-                  lessons: d.lessons.map((l) => (l.id === id ? { ...l, status: "live" } : l)),
-                }));
-                if (ok) notify(liveMode ? "Kelas dimulai." : "Kelas demo dimulai.");
-              }}
-            >
-              <Play size={15} />
-              Mulai kelas
-            </button>
-          )}
-        </div>
-        <PageClock />
+        <HeadingMeta
+          action={
+            <div className="session-actions">
+              {lecturer && lesson.status === "failed" && (
+                <button
+                  className="button secondary"
+                  disabled={session.pending}
+                  onClick={() =>
+                    void update((d) => ({
+                      ...d,
+                      lessons: d.lessons.map((l) =>
+                        l.id === id ? { ...l, status: "processing" } : l,
+                      ),
+                    }))
+                  }
+                >
+                  Coba proses lagi
+                </button>
+              )}
+              {lecturer && live && (
+                <button
+                  className="button secondary small"
+                  disabled={stopRequested || session.pending}
+                  aria-busy={stopRequested && recordingBusy}
+                  onClick={() => {
+                    if (liveMode && lesson.startedAt) setStopRequested(true);
+                    else void finishClass();
+                  }}
+                >
+                  <Square size={13} />
+                  {stopRequested ? "Menyelesaikan…" : "Akhiri kelas"}
+                </button>
+              )}
+              {lecturer && upcoming && (
+                <button
+                  className="button primary"
+                  disabled={session.pending}
+                  onClick={async () => {
+                    const ok = await update((d) => ({
+                      ...d,
+                      lessons: d.lessons.map((l) => (l.id === id ? { ...l, status: "live" } : l)),
+                    }));
+                    if (ok) {
+                      setAutoRecord(true);
+                      notify(liveMode ? "Kelas dimulai." : "Kelas demo dimulai.");
+                    }
+                  }}
+                >
+                  <Play size={15} />
+                  Mulai kelas
+                </button>
+              )}
+            </div>
+          }
+        />
       </div>
       <div className="class-tabs">
         <div className="tabs" aria-label="Bagian kelas">
@@ -207,6 +227,9 @@ export function SessionView({ id }: { id: string }) {
             onChange={setRecordingBusy}
             onUploaded={session.reload}
             onDraft={setSpeechDraft}
+            autoStart={autoRecord}
+            stopRequested={stopRequested}
+            onStopped={finishClass}
           />
         </div>
       )}
@@ -307,34 +330,6 @@ export function SessionView({ id }: { id: string }) {
           )}
         </>
       )}
-      <Modal
-        open={end}
-        title="Akhiri kelas?"
-        subtitle="Catatan akan diproses. Agenda dari kelas perlu dikonfirmasi mahasiswa."
-        onClose={() => setEnd(false)}
-      >
-        <div className="dialog-actions">
-          <button className="button secondary" onClick={() => setEnd(false)}>
-            Batal
-          </button>
-          <button
-            className="button primary"
-            disabled={session.pending || recordingBusy}
-            onClick={async () => {
-              window.history.replaceState(null, "", `?tab=notes`);
-              if (
-                await update((d) => ({
-                  ...d,
-                  lessons: d.lessons.map((l) => (l.id === id ? { ...l, status: "processing" } : l)),
-                }))
-              )
-                setEnd(false);
-            }}
-          >
-            Selesaikan kelas
-          </button>
-        </div>
-      </Modal>
     </div>
   );
 }

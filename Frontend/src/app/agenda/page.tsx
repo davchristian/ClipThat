@@ -24,7 +24,11 @@ const demoMonth = liveMode
   : new Date(demoCalendarMonth.year, demoCalendarMonth.monthIndex, 1, 12);
 
 function kindClass(kind: Agenda["kind"]) {
-  return kind === "Kuis" ? "quiz" : kind === "Tugas" ? "assignment" : "study";
+  return kind === "Kuis" || kind === "Ujian"
+    ? "quiz"
+    : kind === "Tugas" || kind === "Presentasi"
+      ? "assignment"
+      : "study";
 }
 
 export default function AgendaPage() {
@@ -64,6 +68,7 @@ export default function AgendaPage() {
     .filter((a) => a.confirmed)
     .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
   const selectedEntries = entries.filter((item) => item.date === selectedDate);
+  const drafts = data.agenda.filter((item) => !item.confirmed && !item.done);
 
   function openEditor(item: Agenda | "new") {
     setDayOpen(false);
@@ -93,32 +98,40 @@ export default function AgendaPage() {
         title="Agenda"
         action={
           <div className="heading-actions">
-            <ActionMenu label="Opsi agenda">
-              <button
-                onClick={() => {
-                  if (!data.agenda.some((a) => a.confirmed && !a.done)) {
-                    notify("Belum ada agenda aktif.");
-                    return;
-                  }
-                  downloadText(
-                    "clipthat-agenda.ics",
-                    calendarText(
-                      data.agenda,
-                      Object.fromEntries(courses.map((c) => [c.id, c.name])),
-                    ),
-                    "text/calendar;charset=utf-8",
-                  );
-                  notify("Kalender diunduh.");
-                }}
-              >
-                <Download size={16} />
-                Unduh kalender (.ics)
-              </button>
-              <Link href="/settings">Atur kalender</Link>
-            </ActionMenu>
+            <button
+              className="button secondary"
+              onClick={() => {
+                if (!data.agenda.some((a) => a.confirmed && !a.done)) {
+                  notify("Belum ada agenda aktif.");
+                  return;
+                }
+                downloadText(
+                  "clipthat-agenda.ics",
+                  calendarText(data.agenda, Object.fromEntries(courses.map((c) => [c.id, c.name]))),
+                  "text/calendar;charset=utf-8",
+                );
+                notify("Kalender diunduh.");
+              }}
+            >
+              <Download size={16} />
+              Unduh kalender (.ics)
+            </button>
           </div>
         }
       />
+      {drafts.length > 0 && (
+        <section className="agenda-drafts" aria-label="Agenda perlu dilengkapi">
+          <h2>Perlu dilengkapi</h2>
+          {drafts.map((item) => (
+            <div className="agenda-draft" key={item.id}>
+              <strong>{item.title}</strong>
+              <button className="text-button" onClick={() => openEditor(item)}>
+                Tinjau <Pencil size={14} />
+              </button>
+            </div>
+          ))}
+        </section>
+      )}
       <div className="agenda-workspace">
         <section className="calendar-panel" aria-label="Kalender agenda">
           <div className="calendar-toolbar">

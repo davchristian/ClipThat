@@ -83,14 +83,10 @@ test("course shows schedule, overall summary, nearest agenda and past class sour
   await expect(live.getByRole("link", { name: "Masuk kelas" })).toBeVisible();
   await main.locator(".course-summary-panel").getByRole("link", { name: "Lihat materi" }).click();
   await expect(page).toHaveURL(/classes\/aljabar\/materials/);
-  await expect(main).toContainText("Basis adalah himpunan vektor");
   await expect(main.getByLabel("Peta konsep interaktif")).toBeVisible();
-  await expect(main.getByLabel("Pilih subbab").locator("option")).toContainText([
-    "Pilih subbab",
-    "Bebas linear",
-    "Basis sebuah ruang",
-    "Dimensi",
-  ]);
+  await main.locator(".graph-topic-card").filter({ hasText: "Basis sebuah ruang" }).click();
+  await expect(main.locator(".graph-node-detail")).toContainText("Basis adalah himpunan vektor");
+  await expect(main.locator(".course-materials-summary")).toHaveCount(0);
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.reload();
   await expect(main.getByRole("heading", { name: "Materi Aljabar Linear" })).toBeVisible();
@@ -335,6 +331,17 @@ test("compact questions support anonymous posting, voting and reload on mobile",
   await composer.fill("   ");
   await expect(send).toBeDisabled();
   await composer.fill("");
+  const initialHeight = await composer.evaluate((element) => element.clientHeight);
+  await expect(composer).toHaveCSS("resize", "none");
+  await composer.fill(Array(10).fill("Pertanyaan yang terdiri dari beberapa baris.").join("\n"));
+  await expect
+    .poll(() => composer.evaluate((element) => element.clientHeight))
+    .toBeGreaterThan(initialHeight);
+  expect(await composer.evaluate((element) => element.scrollHeight <= element.clientHeight)).toBe(
+    true,
+  );
+  await composer.fill("");
+  await expect.poll(() => composer.evaluate((element) => element.clientHeight)).toBe(initialHeight);
   await page.screenshot({
     path: "docs/screenshots/questions.png",
     animations: "disabled",
@@ -346,6 +353,7 @@ test("compact questions support anonymous posting, voting and reload on mobile",
     .locator(".question-card")
     .filter({ hasText: "Bagaimana cara memilih basis yang tepat?" });
   await expect(question).toBeVisible();
+  await expect(question).not.toContainText("Posisi rekaman:");
   await expect(composer).toHaveValue("");
   await expect(send).toBeDisabled();
   await question.getByRole("button", { name: /^Dukung pertanyaan:/ }).click();
@@ -371,8 +379,8 @@ test("unconfirmed class agenda stays off the calendar after class ends", async (
   await page.locator("#main-sidebar").hover();
   await page.getByRole("button", { name: "Pilih peran demo" }).click();
   await page.getByRole("button", { name: "Dosen", exact: true }).click();
-  await page.getByRole("button", { name: "Akhiri", exact: true }).click();
-  await page.getByRole("button", { name: "Selesaikan kelas", exact: true }).click();
+  await page.getByRole("button", { name: "Akhiri kelas", exact: true }).click();
+
   await expect(page.getByRole("heading", { name: "Catatan kelas", exact: true })).toBeVisible();
   await page.locator("#main-sidebar").hover();
   await page.getByRole("button", { name: "Pilih peran demo" }).click();
@@ -380,7 +388,7 @@ test("unconfirmed class agenda stays off the calendar after class ends", async (
   await page.goto("/agenda");
   await page.reload();
   await expect(page.getByRole("heading", { name: "Usulan dari kelas" })).toHaveCount(0);
-  await expect(page.locator(".agenda-drafts")).toHaveCount(0);
+  await expect(page.locator(".agenda-drafts")).toBeVisible();
   await expect(
     page.locator(".calendar-event").filter({ hasText: "Latihan matriks transformasi" }),
   ).toHaveCount(0);
@@ -426,7 +434,6 @@ test("agenda supports date selection, quick creation, edit, completion, export a
   await item.getByRole("button", { name: /^Selesaikan:/ }).click();
   await expect(item).toHaveClass(/done/);
   await page.keyboard.press("Escape");
-  await page.getByLabel("Opsi agenda").click();
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "Unduh kalender (.ics)", exact: true }).click();
   expect((await download).suggestedFilename()).toBe("clipthat-agenda.ics");
@@ -469,10 +476,17 @@ test("lecturer marks spoken answers, updates map, ends class, archives, restores
   await page.getByRole("button", { name: "Koreksi hubungan" }).click();
   await page.getByLabel("Jenis hubungan").selectOption("penerapan");
   await page.getByRole("button", { name: "Simpan hubungan" }).click();
-  await page.getByLabel("Pilih subbab").selectOption("linear-05-0");
-  await expect(page.locator(".graph-relations")).toContainText("penerapan");
-  await page.getByRole("button", { name: "Akhiri", exact: true }).click();
-  await page.getByRole("button", { name: "Selesaikan kelas", exact: true }).click();
+  await page.locator(".graph-topic-card").first().click();
+  expect(
+    await page.evaluate(
+      () =>
+        JSON.parse(localStorage.getItem("clipthat-frontend-v1")!).conceptGraphs[
+          "linear-05"
+        ].edges.find((edge: { from: string }) => edge.from === "linear-05-0").relation,
+    ),
+  ).toBe("penerapan");
+  await page.getByRole("button", { name: "Akhiri kelas", exact: true }).click();
+
   await expect(page.getByRole("heading", { name: "Catatan kelas", exact: true })).toBeVisible();
   await expect(page.getByLabel("Catatan pribadimu")).toHaveCount(0);
   await page.goto("/classes/aljabar");
@@ -487,20 +501,21 @@ test("lecturer marks spoken answers, updates map, ends class, archives, restores
   await expect(
     page.locator(".course-session-card").filter({ hasText: "Transformasi linear" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Buat sesi", exact: true }).click();
+  await page.getByRole("button", { name: "Mulai kelas", exact: true }).click();
   const backdrop = await page.getByRole("dialog").evaluate((dialog) => {
     const style = getComputedStyle(dialog, "::backdrop");
     return { color: style.backgroundColor, filter: style.backdropFilter };
   });
   expect(backdrop).toEqual({ color: "rgba(46, 81, 69, 0.6)", filter: "none" });
   await page.getByLabel("Topik pertemuan").fill("Nilai eigen");
-  await page.getByRole("button", { name: "Buat sesi kelas" }).click();
+  await page.getByRole("button", { name: "Mulai & rekam" }).click();
   await expect(page.getByRole("heading", { name: "Nilai eigen", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Mulai kelas", exact: true }).click();
   await expect(page.getByText("Live", { exact: true })).toBeVisible();
 });
 
 test("main views work without browser errors or horizontal overflow", async ({ page }) => {
+  // This matrix navigates 27 pages and can exceed a single-screen timeout on a cold dev server.
+  test.setTimeout(90000);
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   for (const width of [1440, 1024, 390]) {
@@ -514,7 +529,7 @@ test("main views work without browser errors or horizontal overflow", async ({ p
       "/session/basis-04",
       "/classes/algoritma",
       "/agenda",
-      "/settings",
+      "/profile",
     ]) {
       await page.goto(path);
       await expect(page.locator("h1").first()).toBeVisible();
@@ -636,7 +651,7 @@ test("live heading clock and page padding stay consistent across main views", as
     "/classes/aljabar/materials",
     "/session/linear-05",
     "/agenda",
-    "/settings",
+    "/profile",
   ];
   let homeLeft = 0;
   let homeTitleSize = "";
@@ -646,7 +661,7 @@ test("live heading clock and page padding stay consistent across main views", as
     await expect(clock).toHaveCount(1);
     await expect(page.locator("#main-sidebar").getByLabel("Waktu saat ini")).toHaveCount(0);
     await expect(
-      page.locator("#main-content .page-heading:visible").getByLabel("Waktu saat ini"),
+      page.locator("#main-content .breadcrumbs:visible").getByLabel("Waktu saat ini"),
     ).toBeVisible();
     await expect(clock).toContainText("Sabtu, 10 Oktober 2026");
     await expect(clock).toContainText("10.30 WIB");
@@ -659,10 +674,20 @@ test("live heading clock and page padding stay consistent across main views", as
     const title = page.locator("h1").first();
     const titleLeft = (await title.boundingBox())!.x;
     const clockBox = (await clock.boundingBox())!;
-    const titleBox = (await title.boundingBox())!;
-    expect(clockBox.x).toBeGreaterThan(titleBox.x + titleBox.width);
-    expect(clockBox.y).toBeLessThan(titleBox.y + titleBox.height);
-    expect(clockBox.y + clockBox.height).toBeGreaterThan(titleBox.y);
+    const breadcrumbs = page.locator("#main-content .breadcrumbs:visible");
+    const breadcrumbBox = (await breadcrumbs.boundingBox())!;
+    expect(clockBox.x + clockBox.width).toBeCloseTo(breadcrumbBox.x + breadcrumbBox.width);
+    expect(
+      Math.abs(clockBox.y + clockBox.height / 2 - breadcrumbBox.y - breadcrumbBox.height / 2),
+    ).toBeLessThan(1);
+    await expect(clock).toHaveCSS(
+      "font-size",
+      await breadcrumbs.evaluate((el) => getComputedStyle(el).fontSize),
+    );
+    const spans = clock.locator("time > span");
+    expect((await spans.nth(0).boundingBox())!.y).toBeCloseTo(
+      (await spans.nth(1).boundingBox())!.y,
+    );
     const titleSize = await title.evaluate((element) => getComputedStyle(element).fontSize);
     if (path === "/") {
       homeLeft = left;
@@ -678,16 +703,43 @@ test("live heading clock and page padding stay consistent across main views", as
   await page.setViewportSize({ width: 390, height: 844 });
   for (const path of paths) {
     await page.goto(path);
-    const clock = page.locator("#main-content .page-heading:visible").getByLabel("Waktu saat ini");
+    const clock = page.locator("#main-content .breadcrumbs:visible").getByLabel("Waktu saat ini");
     await expect(clock).toBeVisible();
     const clockBox = (await clock.boundingBox())!;
-    const titleBox = (await page.locator("h1").first().boundingBox())!;
-    expect(clockBox.x).toBeGreaterThanOrEqual(titleBox.x + titleBox.width);
     expect(clockBox.x + clockBox.width).toBeLessThanOrEqual(390);
-    expect(clockBox.y).toBe(titleBox.y);
     expect(
       await page.locator(".main-wrapper").evaluate((el) => el.scrollWidth),
     ).toBeLessThanOrEqual(390);
+  }
+  await page.evaluate(() => {
+    const key = "clipthat-frontend-v1";
+    const state = JSON.parse(localStorage.getItem(key)!);
+    state.role = "lecturer";
+    localStorage.setItem(key, JSON.stringify(state));
+  });
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    await expect(page.getByText("Siap lanjut mengajar hari ini?", { exact: true })).toHaveCount(0);
+    await page.goto("/classes/aljabar");
+    const heading = page.locator(".page-heading");
+    const clock = page.getByLabel("Waktu saat ini");
+    const button = heading.getByRole("button", { name: "Lanjutkan kelas", exact: true });
+    await expect(button).toBeVisible();
+    const clockBox = (await clock.boundingBox())!;
+    const buttonBox = (await button.boundingBox())!;
+    const titleBox = (await heading.locator("h1").boundingBox())!;
+    if (width > 620) {
+      expect(
+        Math.abs(buttonBox.y + buttonBox.height / 2 - titleBox.y - titleBox.height / 2),
+      ).toBeLessThan(1);
+    } else {
+      expect(buttonBox.y).toBeGreaterThanOrEqual(titleBox.y + titleBox.height);
+      expect(buttonBox.y - titleBox.y - titleBox.height).toBeLessThanOrEqual(20);
+    }
+    expect(buttonBox.x + buttonBox.width).toBeCloseTo(clockBox.x + clockBox.width);
+    await expect(button).toHaveCSS("box-shadow", "none");
+    await heading.screenshot({ path: `test-results/header-${width}.png` });
   }
 });
 
@@ -739,21 +791,23 @@ test("a private bookmark remains available when its lesson is archived", async (
   await expect(page.getByRole("dialog")).toContainText("Menentukan basis sebuah ruang");
 });
 
-test("calendar preferences remain explicit about connection state and reset works", async ({
-  page,
-}) => {
-  await page.goto("/settings");
-  await page.locator(".settings-calendars:visible > summary").click();
-  await page.getByRole("button", { name: "Atur tujuan" }).first().click();
-  await page.getByLabel("Nama kalender tujuan").fill("Kuliah semester 3");
-  await page.getByRole("button", { name: "Simpan tujuan" }).click();
-  await expect(page.getByText("Tujuan: Kuliah semester 3 · belum terhubung")).toBeVisible();
-  await page.reload();
-  await page.locator(".settings-calendars:visible > summary").click();
-  await expect(page.getByText("Tujuan: Kuliah semester 3 · belum terhubung")).toBeVisible();
+test("profile is reachable from the sidebar and demo reset remains available", async ({ page }) => {
+  await page.goto("/");
+  await page.locator("#main-sidebar").hover();
+  await page
+    .locator(".profile-info")
+    .getByRole("link", { name: "Davin Farel", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/profile$/);
+  await expect(page.getByRole("region", { name: "Informasi profil" })).toContainText("Davin Farel");
+  await expect(page.getByRole("button", { name: "Keluar", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Pengaturan", exact: true })).toHaveCount(0);
+  await page.locator(".profile-demo > summary").click();
   await page.getByRole("button", { name: "Reset demo", exact: true }).click();
   await page.getByRole("button", { name: "Reset sekarang", exact: true }).click();
-  await expect(page.getByText("Belum terhubung", { exact: true })).toHaveCount(3);
+  await expect(page.locator(".toast")).toContainText("demo direset");
+  await page.getByRole("button", { name: "Keluar", exact: true }).click();
+  await expect(page).toHaveURL(/\/login$/);
 });
 
 test("login and registration remain readable on phone, tablet and desktop", async ({ page }) => {
@@ -761,7 +815,7 @@ test("login and registration remain readable on phone, tablet and desktop", asyn
     await page.setViewportSize({ width, height: 900 });
     for (const path of ["/login", "/register"]) {
       await page.goto(path);
-      await expect(page.getByRole("button", { name: "Lanjutkan dengan Google" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Lanjutkan dengan Google" })).toHaveCount(0);
       await expect(page.getByLabel("Email", { exact: true })).toBeVisible();
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
@@ -774,10 +828,6 @@ test("login and registration remain readable on phone, tablet and desktop", asyn
         });
     }
   }
-  await page.getByRole("button", { name: "Lanjutkan dengan Google" }).click();
-  await expect(page.locator(".field-error")).toContainText(
-    "Google Sign-In tersedia setelah mode live",
-  );
 });
 
 test("graph stays static while topic details work on desktop and phone", async ({ page }) => {
@@ -816,11 +866,13 @@ test("graph stays static while topic details work on desktop and phone", async (
     );
     await expect(cards.first()).toHaveAttribute("aria-pressed", "true");
     if (width === 390) await expect(page.locator(".graph-node-detail")).toBeInViewport();
-    await page.getByLabel("Tutup detail subbab").click();
+    await page.getByLabel("Tutup preview bab").click();
     await cards.nth(1).focus();
     await page.keyboard.press("Enter");
     await expect(page.locator(".graph-node-detail")).toContainText("Dari vektor ke matriks");
-    await page.getByLabel("Pilih subbab").selectOption({ index: 1 });
+    await page.getByLabel("Tutup preview bab").click();
+    await cards.first().click();
+    await expect(page.getByLabel("Pilih subbab")).toHaveCount(0);
     await expect(page.locator(".graph-node-detail")).toContainText("Apa itu transformasi linear?");
     const initialWidth = (await cards.nth(1).boundingBox())!.width;
     const viewport = graph.locator(".graph-viewport");
@@ -834,7 +886,7 @@ test("graph stays static while topic details work on desktop and phone", async (
     expect((await cards.nth(1).boundingBox())!.x).toBeCloseTo(initialX);
     await page.mouse.wheel(0, 200);
     expect((await cards.nth(1).boundingBox())!.width).toBeCloseTo(initialWidth);
-    await page.getByLabel("Tutup detail subbab").click();
+    await page.getByLabel("Tutup preview bab").click();
     await expect(page.locator(".graph-node-detail")).toHaveCount(0);
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),

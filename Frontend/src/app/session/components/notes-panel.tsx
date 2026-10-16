@@ -6,6 +6,7 @@ import { useApp } from "@/state/app-provider";
 import { useContent } from "@/data/use-content";
 import { liveMode } from "@/lib/app-mode";
 import { seconds } from "@/lib/format";
+import { cleanNoteText } from "@/lib/note-text";
 import type { Lesson, SavedItem } from "@/lib/types";
 import { SectionTitle } from "@/components/ui";
 export function NotesPanel({
@@ -45,18 +46,21 @@ export function NotesPanel({
         notes.map((note, i) => (
           <details className="reading-note" key={note.title} open={i === 0}>
             <summary>{note.title}</summary>
-            <p>{note.body}</p>
+            <p>{cleanNoteText(note.body)}</p>
             {note.formula && <div className="formula">{note.formula}</div>}
           </details>
         ))
       ) : (
-        <p className="muted">Catatan otomatis tersedia setelah kelas selesai diproses.</p>
+        <p className="muted">
+          {lesson.status === "done"
+            ? "Pemrosesan selesai, tetapi belum ada rangkuman yang dihasilkan."
+            : "Catatan otomatis tersedia setelah kelas selesai diproses."}
+        </p>
       )}
       <div className="concept-preview">
         <Network size={18} />
         <div>
           <strong>Peta konsep</strong>
-          <p>Lihat hubungan antar subbab.</p>
         </div>
         <button className="text-button" onClick={onGraph}>
           Jelajahi <ArrowRight size={14} />
@@ -70,7 +74,7 @@ export function NotesPanel({
               {review.sections.map((n) => (
                 <div className="reading-note" key={n.title}>
                   <h3>{n.title}</h3>
-                  <p>{n.body}</p>
+                  <p>{cleanNoteText(n.body)}</p>
                 </div>
               ))}
               {review.previous.map((p) => (

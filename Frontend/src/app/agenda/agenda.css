@@ -276,6 +276,25 @@
   display: none;
   gap: 4px;
 }
+.agenda-drafts {
+  margin-bottom: 24px;
+}
+.agenda-drafts h2 {
+  font-size: var(--font-card);
+  margin-bottom: 12px;
+}
+.agenda-draft {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+.agenda-draft strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .source-quote {
   padding: 15px;
   background: #f6f1e4;

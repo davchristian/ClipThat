@@ -13,7 +13,7 @@ export function GraphExplorer({
   onEdit,
 }: {
   graph: ConceptGraph;
-  onSource: (nodeId: string, sourceId?: string) => void;
+  onSource: (nodeId: string, sourceId?: string, sessionId?: string) => void;
   onEdit?: () => void;
 }) {
   const canvas = useRef<HTMLDivElement>(null);
@@ -130,7 +130,6 @@ export function GraphExplorer({
       detail.current?.scrollIntoView({ block: "nearest" });
   }, [selected]);
   const node = graph.nodes.find((n) => n.id === selected);
-  const related = graph.edges.filter((e) => e.from === selected || e.to === selected);
   const visible = node ? new Set([node.id]) : null;
   if (visible && node)
     for (const edge of graph.edges) {
@@ -143,10 +142,11 @@ export function GraphExplorer({
         <div className="graph-empty">
           <Network size={30} />
           <h3>Peta konsep belum tersedia</h3>
-          <p>Hubungan subbab disusun dari pembahasan dosen.</p>
         </div>
       ) : (
-        <div className={`graph-stage ${node ? "has-detail" : ""}`}>
+        <div
+          className={`graph-stage ${node ? "has-detail" : ""} ${failed ? "graph-fallback" : ""}`}
+        >
           <div className="graph-viewport">
             <div className="graph-surface" ref={surface}>
               <div className="graph-canvas" ref={canvas} aria-hidden="true" />
@@ -158,7 +158,7 @@ export function GraphExplorer({
                     className={`graph-topic-card${selected === topic.id ? " selected" : ""}${visible && !visible.has(topic.id) ? " dimmed" : ""}`}
                     aria-label={topic.title}
                     aria-pressed={selected === topic.id}
-                    hidden={!positions[topic.id]}
+                    hidden={!failed && !positions[topic.id]}
                     style={{
                       left: positions[topic.id]?.x,
                       top: positions[topic.id]?.y,
@@ -178,70 +178,49 @@ export function GraphExplorer({
             <aside className="graph-node-detail" ref={detail}>
               <button
                 className="icon-button graph-detail-close"
-                aria-label="Tutup detail subbab"
+                aria-label="Tutup preview bab"
                 onClick={() => setSelected(null)}
               >
                 <X size={17} />
               </button>
-              <span className="eyebrow">SUBBAB</span>
               <h3>{node.title}</h3>
               <p>{node.description}</p>
-              <div className="graph-relations">
-                {related.map((e, i) => {
-                  const other = graph.nodes.find(
-                    (n) => n.id === (e.from === node.id ? e.to : e.from),
-                  );
-                  return (
-                    other && (
-                      <button key={i} onClick={() => setSelected(other.id)}>
-                        <small>{e.relation}</small>
-                        <span>{other.title}</span>
-                        <ArrowUpRight size={14} />
-                      </button>
-                    )
-                  );
-                })}
+              <div className="graph-source-links">
+                {(node.sections?.length
+                  ? node.sections
+                  : [
+                      {
+                        title: "Buka pembahasan",
+                        source_ids: node.source_ids,
+                        sessionId: node.sessionId,
+                      },
+                    ]
+                ).map((section, index) => (
+                  <button
+                    key={`${section.sessionId || node.sessionId}:${index}`}
+                    className="text-button"
+                    onClick={() =>
+                      onSource(node.id, section.source_ids[0], section.sessionId || node.sessionId)
+                    }
+                  >
+                    {section.title} <ArrowUpRight size={14} />
+                  </button>
+                ))}
               </div>
-              <button
-                className="button secondary small"
-                onClick={() => onSource(node.id, node.source_ids[0])}
-              >
-                Buka pembahasan <ArrowUpRight size={14} />
-              </button>
             </aside>
           )}
         </div>
       )}
-      <div className="graph-footer">
-        <span>
-          {graph.nodes.length} subbab · {graph.edges.length} hubungan
-        </span>
-        {graph.nodes.length > 0 && (
-          <label className="graph-accessible-select">
-            <span className="sr-only">Pilih subbab</span>
-            <select
-              aria-label="Pilih subbab"
-              value={selected || ""}
-              onChange={(e) => setSelected(e.target.value || null)}
-            >
-              <option value="">Pilih subbab</option>
-              {graph.nodes.map((n) => (
-                <option value={n.id} key={n.id}>
-                  {n.title}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-        {onEdit && graph.nodes.length > 0 && (
+      {onEdit && graph.nodes.length > 0 && (
+        <div className="graph-footer">
           <button className="text-button" onClick={onEdit}>
             Koreksi hubungan
           </button>
-        )}
-      </div>
+        </div>
+      )}
       {failed && (
         <p role="alert" className="field-error">
-          Canvas belum bisa dibuka. Gunakan pilihan subbab untuk membaca detailnya.
+          Peta belum bisa digambar. Pilih bab untuk membaca rangkumannya.
         </p>
       )}
     </section>

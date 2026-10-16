@@ -1,0 +1,201 @@
+[
+  {
+    "name": "chapter_summary_and_section_links",
+    "expected": "two chapter nodes, combined matrices summary and subsection source links",
+    "pass": true,
+    "result": {
+      "notes": [
+        {
+          "title": "Matriks",
+          "body": "Matriks merupakan susunan bilangan dalam baris dan kolom. Matriks identitas memiliki satu pada diagonal utama dan nol di tempat lain.",
+          "source_ids": [
+            "00000000-0000-4000-8000-000000000001",
+            "00000000-0000-4000-8000-000000000002"
+          ]
+        },
+        {
+          "title": "Determinan",
+          "body": "Determinan matriks dua kali dua dihitung dengan rumus ad dikurangi bc.",
+          "source_ids": [
+            "00000000-0000-4000-8000-000000000003"
+          ]
+        }
+      ],
+      "graph": {
+        "nodes": [
+          {
+            "id": "bab-matriks",
+            "title": "Matriks",
+            "description": "Pembahasan mengenai susunan bilangan dalam baris dan kolom serta matriks identitas.",
+            "topics": [
+              "Definisi Matriks",
+              "Matriks Identitas"
+            ],
+            "source_ids": [
+              "00000000-0000-4000-8000-000000000001",
+              "00000000-0000-4000-8000-000000000002"
+            ],
+            "sections": [
+              {
+                "title": "Definisi Matriks",
+                "source_ids": [
+                  "00000000-0000-4000-8000-000000000001"
+                ]
+              },
+              {
+                "title": "Matriks Identitas",
+                "source_ids": [
+                  "00000000-0000-4000-8000-000000000002"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "bab-determinan",
+            "title": "Determinan",
+            "description": "Pembahasan mengenai nilai determinan matriks berukuran dua kali dua.",
+            "topics": [
+              "Determinan 2x2"
+            ],
+            "source_ids": [
+              "00000000-0000-4000-8000-000000000003"
+            ],
+            "sections": [
+              {
+                "title": "Determinan Matriks 2x2",
+                "source_ids": [
+                  "00000000-0000-4000-8000-000000000003"
+                ]
+              }
+            ]
+          }
+        ],
+        "edges": [
+          {
+            "from": "bab-matriks",
+            "to": "bab-determinan",
+            "relation": "lanjutan"
+          }
+        ]
+      },
+      "agenda": []
+    }
+  },
+  {
+    "name": "mixed_material_quiz_offtopic",
+    "expected": "notes include matrices, exclude holiday; quiz 2026-10-20",
+    "pass": true,
+    "result": {
+      "notes": [
+        {
+          "title": "Matriks Identitas",
+          "body": "Matriks identitas memiliki angka satu pada diagonal utama dan nol pada posisi lainnya.",
+          "source_ids": [
+            "00000000-0000-4000-8000-000000000001"
+          ]
+        }
+      ],
+      "graph": {
+        "nodes": [
+          {
+            "id": "bab-matriks",
+            "title": "Matriks Identitas",
+            "description": "Pembahasan mengenai sifat dan bentuk matriks identitas yang memiliki angka satu pada diagonal utama dan nol pada posisi lainnya.",
+            "topics": [
+              "Matriks Identitas"
+            ],
+            "source_ids": [
+              "00000000-0000-4000-8000-000000000001"
+            ],
+            "sections": [
+              {
+                "title": "Matriks Identitas",
+                "source_ids": [
+                  "00000000-0000-4000-8000-000000000001"
+                ]
+              }
+            ]
+          }
+        ],
+        "edges": []
+      },
+      "agenda": [
+        {
+          "title": "Kuis Matriks",
+          "kind": "Kuis",
+          "due_at": "2026-10-20T00:00:00+07:00",
+          "source_id": "00000000-0000-4000-8000-000000000002",
+          "quote": "Minggu depan hari Selasa ada kuis matriks."
+        }
+      ]
+    }
+  },
+  {
+    "name": "offtopic_only",
+    "expected": "notes and graph and agenda empty",
+    "pass": true,
+    "result": {
+      "notes": [],
+      "graph": {
+        "nodes": [],
+        "edges": []
+      },
+      "agenda": []
+    }
+  },
+  {
+    "name": "unclear_date",
+    "expected": "one exam draft with no invented date",
+    "pass": true,
+    "result": {
+      "notes": [],
+      "graph": {
+        "nodes": [],
+        "edges": []
+      },
+      "agenda": [
+        {
+          "title": "Ujian Matriks",
+          "kind": "Ujian",
+          "due_at": null,
+          "source_id": "00000000-0000-4000-8000-000000000001",
+          "quote": "Akan ada ujian matriks, tapi tanggalnya belum ditentukan. Nanti saya kabari lagi."
+        }
+      ]
+    }
+  },
+  {
+    "name": "revised_schedule",
+    "expected": "one quiz on 2026-10-21 at 09:00 Jakarta",
+    "pass": true,
+    "result": {
+      "notes": [],
+      "graph": {
+        "nodes": [],
+        "edges": []
+      },
+      "agenda": [
+        {
+          "title": "Kuis Matriks",
+          "kind": "Kuis",
+          "due_at": "2026-10-21T09:00:00+07:00",
+          "source_id": "00000000-0000-4000-8000-000000000002",
+          "quote": "Kuis matriks dipindah ke hari Rabu minggu depan pukul sembilan pagi."
+        }
+      ]
+    }
+  },
+  {
+    "name": "historical_hypothetical",
+    "expected": "no agenda",
+    "pass": true,
+    "result": {
+      "notes": [],
+      "graph": {
+        "nodes": [],
+        "edges": []
+      },
+      "agenda": []
+    }
+  }
+]

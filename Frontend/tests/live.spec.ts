@@ -65,10 +65,15 @@ test("live capture discard makes no save request; confirmation uses the real sig
   expect(writes).toBe(0);
   await page.getByRole("button", { name: "Capture 90 detik" }).click();
   await preview.getByRole("button", { name: "Simpan capture" }).click();
-  await expect(page.getByRole("button", { name: "Tersimpan (1)" })).toBeVisible();
+  await page.getByRole("button", { name: "Catatan", exact: true }).click();
+  await expect(page.locator(".saved-preview").filter({ hasText: "Capture" })).toBeVisible();
   expect(writes).toBe(1);
   await page.reload();
-  await expect(page.getByRole("button", { name: "Tersimpan (1)" })).toBeVisible();
+  await expect(page.locator(".saved-preview").filter({ hasText: "Capture" })).toBeVisible();
+  await page
+    .getByLabel("Bagian kelas")
+    .getByRole("button", { name: "Transkrip", exact: true })
+    .click();
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole("button", { name: "Capture 90 detik" }).click();
   await expect(preview).toBeInViewport();
@@ -79,7 +84,7 @@ test("live capture discard makes no save request; confirmation uses the real sig
   await expect(page.locator(".toast")).toContainText("Penyimpanan belum tersedia.");
   await expect(preview).toBeVisible();
 });
-test("live question and private note persist through the API, and unconfigured calendars stay disconnected", async ({
+test("live question and private note persist while calendar integrations are retired", async ({
   page,
 }) => {
   await login(page);
@@ -98,27 +103,114 @@ test("live question and private note persist through the API, and unconfigured c
   await page.getByText("Catatan pribadi", { exact: true }).click();
   await expect(page.getByLabel("Catatan pribadimu")).toHaveValue("Ulangi basis dahulu.");
   await page.goto("/settings");
-  await expect(page.getByRole("button", { name: "Hubungkan" })).toHaveCount(3);
-  for (const button of await page.getByRole("button", { name: "Hubungkan" }).all())
-    await expect(button).toBeDisabled();
+  await expect(page).toHaveURL(/\/profile$/);
+  await expect(page.getByRole("button", { name: "Hubungkan" })).toHaveCount(0);
+  const response = await page.request.get("/api/v1/integrations");
+  expect(response.status()).toBe(410);
 });
+for (const { width, teacher } of [
+  { width: 1440, teacher: false },
+  { width: 390, teacher: false },
+  { width: 390, teacher: true },
+])
+  test(`profile opens from sidebar and logs out at ${width}px as ${teacher ? "lecturer" : "student"}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await login(page, teacher);
+    const name = teacher ? "Nadia Putri" : "Keisha Sakura Widjaja";
+    if (!teacher)
+      await page.route("**/api/v1/boot", async (route) => {
+        const response = await route.fetch();
+        const body = await response.json();
+        body.data.profile.name = name;
+        await route.fulfill({ response, json: body });
+      });
+    const calendarRequests: string[] = [];
+    page.on("request", (request) => {
+      if (request.url().includes("/integrations")) calendarRequests.push(request.url());
+    });
+    await page.goto("/");
+    if (width < 621) await page.getByRole("button", { name: "Buka navigasi" }).click();
+    else await page.locator("#main-sidebar").hover();
+    await page.getByRole("link", { name: `Buka profil ${name}`, exact: true }).click();
+    await expect(page).toHaveURL(/\/profile$/);
+    const profile = page.getByRole("region", { name: "Informasi profil" });
+    await expect(profile).toContainText(name);
+    await expect(profile).toContainText(teacher ? "Dosen" : "Mahasiswa");
+    await expect(profile).toContainText(teacher ? "dosen@test.local" : "student@test.local");
+    await expect(page.getByRole("link", { name: "Pengaturan", exact: true })).toHaveCount(0);
+    expect(
+      await page.locator(".main-wrapper").evaluate((element) => element.scrollWidth),
+    ).toBeLessThanOrEqual(width);
+    expect(calendarRequests).toEqual([]);
+    await page.screenshot({ path: `test-results/profile-${width}-${teacher}.png`, fullPage: true });
+    await page.getByRole("button", { name: "Keluar", exact: true }).click();
+    await expect(page).toHaveURL(/\/login$/);
+    const protectedResponse = await page.request.get("/api/v1/boot");
+    expect(protectedResponse.status()).toBe(401);
+    await page.unrouteAll({ behavior: "wait" });
+  });
+
+test("retired calendar endpoints do not exchange tokens and the worker runs only study jobs", async ({
+  page,
+  request,
+}) => {
+  await login(page);
+  const integration = await page.request.post("/api/v1/integrations/google/connect", {
+    headers: { Origin: "http://127.0.0.1:3188" },
+    data: {},
+  });
+  expect(integration.status()).toBe(410);
+  const callback = await request.get("/api/integrations/google/callback?code=synthetic-test-only", {
+    maxRedirects: 0,
+  });
+  expect(callback.status()).toBe(307);
+  expect(callback.headers().location).toBe("http://127.0.0.1:3188/profile");
+  const jobs = await request.post("/api/internal/jobs", {
+    headers: { Authorization: "Bearer local-fixture-job-secret" },
+  });
+  expect(jobs.status()).toBe(200);
+  expect((await jobs.json()).data).toEqual({ processed: false, study: { processed: false } });
+});
+
 test("live lecturer creates the first course and session; student requests cannot run the worker", async ({
   page,
   request,
 }) => {
   await request.get("http://127.0.0.1:54339/reset?empty=1");
   await login(page, true);
+  await expect(page.getByRole("button", { name: "Buat sesi", exact: true })).toHaveCount(0);
+  await page.context().grantPermissions(["microphone"]);
+  await page.route("**/api/v1/health", (route) =>
+    route.fulfill({
+      json: { data: { transcription_configured: true, transcription_provider: "gemini" } },
+    }),
+  );
+  let uploads = 0;
+  await page.route("**/api/v1/sessions/*/transcribe", async (route) => {
+    uploads++;
+    await route.fulfill({ json: { data: { saved: true, segments: 1 } } });
+  });
   await page.goto("/classes");
-  await page.getByRole("button", { name: "Buat sesi", exact: true }).click();
-  await page.getByLabel("Nama mata kuliah", { exact: true }).fill("Aljabar Baru");
-  await page.getByLabel("Topik pertemuan", { exact: true }).fill("Nilai eigen");
-  await page.getByRole("button", { name: "Buat sesi kelas" }).click();
-  await expect(page.getByRole("heading", { name: "Nilai eigen", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Buat sesi", exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Buat course", exact: true }).click();
+  const courseDialog = page.getByRole("dialog", { name: "Buat course", exact: true });
+  await courseDialog.getByLabel("Nama mata kuliah", { exact: true }).fill("Aljabar Baru");
+  await courseDialog.getByRole("button", { name: "Simpan course", exact: true }).click();
+  await expect(page).toHaveURL(/\/classes\/[^/]+$/);
+  await expect(page.getByRole("heading", { name: "Aljabar Baru", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Buat course", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Salin kode course COURSE2026" })).toBeVisible();
   await page.getByRole("button", { name: "Mulai kelas", exact: true }).click();
+  await page.getByLabel("Topik pertemuan", { exact: true }).fill("Nilai eigen");
+  await page.getByRole("button", { name: "Mulai & rekam" }).click();
+  await expect(page.getByRole("heading", { name: "Nilai eigen", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Hentikan rekaman", exact: true })).toBeVisible();
   await expect(page.getByText("Live", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Akhiri", exact: true }).click();
-  await page.getByRole("button", { name: "Selesaikan kelas" }).click();
+  await page.getByRole("button", { name: "Akhiri kelas", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Menyiapkan catatan…" })).toBeVisible();
+  expect(uploads).toBeGreaterThan(0);
   const bad = await request.post("/api/v1/courses", {
     headers: { Origin: "https://evil.test" },
     data: { name: "Injected" },
@@ -127,6 +219,37 @@ test("live lecturer creates the first course and session; student requests canno
   const worker = await request.post("/api/internal/jobs");
   expect([401, 503]).toContain(worker.status());
 });
+
+for (const width of [1440, 390])
+  test(`course code is generated and students join only from Course at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await login(page, true);
+    await page.goto("/classes/00000000-0000-4000-8000-000000000010");
+    await expect(page.getByRole("button", { name: "Salin kode course COURSE2026" })).toBeVisible();
+    expect(
+      await page.locator(".main-wrapper").evaluate((node) => node.scrollWidth),
+    ).toBeLessThanOrEqual(width);
+    await expect(page.getByRole("button", { name: "Buat course", exact: true })).toHaveCount(0);
+    await page.goto(`/session/${sid}`);
+    await expect(page.getByText("Kode: LINEAR2026", { exact: true })).toHaveCount(0);
+    await login(page);
+    await expect(page.getByRole("button", { name: "Gabung course", exact: true })).toHaveCount(0);
+    await page.goto("/classes");
+    await page.getByRole("button", { name: "Gabung course", exact: true }).click();
+    const dialog = page.getByRole("dialog", { name: "Gabung course", exact: true });
+    await dialog.getByLabel("Kode course", { exact: true }).fill("LINEAR2026");
+    await dialog.getByRole("button", { name: "Gabung", exact: true }).click();
+    await expect(dialog.getByRole("alert")).toContainText("Kode course tidak ditemukan");
+    await dialog.getByLabel("Kode course", { exact: true }).fill("course2026");
+    await dialog.getByRole("button", { name: "Gabung", exact: true }).click();
+    await expect(page).toHaveURL(/\/classes\/00000000-0000-4000-8000-000000000010$/);
+    await expect(page.getByRole("button", { name: "Gabung course", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Salin kode course COURSE2026" })).toHaveCount(0);
+    await page.getByRole("link", { name: "Masuk kelas", exact: true }).click();
+    await expect(page.locator(".transcript-panel")).toBeVisible();
+  });
 
 test("generated class graph links to its transcript and agenda confirmation survives reload", async ({
   page,
@@ -138,7 +261,7 @@ test("generated class graph links to its transcript and agenda confirmation surv
   await expect(
     page.locator(".graph-topic-card").filter({ hasText: "Matriks" }).locator("span"),
   ).toHaveText("Kolom matriks");
-  await page.getByLabel("Pilih subbab").selectOption("matrix");
+  await page.locator(".graph-topic-card").filter({ hasText: "Matriks" }).click();
   await expect(page.locator(".graph-node-detail")).toContainText(
     "Kolom dari hasil pemetaan basis.",
   );
@@ -173,14 +296,15 @@ test("generated class graph links to its transcript and agenda confirmation surv
   await expect(
     page.locator(".graph-topic-card").filter({ hasText: "Matriks" }).locator("span"),
   ).toHaveText("Kolom matriks");
-  await page.getByLabel("Pilih subbab").selectOption("matrix");
+  await page.locator(".graph-topic-card").filter({ hasText: "Matriks" }).click();
   await expect(page.locator(".graph-node-detail")).toContainText(
     "Kolom dari hasil pemetaan basis.",
   );
-  await expect(page.locator(".graph-relations")).toContainText("penerapan");
+  const detail = await (await page.request.get(`/api/v1/sessions/${sid}`)).json();
+  expect(detail.data.results.graph.edges[0].relation).toBe("penerapan");
 });
 
-test("Deepgram shows interim speech, persists finals on stop and protects the token endpoint", async ({
+test("Deepgram auto-records and ending waits for final transcript and failed-save retry", async ({
   page,
 }) => {
   await login(page);
@@ -239,23 +363,24 @@ test("Deepgram shows interim speech, persists finals on stop and protects the to
       }
     });
   });
-  await page.goto(`/session/${sid}?tab=transcript`);
-  await page.getByRole("button", { name: "Rekam suara dosen", exact: true }).click();
+  await page.goto(`/session/${sid}?tab=transcript&record=1`);
+  await expect(page.getByRole("button", { name: "Hentikan rekaman", exact: true })).toBeVisible();
   await expect(page.getByLabel("Transkrip langsung")).toContainText("Matriks terdiri");
-  await expect(page.getByRole("button", { name: "Akhiri", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Akhiri kelas", exact: true })).toBeEnabled();
   expect(saved).toBeUndefined();
-  await page.getByRole("button", { name: "Hentikan rekaman", exact: true }).click();
+  await page.getByRole("button", { name: "Akhiri kelas", exact: true }).click();
   await expect(
     page.getByRole("region", { name: "Rekaman kelas" }).getByRole("alert"),
   ).toContainText("Uji simpan ulang");
-  await expect(page.getByRole("button", { name: "Akhiri", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Menyelesaikan…", exact: true })).toBeDisabled();
+  await expect(page.getByRole("heading", { name: "Menyiapkan catatan…" })).toHaveCount(0);
   await page.getByRole("button", { name: "Coba kirim ulang", exact: true }).click();
   await expect.poll(() => saved?.segments[0].text).toBe("Matriks terdiri dari baris dan kolom.");
   expect(saved!.segments[0].start).toBeGreaterThanOrEqual(0);
   expect(attempts).toBe(2);
   expect(saved!.chunk_id).toBe(firstBatchId);
   expect(saved!.segments[0].end - saved!.segments[0].start).toBeCloseTo(2);
-  await expect(page.getByRole("button", { name: "Akhiri", exact: true })).toBeEnabled();
+  await expect(page.getByRole("heading", { name: "Menyiapkan catatan…" })).toBeVisible();
   await expect(page.getByLabel("Transkrip langsung")).toHaveCount(0);
 });
 
@@ -291,13 +416,11 @@ for (const width of [1440, 390]) {
     await expect(page.locator(".panel.live-mic")).toHaveCount(0);
     const mic = page.getByRole("region", { name: "Rekaman kelas" });
     await expect(mic).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Rekam suara dosen", exact: true }),
-    ).toBeEnabled();
+    await expect(page.getByRole("button", { name: "Rekam", exact: true })).toBeEnabled();
     expect((await mic.boundingBox())!.height).toBeLessThan(100);
     const segments = page.locator(".transcript-segment");
-    await expect(segments.first().locator("time")).toHaveText("20:14");
-    await expect(segments.nth(1).locator("time")).toHaveText("20:41");
+    await expect(segments.first().locator("time")).toHaveText("20:00");
+    await expect(segments.nth(1).locator("time")).toHaveText("20:30");
     for (const segment of await segments.all()) {
       const time = (await segment.locator("time").boundingBox())!;
       const text = (await segment.locator(".transcript-entry").boundingBox())!;
@@ -311,16 +434,20 @@ for (const width of [1440, 390]) {
       path: `test-results/lecturer-transcript-${width}.png`,
       fullPage: true,
     });
-    await page.getByRole("button", { name: "Rekam suara dosen", exact: true }).click();
+    await page.getByRole("button", { name: "Rekam", exact: true }).click();
     const stop = page.getByRole("button", { name: "Hentikan rekaman", exact: true });
     await expect(stop).toBeVisible();
-    await expect(page.getByRole("button", { name: "Akhiri", exact: true })).toBeDisabled();
+    await expect(page.getByRole("button", { name: "Akhiri kelas", exact: true })).toBeEnabled();
     await page.getByRole("button", { name: "Pertanyaan", exact: true }).click();
     await expect(stop).toBeVisible();
     await stop.click();
     await expect.poll(() => uploads).toBeGreaterThan(0);
-    await expect(page.getByRole("button", { name: "Akhiri", exact: true })).toBeEnabled();
-    await page.getByRole("button", { name: "Transkrip", exact: true }).click();
-    await expect(segments.first().locator("time")).toHaveText("20:14");
+    await expect(page.getByRole("button", { name: "Akhiri kelas", exact: true })).toBeEnabled();
+    await page
+      .getByLabel("Bagian kelas")
+      .getByRole("button", { name: "Transkrip", exact: true })
+      .click();
+    await expect(segments.first().locator("time")).toHaveText("20:00");
+    await page.unrouteAll({ behavior: "wait" });
   });
 }

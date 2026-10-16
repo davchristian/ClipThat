@@ -84,11 +84,18 @@ export function fromBoot(boot: Boot, previous: DemoState): DemoState {
         agenda.some(
           (a) =>
             a.sourceSessionId === result.session_id &&
-            (a.sourceData?.draft_key === draftKey ||
-              (!a.sourceData?.draft_key &&
-                a.sourceData?.source_id === draft.source_id &&
-                a.sourceData?.quote === draft.quote &&
-                a.title === draft.title)),
+            (a.sourceData?.automatic
+              ? a.sourceData.announcement_title?.trim().toLowerCase() ===
+                  draft.title.trim().toLowerCase() &&
+                a.sourceData.announcement_kind === draft.kind &&
+                Boolean(draft.due_at) &&
+                Date.parse(a.sourceData.announcement_due_at || "") ===
+                  Date.parse(draft.due_at || "")
+              : a.sourceData?.draft_key === draftKey ||
+                (!a.sourceData?.draft_key &&
+                  a.sourceData?.source_id === draft.source_id &&
+                  a.sourceData?.quote === draft.quote &&
+                  a.title === draft.title)),
         )
       )
         continue;
@@ -154,6 +161,7 @@ export function fromBoot(boot: Boot, previous: DemoState): DemoState {
       days: c.days || "",
       scheduleTime: c.schedule_time || "",
       ownerId: c.owner_id,
+      joinCode: c.join_code,
     })),
     lessons: lessons.filter((s) => !archivedIds.has(s.id)),
     archived: [...orphaned, ...lessons.filter((s) => archivedIds.has(s.id))].map((lesson) => ({
@@ -318,12 +326,13 @@ export async function persistChanges(before: DemoState, after: DemoState) {
   for (const [id, graph] of Object.entries(after.conceptGraphs || {}))
     if (changed(graph, before.conceptGraphs?.[id]))
       await api(`sessions/${id}/graph`, "PUT", {
-        nodes: graph.nodes.map(({ id, title, description, topics, source_ids }) => ({
+        nodes: graph.nodes.map(({ id, title, description, topics, source_ids, sections }) => ({
           id,
           title,
           description,
           topics,
           source_ids,
+          sections: sections?.map(({ title, source_ids }) => ({ title, source_ids })),
         })),
         edges: graph.edges,
       });

@@ -1,5 +1,13 @@
 import type { ReactNode } from "react";
-import { PageClock } from "./page-clock";
+
+export function HeadingMeta({ action }: { action?: ReactNode }) {
+  if (!action) return null;
+  return (
+    <div className="page-heading-meta">
+      {action && <div className="page-heading-actions">{action}</div>}
+    </div>
+  );
+}
 
 export function PageHeading({
   title,
@@ -20,8 +28,7 @@ export function PageHeading({
       ) : (
         <h1>{title}</h1>
       )}
-      {action && <div className="page-heading-actions">{action}</div>}
-      <PageClock />
+      <HeadingMeta action={action} />
     </div>
   );
 }
